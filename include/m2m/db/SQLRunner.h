@@ -47,13 +47,13 @@ extern "C"
 
 
 /*******************************************************************************
- * 公開メソッド
+ * Public method
  ******************************************************************************/
 /**
- * 指定されたSQLite3データベース管理オブジェクトに対し、トランザクションを開始する．<br>
+ * This function starts transaction with indicated SQLite3 database as an argument.<br>
  *
- * @param[in] database	SQLite3データベース管理オブジェクト
- * @return				true : 成功，false : 失敗
+ * @param[in] database	SQLite3 database manager object
+ * @return				true : success，false : failure
  */
 bool SQLRunner_beginTransaction (sqlite3 *database);
 
@@ -61,8 +61,8 @@ bool SQLRunner_beginTransaction (sqlite3 *database);
 /**
  * 指定されたSQLite3データベース管理オブジェクトのトランザクションをコミットする．<br>
  *
- * @param[in] database	SQLite3データベース
- * @return				true : 成功，false : 失敗
+ * @param[in] database	SQLite3 database manager object
+ * @return				true : success，false : failure
  */
 bool SQLRunner_commitTransaction (sqlite3 *database);
 
@@ -70,13 +70,13 @@ bool SQLRunner_commitTransaction (sqlite3 *database);
 /**
  * 引数で指定されたSQLite3データベース管理オブジェクトに対してSQL文を実行する．<br>
  * <br>
- * 【注意】<br>
- * この処理は完了まで時間が掛かるため，通常の"INSERT"や"UPDATE"の目的では利用<br>
- * しない事．<br>
+ * [Caution!]<br>
+ * This function needs many times, so don't use this for "INSERT" SQL or <br>
+ * "UPDATE" SQL.<br>
  *
- * @param database	SQLite3データベース管理オブジェクト
- * @param sql		SQL文を示す文字列
- * @return			true : 成功，false : 失敗
+ * @param database	SQLite3 database manager object
+ * @param sql		SQL string
+ * @return			true : success，false : failuer
  */
 bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 

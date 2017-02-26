@@ -80,10 +80,10 @@ extern "C"
  * 呼び出し側では当該バイナリデータ使用後、メモリーリークを防止するため、必ず<br>
  * "M2MHeap_free()"関数を呼び出す事。<br>
  *
- * @param string		Base64変換された文字列
- * @param stringLength	Base64変換された文字列のサイズ[Byte]
- * @param buffer		Base64逆変換されたバイナリデータのコピーバッファ（バッファリング自体は関数内部で実行する)
- * @return				Base64逆変換されたバイナリデータのサイズ[Byte]
+ * @param string		Target string for Base64 decoding
+ * @param stringLength	Length of string[Byte]
+ * @param buffer		Buffer for copying decoded data Base64(buffering is executed in this function)
+ * @return				Length of decoded data[Byte]
  */
 size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLength, unsigned char **buffer);
 

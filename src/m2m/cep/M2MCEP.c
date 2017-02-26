@@ -31,7 +31,7 @@
 
 
 /*******************************************************************************
- * 関数定義
+ * The definition of internal function
  ******************************************************************************/
 /**
  * 引数で指定されたSQLite3データベースファイル名を示す文字列から、データベース<br>
@@ -299,7 +299,7 @@ static void this_vacuum (sqlite3 *database);
 
 
 /*******************************************************************************
- * 内部関数
+ * Internal function
  ******************************************************************************/
 /**
  * メモリ上のSQLite3データベースに対し、引数で指定されたテーブルのレコード数が<br>
@@ -2538,13 +2538,13 @@ static void this_setUTF8 (sqlite3 *database)
 static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const unsigned char *value, const size_t valueLength, sqlite3_stmt *statement)
 	{
 	//===== 引数の確認 =====
-	if (index>0 && value!=NULL && valueLength<=M2MString_length(value) && statement!=NULL)
+	if (index>0 && statement!=NULL)
 		{
 		//===== BLOB型データの場合 =====
 		if (dataType==M2M_DATA_TYPE_BLOB)
 			{
 			//===== 値をセット =====
-			if (sqlite3_bind_blob(statement, index, value, valueLength, NULL)==SQLITE_OK)
+			if (sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BLOB\"型データをセットしました");
@@ -2564,7 +2564,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 		else if (dataType==M2M_DATA_TYPE_CHAR)
 			{
 			//===== 値をセット =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, NULL)==SQLITE_OK)
+			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BOOL\"型データをセットしました");
@@ -2684,7 +2684,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 		else if (dataType==M2M_DATA_TYPE_TEXT)
 			{
 			//===== 値をセット =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, NULL)==SQLITE_OK)
+			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"TEXT\"型データをセットしました");
@@ -2700,7 +2700,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 		else if (dataType==M2M_DATA_TYPE_VARCHAR)
 			{
 			//===== 値をセット =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, NULL)==SQLITE_OK)
+			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"VARCHAR\"型データをセットしました");
@@ -2893,7 +2893,7 @@ static void this_vacuum (sqlite3 *database)
 
 
 /*******************************************************************************
- * 公開関数
+ * External function
  ******************************************************************************/
 /**
  * 引数で指定されたCEP実行オブジェクトのヒープメモリ領域を解放する．<br>
@@ -2904,10 +2904,10 @@ static void this_vacuum (sqlite3 *database)
  */
 void M2MCEP_delete (M2MCEP **self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MCEPRecord *record = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
 		//===== データベース名文字列のヒープメモリ領域を解放 =====
@@ -2934,10 +2934,10 @@ void M2MCEP_delete (M2MCEP **self)
 		M2MLogger_printDebugMessage((M2MString *)"M2MCEP_delete()", __LINE__, (M2MString *)"CEP実行オブジェクトのメモリ領域を解放しました");
 #endif // DEBUG
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
-		// 何もしない
+		// do nothing
 		}
 #ifdef DEBUG
 	M2MLogger_printDebugMessage((M2MString *)"M2MCEP.delete()", __LINE__, (M2MString *)"********** CEPライブラリ終了 **********");

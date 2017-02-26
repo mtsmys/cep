@@ -39,14 +39,14 @@
  * 呼び出し側では当該バイナリデータ使用後、メモリーリークを防止するため、必ず<br>
  * "M2MHeap_free()"関数を呼び出す事。<br>
  *
- * @param string		Base64変換された文字列
- * @param stringLength	Base64変換された文字列のサイズ[Byte]
- * @param buffer		Base64逆変換されたバイナリデータのコピーバッファ（バッファリング自体は関数内部で実行する)
- * @return				Base64逆変換されたバイナリデータのサイズ[Byte]
+ * @param string		Target string for Base64 decoding
+ * @param stringLength	Length of string[Byte]
+ * @param buffer		Buffer for copying decoded data Base64(buffering is executed in this function)
+ * @return				Length of decoded data[Byte]
  */
-size_t M2MBase64_decode (const unsigned char *string, const unsigned long stringLength, unsigned char **buffer)
+size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLength, unsigned char **buffer)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned long i = 0;
 	unsigned long j = 0;
 	unsigned long repeatNumber = 0;
@@ -70,14 +70,14 @@ size_t M2MBase64_decode (const unsigned char *string, const unsigned long string
 		41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
 		};
 	const unsigned int DECODING_TABLE_LENGTH = sizeof(DECODING_TABLE);
-	const unsigned long CRLF_LENGTH = M2MString_length((unsigned char *)M2MString_CRLF);
+	const unsigned long CRLF_LENGTH = M2MString_length(M2MString_CRLF);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL)
 		{
 		//===== Check existing of CRLF(=chunk data) =====
 		chunk = (unsigned char *)string;
-		while ((chunk=M2MString_indexOf(chunk, (unsigned char *)M2MString_CRLF))!=NULL)
+		while ((chunk=M2MString_indexOf(chunk, M2MString_CRLF))!=NULL)
 			{
 			chunkLength += CRLF_LENGTH;
 			chunk += CRLF_LENGTH;
@@ -86,7 +86,7 @@ size_t M2MBase64_decode (const unsigned char *string, const unsigned long string
 		if ((repeatNumber=(stringLength-chunkLength)/M2MBase64_FOUR_WORD)>0)
 			{
 			//===== Check existing of padding =====
-			switch (M2MString_length(M2MString_indexOf(string, (unsigned char *)"=")))
+			switch (M2MString_length(M2MString_indexOf(string, (M2MString *)"=")))
 				{
 				//===== There is no padding =====
 				case 0:
@@ -182,15 +182,15 @@ size_t M2MBase64_decode (const unsigned char *string, const unsigned long string
  * @param chunk		true : 76文字毎に改行コード（\r\n)を挿入する，false : 改行コードを挿入しない
  * @return			Base64で変換された文字列のポインタ or NULL（エラーの場合)
  */
-unsigned char *M2MBase64_encode (const unsigned char *src, const size_t srcLength, unsigned char **string, const bool chunk)
+M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M2MString **string, const bool chunk)
 	{
 	//========== ローカル変数 ==========
 	size_t stringLength = 0;
 	size_t i = 0;
 	size_t index = 0;
 	size_t remainder = 0;
-	const unsigned char *ENCODING_TABLE = (unsigned char *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	const size_t CRLF_LENGTH = M2MString_length((unsigned char *)M2MString_CRLF);
+	const M2MString *ENCODING_TABLE = (M2MString *)"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	const size_t CRLF_LENGTH = M2MString_length(M2MString_CRLF);
 	const size_t CHUNK_TIME = (size_t)(M2MBase64_CHUNK_LENGTH / M2MBase64_FOUR_WORD);
 	const size_t REPEAT_NUMBER = srcLength / (size_t)M2MBase64_THREE_OCTET;
 
@@ -218,7 +218,7 @@ unsigned char *M2MBase64_encode (const unsigned char *src, const size_t srcLengt
 			// 何もしない
 			}
 		//===== ヒープメモリ領域の獲得 =====
-		if (((*string)=(unsigned char *)M2MHeap_malloc(stringLength+1))!=NULL)
+		if (((*string)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
 			{
 			index = 0;
 			//===== Base64変換の繰り返し =====
@@ -232,7 +232,7 @@ unsigned char *M2MBase64_encode (const unsigned char *src, const size_t srcLengt
 				//===== 改行コードを加える場合 =====
 				if (chunk==true && (i+1)%CHUNK_TIME==0)
 					{
-					memcpy(&((*string)[index]), (unsigned char *)M2MString_CRLF, CRLF_LENGTH);
+					memcpy(&((*string)[index]), M2MString_CRLF, CRLF_LENGTH);
 					index += (size_t)CRLF_LENGTH;
 					}
 				//===== 改行コードを加えない場合 =====
@@ -263,7 +263,7 @@ unsigned char *M2MBase64_encode (const unsigned char *src, const size_t srcLengt
 			//===== パディング文字("=")の追加 =====
 			for (i=0; i<=(stringLength-index); i++)
 				{
-				memcpy(&((*string)[index]), (unsigned char *)"=", 1);
+				memcpy(&((*string)[index]), (M2MString *)"=", 1);
 				index++;
 				}
 			//===== Return encoded Base64 string =====

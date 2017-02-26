@@ -50,10 +50,10 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Class variable
  ******************************************************************************/
 /**
- * ユニコード文字列型（＝unsigned char）
+ * String type（＝unsigned char）
  */
 #ifndef M2MString
 typedef unsigned char M2MString;
@@ -61,7 +61,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * コンマ（＝","）を示す文字
+ * COMMA（＝","）
  */
 #ifndef M2MString_COMMA
 #define M2MString_COMMA (unsigned char *)","
@@ -69,7 +69,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * 復帰を含む改行コード（＝"\r\n"）を示す文字列
+ * Line feed and carriage return（＝"\r\n"）
  */
 #ifndef M2MString_CRLF
 #define M2MString_CRLF (unsigned char *)"\r\n"
@@ -77,7 +77,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * ダブルクォテーション（＝"\"")を示す文字
+ * Double quotation（＝"\"")
  */
 #ifndef M2MString_DOUBLE_QUOTATION
 #define M2MString_DOUBLE_QUOTATION (unsigned char *)"\""
@@ -85,7 +85,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * 改行コード（＝"\n"）を示す文字
+ * Line feed（＝"\n"）
  */
 #ifndef M2MString_LF
 #define M2MString_LF (unsigned char *)"\n"
@@ -93,7 +93,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * 半角の疑問符（＝"?")を示す文字
+ * Question mark（＝"?")
  */
 #ifndef M2MString_QUESTION_MARK
 #define M2MString_QUESTION_MARK (unsigned char *)"?"
@@ -101,7 +101,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * クォテーション（＝"'")を示す文字
+ * Quotation（＝"'")
  */
 #ifndef M2MString_QUOTATION
 #define M2MString_QUOTATION (unsigned char *)"'"
@@ -109,7 +109,7 @@ typedef unsigned char M2MString;
 
 
 /**
- * ASCII空白（＝" "）を示す文字
+ * White space（＝" "）
  */
 #ifndef M2MString_SPACE
 #define M2MString_SPACE (unsigned char *)" "
@@ -118,15 +118,16 @@ typedef unsigned char M2MString;
 
 
 /*******************************************************************************
- * 公開関数
+ * Public method
  ******************************************************************************/
 /**
- * 引数で指定された self 文字列の後ろに、同じく引数 string で指定された文字列を<br>
- * 追加する。<br>
+ * This function adds "string" into after the "self" string.<br>
+ * Memory allocation is executed in this function, so caller must release<br>
+ * the memory of "self" string.<br>
  *
- * @param[in,out] self	文字列を追加する、元の文字列（追加後の文字列は self = "self + string" となる）
- * @param[in] string	追加する文字列
- * @return				文字列が追加されたバッファのポインタ or NULL（エラーの場合）
+ * @param[in,out] self	original string or NULL（"self" = "self + string")
+ * @param[in] string	additional string
+ * @return				pointer of connected string or NULL(means error)
  */
 M2MString *M2MString_append (M2MString **self, const M2MString *string);
 
