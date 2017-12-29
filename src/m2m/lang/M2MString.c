@@ -31,79 +31,79 @@
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたself文字列の後ろに引数stringで指定された文字列を追加する．<br>
+ * Add the argument string after the self string.<br>
  *
- * @param[in,out] self	文字列を追加する、元の文字列（追加後の文字列は self = "self + string" となる）
- * @param[in] string	追加する文字列
- * @return				文字列が追加されたバッファのポインタ or NULL（エラーの場合）
+ * @param[in,out] self	Base string for adding (string after addition: self = self + string)
+ * @param[in] string	Additional string
+ * @return				Pointer of the buffer to which the string was added or NULL (means error)
  */
 M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *tmp = NULL;
 	size_t thisLength = 0;
 	size_t stringLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && string!=NULL && (stringLength=M2MString_length(string))>0)
 		{
-		//===== 連結元の文字列が存在する場合 =====
+		//===== In the case of concatenation string existing =====
 		if ((*self)!=NULL)
 			{
-			//===== 連結元の文字列を一時的にコピーするための準備 =====
+			//===== Preparation for temporarily copying the original string =====
 			if( (thisLength=M2MString_length((*self)))>0
 				&& (tmp=(M2MString *)M2MHeap_malloc(thisLength+1))!=NULL)
 				{
-				//===== 連結元の文字列を一時的にコピー =====
+				//===== Temporarily copy the source string =====
 				memcpy(tmp, (*self), thisLength);
-				//===== 連結元の文字列のヒープメモリ領域を解放 =====
+				//===== Release heap memory of consolidation string =====
 				M2MHeap_free((*self));
-				//===== 連結文字列のヒープメモリ領域を獲得 =====
+				//===== Acquire heap memory of concatenated string =====
 				if (((*self)=(M2MString *)M2MHeap_malloc(thisLength+stringLength+1))!=NULL)
 					{
-					//===== 文字列を連結 =====
+					//===== Concatenate strings =====
 					memcpy(&((*self)[0]), tmp, thisLength);
 					memcpy(&((*self)[thisLength]), string, stringLength);
-					//===== 一時的なバッファのヒープメモリ領域を解放 =====
+					//===== Release temporary heap memory =====
 					M2MHeap_free(tmp);
-					//===== 連結した文字列のポインタを返す =====
+					//===== Return pointer of concatenated string =====
 					return (*self);
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MHeap_free(tmp);
 					return NULL;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//===== 連結元の文字列が存在しない場合 =====
+		//===== In the case of not existing of the concatenation string =====
 		else
 			{
-			//===== 文字列コピーのヒープメモリ領域を獲得 =====
+			//===== Acquire heap memory of string copy =====
 			if (((*self)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
 				{
-				//===== 文字列をコピー =====
+				//===== Copy string =====
 				memcpy((*self), string, stringLength);
-				//===== 文字列のポインタを返す =====
+				//===== Returns a pointer to the string =====
 				return (*self);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		return NULL;
@@ -116,8 +116,8 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 
 
 /**
- * 引数で指定されたself文字列の後ろに、引数stringで指定された文字列を追加する．<br>
- * 追加文字列の長さ[Byte]は引数のstringLengthで指定する．<br>
+ * Add the argument string after the "self" string. <br>
+ * The length [Byte] of the additional string is specified by "stringLength".<br>
  *
  * @param[in,out] self		文字列を追加する、元の文字列（追加後の文字列は self = "self + string" となる）
  * @param[in] string		追加する文字列
@@ -126,11 +126,11 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
  */
 M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, const size_t stringLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *tmp = NULL;
 	size_t thisLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && string!=NULL && 0<stringLength && stringLength<=M2MString_length(string))
 		{
 		//===== 連結元の文字列が存在する場合 =====
@@ -155,14 +155,14 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 					//===== 連結した文字列のポインタを返す =====
 					return (*self);
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MHeap_free(tmp);
 					return NULL;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
@@ -179,14 +179,14 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 				//===== 文字列のポインタを返す =====
 				return (*self);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		return NULL;
@@ -208,15 +208,15 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
  */
 signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	size_t thisLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (thisLength=M2MString_length(self))>0 && string!=NULL)
 		{
 		return memcmp(self, string, thisLength);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return -1;
@@ -233,14 +233,14 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
  */
 M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *lineStart = NULL;
 	M2MString *lineEnd = NULL;
 	size_t lineLength = 0;
 	const size_t LF_LENGTH = M2MString_length(M2MString_LF);
 	const size_t CRLF_LENGTH = M2MString_length(M2MString_CRLF);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && string!=NULL)
 		{
 		//===== 文字列中にCRLFが1つでも存在する（補正は実行しない)場合 =====
@@ -254,7 +254,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 				//===== 出力データを返す =====
 				return (*string);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
@@ -301,7 +301,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 			return (*string);
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		return NULL;
@@ -325,11 +325,11 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
  */
 M2MString *M2MString_convertFromDoubleToString (const double number, M2MString **string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL)
 		{
 		//===== 配列の初期化 =====
@@ -344,19 +344,19 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 				memcpy((*string), tmpBuffer, stringLength);
 				return (*string);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -375,11 +375,11 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
  */
 M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MString **string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL)
 		{
 		//===== 配列の初期化 =====
@@ -394,19 +394,19 @@ M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MStr
 				memcpy((*string), tmpBuffer, stringLength);
 				return (*string);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -426,11 +426,11 @@ M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MStr
  */
 M2MString *M2MString_convertFromLongToString (const signed long number, M2MString **string)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL)
 		{
 		//===== 配列の初期化 =====
@@ -445,19 +445,19 @@ M2MString *M2MString_convertFromLongToString (const signed long number, M2MStrin
 				memcpy((*string), tmpBuffer, stringLength);
 				return (*string);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -474,10 +474,10 @@ M2MString *M2MString_convertFromLongToString (const signed long number, M2MStrin
  */
 double M2MString_convertFromStringToDouble (const M2MString *string, const size_t stringLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char STRING_ARRAY[stringLength+1];
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (stringLength<=M2MString_length(string))
 		{
 		//===== 変換バッファに文字列をコピー =====
@@ -486,7 +486,7 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
 		//===== 文字列を実数に変換 =====
 		return strtod(STRING_ARRAY, NULL);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return (double)-1;
@@ -502,10 +502,10 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
  */
 int M2MString_convertFromStringToInteger (const M2MString *string, const size_t stringLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (stringLength<=M2MString_length(string))
 		{
 		//===== 変換バッファに文字列をコピー =====
@@ -514,7 +514,7 @@ int M2MString_convertFromStringToInteger (const M2MString *string, const size_t 
 		//===== 文字列を整数に変換 =====
 		return atoi(STRING_ARRAY);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return (int)-1;
@@ -531,10 +531,10 @@ int M2MString_convertFromStringToInteger (const M2MString *string, const size_t 
  */
 long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (stringLength<=M2MString_length(string))
 		{
 		//===== 変換バッファに文字列をコピー =====
@@ -543,7 +543,7 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 		//===== 文字列を整数に変換 =====
 		return atoi(STRING_ARRAY);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return (int)-1;
@@ -561,7 +561,7 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
  */
 bool M2MString_equals (const M2MString *one, const M2MString *another, const size_t length)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (one!=NULL && another!=NULL && length>0)
 		{
 		//===== 一致するかどうか検証 =====
@@ -575,7 +575,7 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return false;
@@ -595,13 +595,13 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
  */
 unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int bufferLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct timeval currentTime;
 	struct tm *localCalendar = NULL;
 	M2MString *miliSecond = NULL;
 	unsigned int miliSecondLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (buffer!=NULL && bufferLength>0)
 		{
 		//===== 配列の初期化 =====
@@ -625,7 +625,7 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 					M2MHeap_free(miliSecond);
 					return M2MString_length(buffer);
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					//===== ヒープメモリ領域の解放 =====
@@ -633,19 +633,19 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 					return 0;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return 0;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return 0;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (buffer==NULL)
 		{
 		return 0;
@@ -668,13 +668,13 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
  */
 M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL && keyword!=NULL)
 		{
 		//===== キーワード検索結果を返す =====
 		return (M2MString *)strstr(string, keyword);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -693,11 +693,11 @@ M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
  */
 M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *fromIndex)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *lastIndex = NULL;
 	M2MString *index = (M2MString *)string;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (string!=NULL && fromIndex!=NULL)
 		{
 		//=====  =====
@@ -709,7 +709,7 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *from
 		//=====  =====
 		return lastIndex;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -725,37 +725,17 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *from
  */
 size_t M2MString_length (const M2MString *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return strlen(self);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return 0;
 		}
 	}
-
-
-/**
- * 引数で指定されたソース文字列（＝"string"）に対し、分割用文字列（＝"delimiter"）<br>
- * で分割した結果を返す。<br>
- * 連続して取得する場合、初回のみソース文字列を指定し、次回以降はソース文字列に<br>
- * NULLを指定する。<br>
- * なお、当該処理を実行すると、ソース文字列自体が書き換えられるため、壊されてもよい<br>
- * 文字列をソース文字列に指定する事。<br>
- *
- * @param[in] self			分割処理対象のソース文字列
- * @param[in] delimiter		分割文字列
- * @param[in] savePointer	分割処理が施されたソース文字列のコピー用バッファ（毎回同じ変数を渡す事）
- * @return					分割されたソース文字列（の断片に該当する文字列）
- *
-M2MString *M2MString_split (M2MString *self, const M2MString *delimiter, M2MString **savePoint)
-	{
-	return strtok_r(self, delimiter, savePoint);
-	}
-*/
 
 
 /* End Of File */

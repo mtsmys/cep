@@ -34,10 +34,10 @@
  * Public method
  ******************************************************************************/
 /**
- * 引数で指定された文字列をBase64逆変換でバイナリデータに変換する。<br>
- * 逆変換したバイナリデータのバッファリングはこの関数内部で実行するため，<br>
- * 呼び出し側では当該バイナリデータ使用後、メモリーリークを防止するため、必ず<br>
- * "M2MHeap_free()"関数を呼び出す事。<br>
+ * Convert the argument string to binary with Base64 inverse transformation. <br>
+ * Buffering of inversely converted binary data is executed inside this <br>
+ * function, so caller must call "M2MHeap_free ()" function to prevent <br>
+ * memory leak after the relevant binary data is used.
  *
  * @param string		Target string for Base64 decoding
  * @param stringLength	Length of string[Byte]
@@ -168,13 +168,15 @@ size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLeng
 
 
 /**
- * 引数で指定されたバイナリデータをBase64変換で文字列に変換する。<br>
- * 変換した文字列のバッファリングはこの関数内部で実行するため，呼び出し側では<br>
- * 当該文字列使用後、メモリーリークを防止するため必ず"M2MHeap_free()"関数を<br>
- * 呼び出す事。<br>
- * また，変換した文字列を76文字毎に改行コード（"\r\m")で区切りたい場合、引数の<br>
- * "chunk"に true をセットする。<br>
- * 変換した文字列全てを1行に収めたい場合は "chunk" に false をセットする。<br>
+ * Convert the argument binary data to string by Base64 conversion. <br>
+ * Since buffering of converted character string is executed inside <br>
+ * this function, calling "M2MHeap_free()" function must be called on <br>
+ * the caller side to prevent memory leak after using the character string.<br>
+ * In addition, if you wish to delimit the converted character string <br>
+ * with a line feed code ("\r\m") every 76 characters, set "chunk" of <br>
+ * the argument to true. <br>
+ * If you want to put all the converted character strings on one line, <br>
+ * set "chunk" to false.<br>
  *
  * @param src		Base64変換対象のバイナリーデータ
  * @param srcLength	Base64変換対象のバイナリーデータサイズ[Byte]
@@ -184,7 +186,7 @@ size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLeng
  */
 M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M2MString **string, const bool chunk)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	size_t stringLength = 0;
 	size_t i = 0;
 	size_t index = 0;
@@ -194,7 +196,7 @@ M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M
 	const size_t CHUNK_TIME = (size_t)(M2MBase64_CHUNK_LENGTH / M2MBase64_FOUR_WORD);
 	const size_t REPEAT_NUMBER = srcLength / (size_t)M2MBase64_THREE_OCTET;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (src!=NULL && srcLength>0 && string!=NULL)
 		{
 		//===== パディングが不要な場合 =====
@@ -275,7 +277,7 @@ M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
