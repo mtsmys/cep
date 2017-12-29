@@ -1,23 +1,23 @@
 # cep
 C library for CEP(Complex Event Processing) in embedded system
 
-## 内部構成，及び特徴
-このライブラリでは外部の共有ライブラリとしてSQLite3を利用しています．  
-そのため，ターゲットデバイス上で動作させる際，libsqlite3が必要です．
+## Features
+This library uses SQLite 3 as an external shared library.
+Therefore, libsqlite3 is required when operating on the target device.
 
-CEPではデータ処理のオーバーヘッドを低減させるため，SQLiteを使って  
-メモリ空間上にデータベースを構築し，このメモリデータベースの上で  
-データ処理を行います．  
-メモリデータベースに蓄えたデータについては，任意に設定したレコード数  
-に達した場合，先頭のレコードより掃き出されます．  
-そのため，データ処理のためにSQLで取得されるレコードは，現在フォーカスが  
-当たっているレコードのみとなります．
+In CEP, in order to reduce the overhead of data processing, we build a database in memory space using SQLite and process data on this memory database.
 
-メモリーデータベースから掃き出されたレコードについては，冗長化のため，  
-ファイルデータベースに保存する事が可能です．  
+For data stored in the memory database, if it reaches the arbitrarily set number of records, it will be swept out from the first record. 
+As a result, the record acquired by SQL for data processing is only the record that is currently focused.
+Records swept from the memory database can be saved in the file database for redundancy.
 
-## ビルドとインストール
-ビルドはmakeでOKです．  
-インストールはmeke installです．  
-但し，現状のMakefileはRaspberry Pi向けの設定になっているため，  
-他のOSでインストールする場合はMakefileを編集して下さい．  
+## Installation
+Build is OK with make.
+Installation is meke install.
+
+```
+$ make
+$ make install
+```
+
+However, since the current Makefile is set for Raspberry Pi, please edit the Makefile when installing with other OS.
