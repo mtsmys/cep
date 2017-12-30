@@ -34,7 +34,7 @@
 
 
 
-#include "m2m/util/M2MLogger.h"
+#include "m2m/util/logging/M2MLogger.h"
 
 
 

@@ -27,23 +27,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "m2m/util/M2MLogger.h"
+#include "m2m/util/logging/M2MLogger.h"
 
 
 /*******************************************************************************
- * 関数定義
+ * Declaration of function
  ******************************************************************************/
 /**
- * errnoを初期化（＝0)する.<br>
+ * Initialize "errorno".<br>
  */
 static void this_initErrorNumber ();
 
 
 /**
- * 引数で指定されたファイルのサイズが既定値を超過しているかどうか確認する．<br>
+ * Check whether the size of the argument file exceeds the default value. <br>
  *
- * @param[in] file	サイズ確認を行う対象のファイルオブジェクト
- * @return			true : 既定値[Byte]を超過，false : 既定値[Byte]以内
+ * @param[in] file	File object to be checked for size
+ * @return			true: Exceeded default value, false: Within the default value
  */
 static bool this_overMaxLogFileLength (const FILE *file);
 
@@ -60,7 +60,7 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
  * 引数で指定されたポインタにデバッグメッセージをコピーする。<br>
@@ -77,7 +77,7 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 #ifdef DEBUG
 static M2MString *this_createNewDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **debugMessage)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString time[128];
 	M2MString lineNumberString[16];
 	size_t errorMessageLength = 0;
@@ -86,7 +86,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 	size_t lineNumberLength = 0;
 	size_t messageLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
 			&& (messageLength=M2MString_length(message))>0
 			&& debugMessage!=NULL)
@@ -108,7 +108,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s %s:%d[l]: %s\n", time, methodName, lineNumber, message);
 				return (*debugMessage);
 				}
-			//===== エラー処理 ======
+			//===== Error handling ======
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"デバッグメッセージを示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
@@ -125,7 +125,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s:%d[l]: %s\n", methodName, lineNumber, message);
 				return (*debugMessage);
 				}
-			//===== エラー処理 ======
+			//===== Error handling ======
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"デバッグメッセージを示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
@@ -133,7 +133,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (methodName==NULL || methodNameLength<=0)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"引数で指定された\"methodName\"がNULLです", NULL);
@@ -162,7 +162,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
  */
 static M2MString *this_createNewErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **errorMessage)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString time[128];
 	M2MString lineNumberString[16];
 	unsigned char buffer[256];
@@ -173,7 +173,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 	size_t messageLength = 0;
 	size_t bufferLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
 			&& (messageLength=M2MString_length(message))>0
 			&& errorMessage!=NULL)
@@ -201,7 +201,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					this_initErrorNumber();
 					return (*errorMessage);
 					}
-				//===== エラー処理 ======
+				//===== Error handling ======
 				else
 					{
 					this_initErrorNumber();
@@ -219,7 +219,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					this_initErrorNumber();
 					return (*errorMessage);
 					}
-				//===== エラー処理 ======
+				//===== Error handling ======
 				else
 					{
 					this_initErrorNumber();
@@ -241,7 +241,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s %s:%d[l]: %s\r\n", time, methodName, lineNumber, message);
 					return (*errorMessage);
 					}
-				//===== エラー処理 ======
+				//===== Error handling ======
 				else
 					{
 					return NULL;
@@ -257,7 +257,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s:%d[l]: %s\r\n", methodName, lineNumber, message);
 					return (*errorMessage);
 					}
-				//===== エラー処理 ======
+				//===== Error handling ======
 				else
 					{
 					return NULL;
@@ -265,7 +265,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (methodName==NULL || methodNameLength<=0)
 		{
 		return NULL;
@@ -285,7 +285,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
  */
 static FILE *this_getLogFile (const M2MString *logFileName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	FILE *file = NULL;
 	const M2MString *HOME_DIRECTORY = M2MDirectory_getHomeDirectoryPath();
 	const size_t HOME_DIRECTORY_LENGTH = M2MString_length(HOME_DIRECTORY);
@@ -319,7 +319,7 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 				}
 			return file;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
@@ -348,13 +348,13 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 					}
 				return file;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
@@ -364,7 +364,7 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 
 
 /**
- * errnoを初期化する.<br>
+ * Initialize "errorno".<br>
  */
 static void this_initErrorNumber ()
 	{
@@ -374,10 +374,10 @@ static void this_initErrorNumber ()
 
 
 /**
- * 引数で指定されたファイルのサイズが既定値を超過しているかどうか確認する．<br>
+ * Check whether the size of the argument file exceeds the default value. <br>
  *
- * @param[in] file	サイズ確認を行う対象のファイルオブジェクト
- * @return			true : 既定値[Byte]を超過，false : 既定値[Byte]以内
+ * @param[in] file	File object to be checked for size
+ * @return			true: Exceeded default value, false: Within the default value
  */
 static bool this_overMaxLogFileLength (const FILE *file)
 	{
@@ -404,7 +404,7 @@ static bool this_overMaxLogFileLength (const FILE *file)
 #ifdef DEBUG
 static void this_printDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *debugMessage = NULL;
 	FILE *file = NULL;
 	const M2MString *LOG_FILE_NAME = (M2MString *)"m2m.log";
@@ -429,7 +429,7 @@ static void this_printDebugMessage (const M2MString *methodName, const unsigned 
 		//===== ヒープメモリ領域の解放 =====
 		M2MHeap_free(debugMessage);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		}
@@ -448,7 +448,7 @@ static void this_printDebugMessage (const M2MString *methodName, const unsigned 
  */
 static void this_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *errorMessage = NULL;
 	FILE *file = NULL;
 	const M2MString *LOG_FILE_NAME = (M2MString *)"m2m.log";
@@ -473,7 +473,7 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 		//===== ヒープメモリ領域の解放 =====
 		M2MHeap_free(errorMessage);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		}
@@ -482,20 +482,20 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定された関数名、行番号、メッセージを基に、デバッグメッセージを標準出力<br>
- * に出力（表示）する。<br>
+ * Output debug messages to standard output.<br>
+ * Debug message is based on the function name, line number, and message.<br>
  *
- * @param[in] methodName					関数名を示す文字列
- * @param[in] lineNumber					ソースファイル中の行番号（"__LINE__"で埋め込み可能）
- * @param[in] message						エラー内容を示すメッセージ文字列
+ * @param[in] methodName	String indicating function name
+ * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message		Message string indicating error content
  */
 void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
 	{
 #ifdef DEBUG
-	//===== デバッグメッセージを出力 =====
+	//===== Output debug message =====
 	this_printDebugMessage(methodName, lineNumber, message);
 #endif /* DEBUG */
 	return;
@@ -503,24 +503,25 @@ void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned in
 
 
 /**
- * 引数で指定された関数名、行番号、メッセージを基に、エラーメッセージを標準エラー<br>
- * 出力に出力（表示）する。<br>
- * また、エラーメッセージコピー用のポインタが指定された場合、標準エラー出力に出力<br>
- * せずに、この関数内部でバッファリングを行い、エラーメッセージをコピーする。<br>
+ * Output error message to the standard error output.<br>
+ * Error message is based on the function name, line number, and message.<br>
+ * Also, when a pointer for copying error message is specified as argument, <br>
+ * buffering is performed inside this function without copying to standard <br>
+ * error output, and error message is copied.<br>
  *
- * @param[in] methodName					関数名を示す文字列
- * @param[in] lineNumber					ソースファイル中の行番号（"__LINE__"で埋め込み可能）
- * @param[in] message						エラー内容を示すメッセージ文字列
- * @param[out] bufferForCopyingErrorMessage	エラーメッセージ全体をコピーするためのバッファ or NULL（コピー不要の場合）
+ * @param[in] methodName					String indicating function name
+ * @param[in] lineNumber					Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message						Message string indicating error content
+ * @param[out] bufferForCopyingErrorMessage	Buffer to copy the error message or NULL (if copying is unnecessary)
  */
 void M2MLogger_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **bufferForCopyingErrorMessage)
 	{
-	//===== エラーメッセージを引数にコピーする場合 =====
+	//===== In the case of copying error message to argument =====
 	if (bufferForCopyingErrorMessage!=NULL)
 		{
 		this_createNewErrorMessage(methodName, lineNumber, message, bufferForCopyingErrorMessage);
 		}
-	//===== エラーメッセージを引数にコピーしない場合 =====
+	//===== In the case of not copying error message =====
 	else
 		{
 		this_printErrorMessage(methodName, lineNumber, message);

@@ -33,8 +33,8 @@
 #define M2MCEPRECORD_H_
 
 
-#include "m2m/util/M2MLogger.h"
-#include "m2m/util/M2MList.h"
+#include "m2m/util/logging/M2MLogger.h"
+#include "m2m/util/list/M2MList.h"
 
 
 

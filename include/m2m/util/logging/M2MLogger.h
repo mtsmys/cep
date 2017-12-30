@@ -45,10 +45,10 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * ログファイルの規程最大サイズ（8,388,608[Byte]）
+ * Maximum size of log file(8,388,608[Byte])
  */
 #ifndef M2MLogger_MAX_LOG_FILE_LENGTH
 #define M2MLogger_MAX_LOG_FILE_LENGTH (unsigned int)8388608
@@ -56,29 +56,30 @@ extern "C"
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定された関数名、行番号、メッセージを基に、デバッグメッセージを標準出力<br>
- * に出力（表示）する。<br>
+ * Output debug messages to standard output.<br>
+ * Debug message is based on the function name, line number, and message.<br>
  *
- * @param[in] methodName					関数名を示す文字列
- * @param[in] lineNumber					ソースファイル中の行番号（"__LINE__"で埋め込み可能）
- * @param[in] message						エラー内容を示すメッセージ文字列
+ * @param[in] methodName	String indicating function name
+ * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message		Message string indicating error content
  */
 void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message);
 
 
 /**
- * 引数で指定された関数名、行番号、メッセージを基に、エラーメッセージを標準エラー<br>
- * 出力に出力（表示）する。<br>
- * また、エラーメッセージコピー用のポインタが指定された場合、標準エラー出力に出力<br>
- * せずに、この関数内部でバッファリングを行い、エラーメッセージをコピーする。<br>
+ * Output error message to the standard error output.<br>
+ * Error message is based on the function name, line number, and message.<br>
+ * Also, when a pointer for copying error message is specified as argument, <br>
+ * buffering is performed inside this function without copying to standard <br>
+ * error output, and error message is copied.<br>
  *
- * @param[in] methodName					関数名を示す文字列
- * @param[in] lineNumber					ソースファイル中の行番号（"__LINE__"で埋め込み可能）
- * @param[in] message						エラー内容を示すメッセージ文字列
- * @param[out] bufferForCopyingErrorMessage	エラーメッセージ全体をコピーするためのバッファ or NULL（コピー不要の場合）
+ * @param[in] methodName					String indicating function name
+ * @param[in] lineNumber					Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message						Message string indicating error content
+ * @param[out] bufferForCopyingErrorMessage	Buffer to copy the error message or NULL (if copying is unnecessary)
  */
 void M2MLogger_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **bufferForCopyingErrorMessage);
 

@@ -47,15 +47,15 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * 数珠繋ぎに接続されたリスト構造体オブジェクト（無次元配列）。<br>
+ * A list structure object (dynamic array)<br>
  *
- * @param previous		前に位置するリスト構造体オブジェクト（先頭の場合は自分のポインタを示す）
- * @param next			後ろに位置するリスト構造体オブジェクト（末端の場合はNULLを示す）
- * @param value			リスト構造体オブジェクトに格納された“値”のポインタ
- * @param valueLength	“値”の大きさを示す整数[バイト]
+ * @param previous		A list structure object located before (indicating its own pointer in the case of the head)
+ * @param next			A list structure object located behind (indicating NULL in the case of the end)
+ * @param value			Pointer to "value" stored in list structure object
+ * @param valueLength	Integer indicating the size of "value"[Byte]
  */
 #ifndef M2MList
 typedef struct M2MList
@@ -70,12 +70,12 @@ typedef struct M2MList
 
 
 /*******************************************************************************
- * 公開メソッド
+ * Public function
  ******************************************************************************/
 /**
- * リスト構造体オブジェクトのリンクに値を持った新規ノードを1つ追加する。<br>
+ * Add a new node with a value to the link of the list structure object.<br>
  *
- * @param[in,out] self		リスト構造体オブジェクト
+ * @param[in,out] self		List structure object
  * @param[in] value			リスト構造体オブジェクトに格納させる値
  * @param[in] valueLength	値の大きさ[バイト]
  * @return					新規追加されたリスト構造体オブジェクト or NULL（エラーの場合）
@@ -86,7 +86,7 @@ M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength
 /**
  * 引数で指定されたリスト構造体オブジェクトのリンクの1つ先に位置するノードを取得する。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			リスト構造体オブジェクトのリンクの先頭ノード or NULL（エラーの場合）
  */
 M2MList *M2MList_begin (M2MList *self);
@@ -95,7 +95,7 @@ M2MList *M2MList_begin (M2MList *self);
 /**
  * 引数で指定されたリスト構造体オブジェクトのリンクの全ノードのメモリ領域を解放する。<br>
  *
- * @param[in,out] self	リスト構造体オブジェクト
+ * @param[in,out] self	List structure object
  */
 void M2MList_delete (M2MList *self);
 
@@ -104,7 +104,7 @@ void M2MList_delete (M2MList *self);
  * 引数で指定されたリスト構造体オブジェクトのリンク配列において、引数のインデックス<br>
  * に該当するリスト構造体オブジェクトを返す。<br>
  *
- * @param[in] self		リスト構造体オブジェクト
+ * @param[in] self		List structure object
  * @param[in] index		インデックスを示す整数（0 〜 n-1）
  * @return 				リスト構造体オブジェクト or NULL（エラーの場合）
  */
@@ -114,7 +114,7 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index);
 /**
  * 引数で指定されたリスト構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
  *
- * @param[in,out] self	リスト構造体オブジェクト
+ * @param[in,out] self	List structure object
  * @return				リスト構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
  */
 M2MList *M2MList_end (M2MList *self);
@@ -123,7 +123,7 @@ M2MList *M2MList_end (M2MList *self);
 /**
  * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値を返す。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			リスト構造体オブジェクトに格納されている値 or NULL（エラーの場合）
  */
 void *M2MList_getValue (M2MList *self);
@@ -133,7 +133,7 @@ void *M2MList_getValue (M2MList *self);
  * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値の大きさ<br>
  * を示す整数を返す。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			値のサイズ[バイト] or 0（エラーの場合）
  */
 size_t M2MList_getValueLength (M2MList *self);
@@ -143,7 +143,7 @@ size_t M2MList_getValueLength (M2MList *self);
  * 引数で指定されたリスト構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
  * する。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			true : 値が1つも存在しない、false : 値を1つ以上保有している
  */
 bool M2MList_isEmpty (M2MList *self);
@@ -152,7 +152,7 @@ bool M2MList_isEmpty (M2MList *self);
 /**
  * リスト構造体オブジェクトのノード数を示す整数を返す。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			リンクされているリスト構造体オブジェクトのノード数を示す整数
  */
 unsigned int M2MList_length (M2MList *self);
@@ -162,7 +162,7 @@ unsigned int M2MList_length (M2MList *self);
  * 引数で指定されたリスト構造体オブジェクトの1つ後ろに位置するリスト構造体<br>
  * オブジェクトを返す。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return next 	1つ後ろに位置するリスト構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
  */
 M2MList *M2MList_next (const M2MList *self);
@@ -181,7 +181,7 @@ M2MList *M2MList_new ();
  * オブジェクトを取得して返す。<br>
  * 引数で指定されたリスト構造体オブジェクトが先頭ノードの場合、同じポインタを示す。<br>
  *
- * @param[in] self	リスト構造体オブジェクト
+ * @param[in] self	List structure object
  * @return			1つ手前に存在するリスト構造体オブジェクト or NULL（エラーの場合）
  */
 M2MList *M2MList_previous (const M2MList *self);
@@ -198,7 +198,7 @@ M2MList *M2MList_remove (M2MList *self);
 /**
  * 引数で指定されたインデックス位置のリスト構造体オブジェクトの値を変更する。<br>
  *
- * @param[in,out] self		リスト構造体オブジェクト
+ * @param[in,out] self		List structure object
  * @param[in] value			変更する値
  * @param[in] valueLength	値の大きさを示す整数[バイト]
  * @return					値を変更したリスト構造体オブジェクト or NULL（エラーの場合）
