@@ -46,10 +46,17 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * テーブルのカラム情報を保持した構造体オブジェクト．<br>
+ * Structure object holding table column information.<br>
+ * This structure can store many table informations, and each table information <br>
+ * is held in the form of a list structure.<br>
+ *
+ * @param previous		A list structure object located before (indicating its own pointer in the case of the head)
+ * @param next			A list structure object located behind (indicating NULL in the case of the end)
+ * @param tableName		String indicating table name
+ * @param columnList	List structure object containing table column informations
  */
 #ifndef M2MTableBuilder
 typedef struct M2MTableBuilder
@@ -63,7 +70,7 @@ typedef struct M2MTableBuilder
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
  * 引数で指定されたSQLite3データベースに対し、テーブルを作成する。<br>

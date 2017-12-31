@@ -33,6 +33,7 @@
 #define M2MCOLUMNLIST_H_
 
 
+#include "m2m/lang/M2MString.h"
 #include "m2m/cep/M2MColumn.h"
 
 
@@ -48,12 +49,12 @@ extern "C"
  * クラス変数
  ******************************************************************************/
 /**
- * SQLite3データベースのテーブルのカラム情報を格納したカラム構造体オブジェクト。<br>
+ * データベースのテーブルのカラム情報を格納した構造体オブジェクト。<br>
  * リスト構造になっており、複数のカラム情報オブジェクトがリンクで繋がれた構造と<br>
  * なっている。<br>
  *
- * @param previous	1つ前に位置するカラム構造体オブジェクト（先頭の場合は自分を指す）
- * @param next		1つ後ろに位置するカラム構造体オブジェクト（末端の場合はNULLを示す）
+ * @param previous	A list structure object located before (indicating its own pointer in the case of the head)
+ * @param next		A list structure object located behind (indicating NULL in the case of the end)
  * @param column	カラム情報オブジェクト（カラム1つのデータ型を内包する構造体）
  */
 #ifndef M2MColumnList
@@ -81,7 +82,7 @@ typedef struct M2MColumnList
  * @param[in] unique		ユニーク性有効化のフラグ
  * @return					新規追加されたカラム構造体オブジェクト or NULL（エラーの場合）
  */
-M2MColumnList *M2MColumnList_add (M2MColumnList *self, const unsigned char *columnName, const M2MDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique);
+M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnName, const M2MDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique);
 
 
 /**
@@ -174,7 +175,7 @@ M2MColumnList *M2MColumnList_previous (const M2MColumnList *self);
  * @param columnNameLength
  * @return
  */
-M2MColumn *M2MColumnList_search (M2MColumnList *self, const unsigned char *columnName, const size_t columnNameLength);
+M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnName, const size_t columnNameLength);
 
 
 

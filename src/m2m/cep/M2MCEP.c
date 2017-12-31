@@ -312,7 +312,7 @@ static void this_vacuum (sqlite3 *database);
  */
 static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *tableName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	int excess = 0;
 	unsigned char *sql = NULL;
 	const unsigned int MAX_RECORD = this_getMaxRecord(self);
@@ -326,7 +326,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 	unsigned char MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && TABLE_NAME_LENGTH>0)
 		{
 		//===== レコード情報の取得 =====
@@ -356,7 +356,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 						M2MHeap_free(sql);
 						return;
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_executeUpdate()", __LINE__, (unsigned char *)"メモリ上のSQLite3データベースの超過レコード削除処理に失敗しました", NULL);
@@ -364,7 +364,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 						return;
 						}
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_adjustMemoryDatabaseRecord()", __LINE__, (unsigned char *)"超過レコード削除用のDELETE文を作成するためのヒープメモリ領域の獲得に失敗しました", NULL);
@@ -382,7 +382,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 				return;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (MAX_RECORD<=0)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_adjustMemoryDatabaseRecord()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトで設定されているメモリ上のSQLite3データベースのレコード数の上限値が0です", NULL);
@@ -399,7 +399,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_adjustMemoryDatabaseRecord()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -427,10 +427,10 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
  */
 static void this_checkRecordCounterForVacuum (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int vacuumRecord = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== バキューム処理を実行するレコード数を確認 =====
@@ -480,7 +480,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_checkVacuum()", __LINE__, (unsigned char *)"", NULL);
@@ -497,12 +497,12 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
  */
 static void this_closeFileDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
 	sqlite3_stmt *statement = NULL;
 	sqlite3_stmt *next = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (fileDatabase=this_getFileDatabase(self))!=NULL)
 		{
 		//===== SQLite3メモリーデータベースを閉じる =====
@@ -530,7 +530,7 @@ static void this_closeFileDatabase (M2MCEP *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		return;
@@ -550,12 +550,12 @@ static void this_closeFileDatabase (M2MCEP *self)
  */
 static void this_closeMemoryDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	sqlite3_stmt *statement = NULL;
 	sqlite3_stmt *next = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (memoryDatabase=this_getMemoryDatabase(self))!=NULL)
 		{
 		//===== SQLite3メモリーデータベースを閉じる =====
@@ -583,7 +583,7 @@ static void this_closeMemoryDatabase (M2MCEP *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_closeMemoryDatabase()", __LINE__, (unsigned char *)"引数で指定された\"M2MCEP *\"がNULLです", NULL);
@@ -608,7 +608,7 @@ static void this_closeMemoryDatabase (M2MCEP *self)
  */
 static unsigned char *this_createInsertSQL (const unsigned char *tableName, const unsigned char *columnNameCSV, unsigned int columnListLength, unsigned char **sql)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int i = 0;
 	unsigned int index = 0;
 	size_t sqlLength = 0;
@@ -621,7 +621,7 @@ static unsigned char *this_createInsertSQL (const unsigned char *tableName, cons
 	unsigned char MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (tableName!=NULL && columnNameCSV!=NULL && columnListLength>0 && sql!=NULL)
 		{
 		//===== 配列の初期化 =====
@@ -661,7 +661,7 @@ static unsigned char *this_createInsertSQL (const unsigned char *tableName, cons
 #endif // DEBUG
 				return (*sql);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_createInsertSQL()", __LINE__, (unsigned char *)"INSERT文の構築に失敗しました", NULL);
@@ -677,14 +677,14 @@ static unsigned char *this_createInsertSQL (const unsigned char *tableName, cons
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_createInsertSQL()", __LINE__, (unsigned char *)"INSERT文を新規作成するためのヒープメモリ領域の獲得に失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (tableName==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_createInsertSQL()", __LINE__, (unsigned char *)"引数で指定されたテーブル名を示す文字列がNULLです", NULL);
@@ -716,12 +716,12 @@ static unsigned char *this_createInsertSQL (const unsigned char *tableName, cons
  */
 static void this_deleteDatabaseName (M2MCEP *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && this_getDatabaseName(self)!=NULL)
 		{
 		M2MHeap_free(self->databaseName);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_deleteDatabaseName()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -743,15 +743,15 @@ static void this_deleteDatabaseName (M2MCEP *self)
  */
 static void this_deleteTableBuilder (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MTableBuilder *tableBuilder = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (tableBuilder=this_getTableBuilder(self))!=NULL)
 		{
 		M2MTableBuilder_delete(&tableBuilder);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_deleteTableBuilder()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -770,13 +770,13 @@ static void this_deleteTableBuilder (M2MCEP *self)
  */
 static void this_flushCEPRecord (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
 	M2MTableBuilder *tableBuilder = NULL;
 	M2MCEPRecord *record = NULL;
 	bool persistence = false;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== レコード管理オブジェクト（の先頭ノード）を取得 =====
@@ -815,7 +815,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 			//===== 正常終了 =====
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (tableBuilder==NULL)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToFileDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトから取得したテーブル構築オブジェクトがNULLです", NULL);
@@ -827,7 +827,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToFileDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -866,14 +866,14 @@ static M2MCEPRecord *this_getCEPRecord (const M2MCEP *self)
  */
 static unsigned char *this_getDatabaseDirectoryPath (unsigned char **directoryPath)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *home = NULL;
 	size_t homeLength = 0;
 	const unsigned char *SEPARATOR = (unsigned char *)M2MDirectory_SEPARATOR;
 	const size_t CEP_DIRECTORY_LENGTH = M2MString_length((unsigned char *)M2MCEP_DIRECTORY);
 	const size_t SEPARATOR_LENGTH = M2MString_length(SEPARATOR);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (directoryPath!=NULL)
 		{
 		//===== バッファのヒープメモリを取得 =====
@@ -887,14 +887,14 @@ static unsigned char *this_getDatabaseDirectoryPath (unsigned char **directoryPa
 			memcpy(&((*directoryPath)[homeLength+SEPARATOR_LENGTH]), (unsigned char *)M2MCEP_DIRECTORY, CEP_DIRECTORY_LENGTH);
 			return (*directoryPath);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseDirectoryPath()", __LINE__, (unsigned char *)"ホームディレクトリパスを示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseDirectoryPath()", __LINE__, (unsigned char *)"引数で指定された\"directoryPath\"がNULLです", NULL);
@@ -914,14 +914,14 @@ static unsigned char *this_getDatabaseDirectoryPath (unsigned char **directoryPa
  */
 static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseName, unsigned char **databaseFilePath)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *directoryPath = NULL;
 	size_t directoryPathLength = 0;
 	size_t databaseNameLength = 0;
 	const size_t SEPARATOR_LENGTH = M2MString_length((unsigned char *)M2MDirectory_SEPARATOR);
 	const unsigned char *PERMISSION = (unsigned char *)"0755";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (databaseName!=NULL && (databaseNameLength=M2MString_length(databaseName))>0
 			&& databaseFilePath!=NULL)
 		{
@@ -942,7 +942,7 @@ static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseNam
 				//=====  =====
 				return (*databaseFilePath);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				//===== ディレクトリパス文字列が存在する場合 =====
@@ -957,7 +957,7 @@ static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseNam
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			//===== ディレクトリパス文字列が存在する場合 =====
@@ -972,7 +972,7 @@ static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseNam
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (databaseName==NULL || databaseNameLength<=0)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseFilePath()", __LINE__, (unsigned char *)"引数で指定された\"databaseName\"がNULL, または文字列数が0以下です", NULL);
@@ -994,12 +994,12 @@ static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseNam
  */
 static unsigned char *this_getDatabaseName (const M2MCEP *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->databaseName;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseName()", __LINE__, (unsigned char *)"引数で指定された\"M2MCEP *\"がNULLです", NULL);
@@ -1017,7 +1017,7 @@ static unsigned char *this_getDatabaseName (const M2MCEP *self)
  */
 static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const unsigned char *columnNameCSV, M2MDataType dataTypeArray[], const size_t dataTypeArrayLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *columnName = NULL;
 	unsigned char *index = NULL;
 	unsigned int dataTypeIndex = 0;
@@ -1044,7 +1044,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const unsi
 				//===== カラムのデータ型を配列へ格納 =====
 				dataTypeArray[dataTypeIndex] = dataType;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				dataTypeArray[dataTypeIndex] = M2M_DATA_TYPE_ERROR;
@@ -1064,7 +1064,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const unsi
 			dataTypeArray[dataTypeIndex] = dataType;
 			dataTypeIndex++;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			dataTypeArray[dataTypeIndex] = M2M_DATA_TYPE_ERROR;
@@ -1090,12 +1090,12 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const unsi
  */
 static sqlite3 *this_getFileDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *databaseName = NULL;
 	M2MTableBuilder *tableBuilder = NULL;
 	sqlite3 *fileDatabase = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== レコード永続化のフラグが立っている事を確認 =====
@@ -1119,19 +1119,19 @@ static sqlite3 *this_getFileDatabase (M2MCEP *self)
 					//===== ファイル上のSQLite3データベース管理オブジェクトを返す =====
 					return fileDatabase;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else if (databaseName==NULL)
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getFileDatabase()", __LINE__, (unsigned char *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なデータベースファイル名取得に失敗しました", NULL);
 					return NULL;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else if (tableBuilder==NULL)
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getFileDatabase()", __LINE__, (unsigned char *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なテーブル構築オブジェクト取得に失敗しました", NULL);
 					return NULL;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getFileDatabase()", __LINE__, (unsigned char *)"ファイル上のSQLite3データベース管理オブジェクト作成に失敗しました", NULL);
@@ -1165,15 +1165,15 @@ static sqlite3 *this_getFileDatabase (M2MCEP *self)
  */
 static unsigned int this_getMaxColumnLength (sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned int DEFAULT_MAX_COLUMN_LENGTH = (unsigned int)2000;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
 		return (unsigned int)sqlite3_limit(database, SQLITE_LIMIT_COLUMN, -1);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return DEFAULT_MAX_COLUMN_LENGTH;
@@ -1189,15 +1189,15 @@ static unsigned int this_getMaxColumnLength (sqlite3 *database)
  */
 static unsigned int this_getMaxRecord (const M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int DEFAULT_MAX_RECORD = 50;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->maxRecord;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return DEFAULT_MAX_RECORD;
@@ -1213,10 +1213,10 @@ static unsigned int this_getMaxRecord (const M2MCEP *self)
  */
 static sqlite3 *this_getMemoryDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== メモリ上のSQLite3データベース管理オブジェクトの確認 =====
@@ -1235,7 +1235,7 @@ static sqlite3 *this_getMemoryDatabase (M2MCEP *self)
 				//===== メモリ上のSQLite3データベース管理オブジェクトを返す =====
 				return memoryDatabase;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getMemoryDatabase()", __LINE__, (unsigned char *)"メモリ上のSQLite3データベース管理オブジェクト作成に失敗しました", NULL);
@@ -1300,10 +1300,10 @@ static unsigned int this_getRecordCounter (const M2MCEP *self)
  */
 static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const unsigned char *sql)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL && sql!=NULL)
 		{
 		//===== プリペアドステートメントの獲得 =====
@@ -1313,14 +1313,14 @@ static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const u
 			sqlite3_clear_bindings(statement);
 			return statement;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getSQLitePreparedStatement()", __LINE__, (unsigned char *)sqlite3_errmsg(database), NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (database==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getSQLitePreparedStatement()", __LINE__, (unsigned char *)"引数で指定されたSQLite3データベース管理オブジェクトがNULLです", NULL);
@@ -1343,12 +1343,12 @@ static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const u
  */
 static M2MTableBuilder *this_getTableBuilder (const M2MCEP *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->tableBuilder;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getTableBuilder()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -1382,11 +1382,11 @@ static unsigned int this_getVacuumRecord (const M2MCEP *self)
  */
 static bool this_includesData (const unsigned char *csv)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *index = NULL;
 	const size_t CRLF_LENGTH = M2MString_length((unsigned char *)M2MString_CRLF);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (csv!=NULL)
 		{
 		//===== ヘッダの改行コードを確認 =====
@@ -1411,7 +1411,7 @@ static bool this_includesData (const unsigned char *csv)
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return false;
@@ -1429,10 +1429,10 @@ static bool this_includesData (const unsigned char *csv)
  */
 static M2MCEP *this_init (M2MCEP *self, const unsigned char *databaseName, const M2MTableBuilder *tableBuilder)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned int MAX_RECORD = 50;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && databaseName!=NULL && tableBuilder!=NULL)
 		{
 		if (this_setDatabaseName(self, databaseName)!=NULL
@@ -1443,14 +1443,14 @@ static M2MCEP *this_init (M2MCEP *self, const unsigned char *databaseName, const
 			{
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MCEP_delete(&self);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -1468,7 +1468,7 @@ static M2MCEP *this_init (M2MCEP *self, const unsigned char *databaseName, const
  */
 static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *tableRecord, M2MTableBuilder *tableBuilder, const unsigned int maxRecord, const bool persistence)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
 	M2MColumnList *columnList = NULL;
 	M2MList *oldRecordList = NULL;
@@ -1489,7 +1489,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 	unsigned char MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (tableRecord!=NULL
 			&& (tableName=M2MCEPRecord_getTableName(tableRecord))!=NULL
 			&& (oldRecordList=M2MList_begin(M2MCEPRecord_getOldRecordList(tableRecord)))!=NULL
@@ -1514,7 +1514,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 					M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, MESSAGE);
 #endif // DEBUG
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else if (columnNameCSV==NULL)
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, (unsigned char *)"テーブルレコード管理オブジェクトから取得したカラム名を示すCSV形式の文字列がNULLです", NULL);
@@ -1586,7 +1586,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 								M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, (unsigned char *)"ファイル上のSQLite3データベースへレコードを挿入しました");
 #endif // DEBUG
 								}
-							//===== エラー処理 =====
+							//===== Error handling =====
 							else
 								{
 								M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, sqlite3_errmsg(fileDatabase), NULL);
@@ -1616,7 +1616,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 				if (sqlite3_finalize(statement)==SQLITE_OK)
 					{
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, (unsigned char *)sqlite3_errmsg(fileDatabase), NULL);
@@ -1649,7 +1649,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 			return;
 			}
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else if (tableRecord==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, (unsigned char *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
@@ -1684,7 +1684,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
  */
 static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record, M2MTableBuilder *tableBuilder, M2MList *recordList)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
 	M2MColumnList *columnList = NULL;
 	M2MDataType DATA_TYPE_ARRAY[this_getMaxColumnLength(database)];
@@ -1699,7 +1699,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 	int resultCode = 0;
 	const size_t COMMA_LENGTH = M2MString_length((unsigned char *)M2MString_COMMA);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL && tableBuilder!=NULL && record!=NULL && (recordList=M2MList_begin(recordList))!=NULL)
 		{
 		//===== テーブル名, カラム名CSVと挿入対象の新規レコード情報オブジェクトの取得 =====
@@ -1750,7 +1750,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 							M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"SQLite3データベースへレコードを挿入しました");
 #endif // DEBUG
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"SQLite3データベースのINSERT処理でエラーが発生しました", NULL);
@@ -1799,7 +1799,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 					M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"SQLite3データベースへレコードを挿入しました");
 #endif // DEBUG
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"SQLite3データベースのINSERT処理でエラーが発生しました", NULL);
@@ -1818,7 +1818,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 			if (sqlite3_finalize(statement)==SQLITE_OK)
 				{
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)sqlite3_errmsg(database), NULL);
@@ -1828,7 +1828,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 			//===== 挿入したレコード数を返す =====
 			return numberOfRecord;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (tableName==NULL)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"レコード管理オブジェクトから取得したテーブル名を示す文字列がNULLです", NULL);
@@ -1855,7 +1855,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 			return -1;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (database==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertNewRecordList()", __LINE__, (unsigned char *)"引数で指定されたSQLite3データベース管理オブジェクトがNULLです", NULL);
@@ -1890,13 +1890,13 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
  */
 static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MTableBuilder *tableBuilder = NULL;
 	M2MCEPRecord *tableRecord = NULL;
 	unsigned int maxRecord = 0;
 	bool persistence = false;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== テーブルレコード管理オブジェクトを取得 =====
@@ -1945,7 +1945,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 			//===== 正常終了 =====
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (tableBuilder==NULL)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToFileDatabase()", __LINE__, (unsigned char *)"引数で指定された\"CEP *\"から取得したテーブル構築オブジェクトがNULLです", NULL);
@@ -1962,7 +1962,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToFileDatabase()", __LINE__, (unsigned char *)"引数で指定された\"CEP *\"がNULLです", NULL);
@@ -1981,14 +1981,14 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
  */
 static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	M2MTableBuilder *tableBuilder = NULL;
 	M2MCEPRecord *record = NULL;
 	int numberOfRecord = 0;
 	int result = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== データベースとレコード管理オブジェクトの取得 =====
@@ -2012,7 +2012,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 					//===== 挿入したレコード数をカウント =====
 					numberOfRecord += result;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToMemoryDatabase()", __LINE__, (unsigned char *)"メモリ上のSQLiteデータベースへのレコード挿入処理に失敗しました", NULL);
@@ -2028,7 +2028,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 				//===== 挿入したレコード数をカウント =====
 				numberOfRecord += result;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToMemoryDatabase()", __LINE__, (unsigned char *)"メモリ上のSQLiteデータベースへのレコード挿入処理に失敗しました", NULL);
@@ -2041,7 +2041,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 			//===== 挿入したレコード数を返す =====
 			return numberOfRecord;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (memoryDatabase==NULL)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToMemoryDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトから取得したメモリ上のSQLite3管理オブジェクトがNULLです", NULL);
@@ -2058,7 +2058,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 			return -1;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_insertRecordListToMemoryDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -2100,14 +2100,14 @@ static unsigned char *this_makeDirectory (const unsigned char *directoryPath, co
  */
 static sqlite3 *this_openFileDatabase (const unsigned char *databaseName, const M2MTableBuilder *tableBuilder, const unsigned int vacuumRecord)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
 	unsigned char *databaseFilePath = NULL;
 #ifdef DEBUG
 	unsigned char MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (databaseName!=NULL && tableBuilder!=NULL)
 		{
 		//===== データベースファイルパス文字列の取得 =====
@@ -2154,7 +2154,7 @@ static sqlite3 *this_openFileDatabase (const unsigned char *databaseName, const 
 				//===== データベースへ返す =====
 				return fileDatabase;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_openFileDatabase()", __LINE__, (unsigned char *)sqlite3_errmsg(fileDatabase), NULL);
@@ -2164,14 +2164,14 @@ static sqlite3 *this_openFileDatabase (const unsigned char *databaseName, const 
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_openFileDatabase()", __LINE__, (unsigned char *)"ファイル上のSQLiteデータベースのファイルパスを示す文字列取得に失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else if (databaseName==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_openFileDatabase()", __LINE__, (unsigned char *)"引数で指定されたファイル上のSQLiteデータベース名を示す文字列がNULLです", NULL);
@@ -2195,7 +2195,7 @@ static sqlite3 *this_openFileDatabase (const unsigned char *databaseName, const 
  */
 static sqlite3 *this_openMemoryDatabase (const M2MTableBuilder *tableBuilder, const unsigned int vacuumRecord)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	const unsigned char *MEMORY_DATABASE = (unsigned char *)":memory:";
 
@@ -2238,7 +2238,7 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableBuilder *tableBuilder, co
 		//===== メモリ上のSQLite3データベースオブジェクトを返す =====
 		return memoryDatabase;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_openMemoryDatabase()", __LINE__, (unsigned char *)"メモリ上のSQLiteデータベースのオープンに失敗しました", NULL);
@@ -2256,11 +2256,11 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableBuilder *tableBuilder, co
  */
 static void this_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *PRAGMA_AUTO_VACUUM_SQL = (unsigned char *)"PRAGMA auto_vacuum = 1 ";
 	unsigned char *PRAGMA_NOT_AUTO_VACUUM_SQL = (unsigned char *)"PRAGMA auto_vacuum = 0 ";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
 		//===== 自動バキュームを有効にする場合 =====
@@ -2271,7 +2271,7 @@ static void this_setAutoVacuum (sqlite3 *database, const bool flag)
 				{
 				return;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setAutoVacuum()", __LINE__, (unsigned char *)"SQLite3データベースの自動バキュームON設定に失敗しました", NULL);
@@ -2286,7 +2286,7 @@ static void this_setAutoVacuum (sqlite3 *database, const bool flag)
 				{
 				return;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setAutoVacuum()", __LINE__, (unsigned char *)"SQLite3データベースの自動バキュームOFF設定に失敗しました", NULL);
@@ -2294,7 +2294,7 @@ static void this_setAutoVacuum (sqlite3 *database, const bool flag)
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setAutoVacuum()", __LINE__, (unsigned char *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
@@ -2313,7 +2313,7 @@ static void this_setAutoVacuum (sqlite3 *database, const bool flag)
  */
 static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *databaseName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	size_t databaseNameLength = 0;
 	const unsigned char *FILE_EXTENSION = (unsigned char *)".sqlite";
 	const size_t FILE_EXTENSION_LENGTH = M2MString_length(FILE_EXTENSION);
@@ -2321,7 +2321,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 	unsigned char MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && databaseName!=NULL
 			&& (databaseNameLength=M2MString_length(databaseName))>0)
 		{
@@ -2341,7 +2341,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 #endif // DEBUG
 				return self;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setDatabaseName()", __LINE__, (unsigned char *)"データベース名をコピーするためのヒープメモリー領域の獲得に失敗しました", NULL);
@@ -2365,7 +2365,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 #endif // DEBUG
 				return self;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setDatabaseName()", __LINE__, (unsigned char *)"データベース名をコピーするためのヒープメモリー領域の獲得に失敗しました", NULL);
@@ -2373,7 +2373,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setDatabaseName()", __LINE__, (unsigned char *)"引数で指定された\"M2MCEP *\"がNULLです", NULL);
@@ -2402,7 +2402,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
  */
 static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && fileDatabase!=NULL)
 		{
 		self->fileDatabase=fileDatabase;
@@ -2411,7 +2411,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
 #endif // DEBUG
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setFileDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -2435,7 +2435,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
  */
 static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && memoryDatabase!=NULL)
 		{
 		self->memoryDatabase = memoryDatabase;
@@ -2444,7 +2444,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
 #endif // DEBUG
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setMemoryDatabase()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -2468,7 +2468,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
  */
 static M2MCEP *this_setTableBuilder (M2MCEP *self, const M2MTableBuilder *tableBuilder)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableBuilder!=NULL)
 		{
 		//===== 既存のテーブル構築オブジェクトを削除 =====
@@ -2480,7 +2480,7 @@ static M2MCEP *this_setTableBuilder (M2MCEP *self, const M2MTableBuilder *tableB
 #endif // DEBUG
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setTableBuilder()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -2501,10 +2501,10 @@ static M2MCEP *this_setTableBuilder (M2MCEP *self, const M2MTableBuilder *tableB
  */
 static void this_setUTF8 (sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned char *PRAGMA_ENCODING_SQL = (unsigned char *)"PRAGMA encoding = 'UTF-8'";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
 		//===== SQL文の実行 =====
@@ -2512,14 +2512,14 @@ static void this_setUTF8 (sqlite3 *database)
 			{
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setUTF8()", __LINE__, (unsigned char *)"SQLite3データベースのUTF-8文字コード設定に失敗しました", NULL);
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setUTF8()", __LINE__, (unsigned char *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
@@ -2537,7 +2537,7 @@ static void this_setUTF8 (sqlite3 *database)
  */
 static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const unsigned char *value, const size_t valueLength, sqlite3_stmt *statement)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (index>0 && statement!=NULL)
 		{
 		//===== BLOB型データの場合 =====
@@ -2550,7 +2550,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BLOB\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BLOB\"型データのセットに失敗しました", NULL);
@@ -2570,7 +2570,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BOOL\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"BOOL\"型データのセットに失敗しました", NULL);
@@ -2586,7 +2586,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"DATETIME\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"DATETIME\"型データのセットに失敗しました", NULL);
@@ -2602,7 +2602,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"DOUBLE\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"DOUBLE\"型データのセットに失敗しました", NULL);
@@ -2622,7 +2622,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"FLOAT\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"FLOAT\"型データのセットに失敗しました", NULL);
@@ -2638,7 +2638,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"INTEGER\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"INTEGER\"型データのセットに失敗しました", NULL);
@@ -2654,7 +2654,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"NULL\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"NULL\"型データのセットに失敗しました", NULL);
@@ -2674,7 +2674,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"REAL\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"REAL\"型データのセットに失敗しました", NULL);
@@ -2690,7 +2690,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"TEXT\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"TEXT\"型データのセットに失敗しました", NULL);
@@ -2706,19 +2706,19 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"VARCHAR\"型データをセットしました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"\"VARCHAR\"型データのセットに失敗しました", NULL);
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"引数で指定されたデータ型と一致するデータ型が見つかりません", NULL);
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (index<=0)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setValueIntoPreparedStatement()", __LINE__, (unsigned char *)"引数で指定されたデータ値の位置を示すインデックスが0以下です", NULL);
@@ -2747,12 +2747,12 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
  */
 static void this_setWAL (sqlite3 *database, const bool synchronous)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned char *PRAGMA_JOURNAL_MODE_SQL = (unsigned char *)"PRAGMA journal_mode = WAL ";
 	const unsigned char *PRAGMA_SYNCHRONOUS_SQL = (unsigned char *)"PRAGMA synchronous = NORMAL ";
 	const unsigned char *PRAGMA_NOT_SYNCHRONOUS_SQL = (unsigned char *)"PRAGMA synchronous = OFF ";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
 #ifdef DEBUG
@@ -2779,21 +2779,21 @@ static void this_setWAL (sqlite3 *database, const bool synchronous)
 #endif // DEBUG
 				return;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setWAL()", __LINE__, (unsigned char *)"SQLite3データベースの同期モード設定処理に失敗しました", NULL);
 				return;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setWAL()", __LINE__, (unsigned char *)"SQLite3データベースのWALジャーナルモード設定処理に失敗しました", NULL);
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_setWAL()", __LINE__, (unsigned char *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
@@ -2810,7 +2810,7 @@ static void this_setWAL (sqlite3 *database, const bool synchronous)
  */
 static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 自動バキューム設定がONの場合 =====
@@ -2843,7 +2843,7 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_addFileDBVacuumCounter()", __LINE__, (unsigned char *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -2859,10 +2859,10 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
  */
 static void this_vacuum (sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned char *SQL = "VACUUM ";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
 #ifdef DEBUG
@@ -2876,14 +2876,14 @@ static void this_vacuum (sqlite3 *database)
 #endif // DEBUG
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_vacuum()", __LINE__, (unsigned char *)"SQLite3データベースのバキューム処理に失敗しました", NULL);
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_vacuum()", __LINE__, (unsigned char *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
@@ -2896,11 +2896,11 @@ static void this_vacuum (sqlite3 *database)
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたCEP実行オブジェクトのヒープメモリ領域を解放する．<br>
- * この関数呼び出し後は引数で師弟されたCEP実行オブジェクトにアクセス出来なく<br>
- * なる事に注意する．<br>
+ * Release the heap memory of CEP structure object. <br>
+ * Note that after calling this function, caller will not be able to access <br>
+ * the CEP structure object appointed by argument.<br>
  *
- * @param[in,out] self	メモリ領域解放対象のCEP実行オブジェクト
+ * @param[in,out] self	CEP structure object to be freed of memory area
  */
 void M2MCEP_delete (M2MCEP **self)
 	{
@@ -2931,7 +2931,7 @@ void M2MCEP_delete (M2MCEP **self)
 		//===== CEP実行オブジェクトのヒープメモリ領域を解放 =====
 		M2MHeap_free((*self));
 #ifdef DEBUG
-		M2MLogger_printDebugMessage((M2MString *)"M2MCEP_delete()", __LINE__, (M2MString *)"CEP実行オブジェクトのメモリ領域を解放しました");
+		M2MLogger_printDebugMessage((M2MString *)"M2MCEP_delete()", __LINE__, (M2MString *)"Released the heap memory of CEP structure object");
 #endif // DEBUG
 		}
 	//===== Argument error =====
@@ -2940,7 +2940,7 @@ void M2MCEP_delete (M2MCEP **self)
 		// do nothing
 		}
 #ifdef DEBUG
-	M2MLogger_printDebugMessage((M2MString *)"M2MCEP.delete()", __LINE__, (M2MString *)"********** CEPライブラリ終了 **********");
+	M2MLogger_printDebugMessage((M2MString *)"M2MCEP.delete()", __LINE__, (M2MString *)"********** End of CEP process **********");
 #endif // DEBUG
 	return;
 	}
@@ -2968,10 +2968,10 @@ void M2MCEP_delete (M2MCEP **self)
  */
 int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString *csv)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	int numberOfRecord = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && csv!=NULL)
 		{
 		//===== レコード管理オブジェクトへCSV形式の文字列をセット =====
@@ -2992,28 +2992,28 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 					//===== レコード数を返す =====
 					return numberOfRecord;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((M2MString *)"M2MCEP_insertCSV()", __LINE__, (M2MString *)"ファイル上のSQLite3データベースへのレコード挿入処理に失敗しました", NULL);
 					return -1;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEP_insertCSV()", __LINE__, (M2MString *)"メモリ上のSQLite3データベースへのレコード挿入処理に失敗しました", NULL);
 				return -1;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEP_insertCSV()", __LINE__, (M2MString *)"レコード管理オブジェクトへCSV形式の文字列をセットするのに失敗しました", NULL);
 			return -1;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_insertCSV()", __LINE__, (M2MString *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -3043,13 +3043,13 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
  */
 M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableBuilder)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MCEP *self = NULL;
 
 #ifdef DEBUG
 	M2MLogger_printDebugMessage((M2MString *)"M2MCEP.new()", __LINE__, (M2MString *)"********** CEPライブラリ起動 **********");
 #endif // DEBUG
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (databaseName!=NULL && tableBuilder!=NULL)
 		{
 #ifdef DEBUG
@@ -3066,7 +3066,7 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableB
 #endif // DEBUG
 				return self;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEP_new()", __LINE__, (M2MString *)"CEP実行オブジェクトの初期化処理に失敗しました", NULL);
@@ -3075,14 +3075,14 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableB
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEP_new()", __LINE__, (M2MString *)"CEP実行オブジェクトを新規作成するためのヒープメモリ領域の獲得に失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (databaseName==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_new()", __LINE__, (M2MString *)"引数で指定された\"databaseName\"文字列がNULLです", NULL);
@@ -3116,7 +3116,7 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableB
  */
 M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	sqlite3_stmt* statement = NULL;
 	int resultCode = 0;
@@ -3129,7 +3129,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 	size_t dataLength = 0;
 	int sqliteColumnType = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && sql!=NULL && result!=NULL)
 		{
 		//===== SQL文をVDBE（内部実行形式）へ変換 =====
@@ -3176,7 +3176,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 							//===== カラム名を付加 =====
 							M2MString_append(result, columnName);
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)"SELECT結果からカラム名を示す文字列が取得出来ません", NULL);
@@ -3216,7 +3216,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 							//===== 整数データ文字列のメモリ領域を解放 =====
 							M2MHeap_free(data);
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)"SELECT結果の整数データを文字列に変換出来ませんでした", NULL);
@@ -3232,7 +3232,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 							//===== 整数データ文字列のメモリ領域を解放 =====
 							M2MHeap_free(data);
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)"SELECT結果の浮動小数点数データを文字列に変換出来ませんでした", NULL);
@@ -3246,7 +3246,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 							//===== 文字列を付加 =====
 							M2MString_append(result, data);
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)"SELECT結果の文字列データを取得出来ませんでした", NULL);
@@ -3263,7 +3263,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 							//===== 文字列のメモリ領域を解放 =====
 							M2MHeap_free(data);
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else if (dataLength<=0)
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
@@ -3302,14 +3302,14 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_select()", __LINE__, (M2MString *)"引数で指定された\"M2MCEP *\"がNULLです", NULL);
@@ -3339,13 +3339,13 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
  */
 M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const unsigned int MAX_RECORD_MAX = 500;
 #ifdef DEBUG
 	M2MString MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && 0<maxRecord && maxRecord<MAX_RECORD_MAX)
 		{
 		//===== レコード数上限値の設定 =====
@@ -3357,7 +3357,7 @@ M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
 #endif // DEBUG
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_setMaxRecord()", __LINE__, (M2MString *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -3384,7 +3384,7 @@ M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
  */
 void M2MCEP_setSignalHandler (const M2MCEP *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct sigaction newAction;
 	struct sigaction oldAction;
 
@@ -3439,7 +3439,7 @@ void M2MCEP_setSignalHandler (const M2MCEP *self)
  */
 M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 永続化の場合 =====
@@ -3460,14 +3460,14 @@ M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence)
 #endif // DEBUG
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEP_setPersistence()", __LINE__, (M2MString *)"引数で指定された永続化可否のフラグが\"true\"でも\"false\"でもありません", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_setPersistence()", __LINE__, (M2MString *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);
@@ -3487,13 +3487,13 @@ M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence)
  */
 M2MCEP *M2MCEP_setVacuumRecord (M2MCEP *self, const unsigned int vacuumRecord)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->vacuumRecord = vacuumRecord;
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEP_setMaxMemoryDatabaseVacuumRecord()", __LINE__, (M2MString *)"引数で指定されたCEP実行オブジェクトがNULLです", NULL);

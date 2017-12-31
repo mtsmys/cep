@@ -34,6 +34,7 @@
 
 
 
+#include "m2m/lang/M2MString.h"
 #include "m2m/cep/M2MDataType.h"
 
 
@@ -46,10 +47,12 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * @param name				カラム名
+ * Structure object containing database column information.<br>
+ *
+ * @param name				String indicating column name
  * @param dataType			カラムのデータ型
  * @param primaryKey		主キー有効化のフラグ
  * @param autoIncrement		自動インクリメント有効化のフラグ
@@ -59,7 +62,7 @@ extern "C"
 #ifndef M2MColumn
 typedef struct
 	{
-	unsigned char *name;
+	M2MString *name;
 	M2MDataType dataType;
 	bool primaryKey;
 	bool autoIncrement;
@@ -172,7 +175,7 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType);
  * @param[in] name		カラム名を示す文字列
  * @return				カラム名をセットされたカラム情報オブジェクト or NULL（エラーの場合）
  */
-M2MColumn *M2MColumn_setName (M2MColumn *self, const unsigned char *name);
+M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name);
 
 
 /**

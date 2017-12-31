@@ -133,13 +133,13 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string);
 
 
 /**
- * 引数で指定されたself文字列の後ろに、引数stringで指定された文字列を追加する．<br>
- * 追加文字列の長さ[Byte]は引数のstringLengthで指定する．<br>
+ * Add the string after the "self" string. <br>
+ * The length [Byte] of the additional string is specified by argument.<br>
  *
- * @param[in,out] self		文字列を追加する、元の文字列（追加後の文字列は self = "self + string" となる）
- * @param[in] string		追加する文字列
- * @param[in] stringLength	追加する文字列の長さを示す整数[Byte]（文字列の一部のみを追加する場合に有効)
- * @return					文字列が追加されたバッファのポインタ or NULL（エラーの場合）
+ * @param[in,out] self		The original string to be added to the string (the string after addition is self = self + string)
+ * @param[in] string		String to be added
+ * @param[in] stringLength	Length of the string to be added[Byte]
+ * @return					Pointer of the buffer to which the string was added or NULL (in case of error)
  */
 M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, const size_t stringLength);
 

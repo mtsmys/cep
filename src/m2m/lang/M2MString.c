@@ -116,13 +116,13 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 
 
 /**
- * Add the argument string after the "self" string. <br>
- * The length [Byte] of the additional string is specified by "stringLength".<br>
+ * Add the string after the "self" string. <br>
+ * The length [Byte] of the additional string is specified by argument.<br>
  *
- * @param[in,out] self		文字列を追加する, 元の文字列（追加後の文字列は self = "self + string" となる）
- * @param[in] string		追加する文字列
- * @param[in] stringLength	追加する文字列の長さを示す整数[Byte]（文字列の一部のみを追加する場合に有効)
- * @return					文字列が追加されたバッファのポインタ or NULL（エラーの場合）
+ * @param[in,out] self		The original string to be added to the string (the string after addition is self = self + string)
+ * @param[in] string		String to be added
+ * @param[in] stringLength	Length of the string to be added[Byte]
+ * @return					Pointer of the buffer to which the string was added or NULL (in case of error)
  */
 M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, const size_t stringLength)
 	{
@@ -133,26 +133,26 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	//===== Check argument =====
 	if (self!=NULL && string!=NULL && 0<stringLength && stringLength<=M2MString_length(string))
 		{
-		//===== 連結元の文字列が存在する場合 =====
+		//===== When the string of the concatenation source exists =====
 		if ((*self)!=NULL)
 			{
-			//===== 連結元の文字列を一時的にコピーするための準備 =====
+			//===== Preparation for temporarily copying the original string =====
 			if( (thisLength=M2MString_length((*self)))>0
 				&& (tmp=(M2MString *)M2MHeap_malloc(thisLength+1))!=NULL)
 				{
-				//===== 連結元の文字列を一時的にコピー =====
+				//===== Temporarily copy the source string =====
 				memcpy(tmp, (*self), thisLength);
-				//===== 連結元の文字列のヒープメモリ領域を解放 =====
+				//===== Rlease heap memory of consolidation source =====
 				M2MHeap_free((*self));
-				//===== 連結文字列のヒープメモリ領域を獲得 =====
+				//===== Get heap memory of concatenated string =====
 				if (((*self)=(M2MString *)M2MHeap_malloc(thisLength+stringLength+1))!=NULL)
 					{
-					//===== 文字列を連結 =====
+					//===== Concatenate strings =====
 					memcpy(&((*self)[0]), tmp, thisLength);
 					memcpy(&((*self)[thisLength]), string, stringLength);
-					//===== 一時的なバッファのヒープメモリ領域を解放 =====
+					//===== Release temporary buffer heap memory =====
 					M2MHeap_free(tmp);
-					//===== 連結した文字列のポインタを返す =====
+					//===== Return pointer of concatenated string =====
 					return (*self);
 					}
 				//===== Error handling =====
@@ -168,15 +168,15 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 				return NULL;
 				}
 			}
-		//===== 連結元の文字列が存在しない場合 =====
+		//===== When the string of the concatenation source does not exist =====
 		else
 			{
-			//===== 文字列コピーのヒープメモリ領域を獲得 =====
+			//===== Get heap memory for copying string =====
 			if (((*self)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
 				{
-				//===== 文字列をコピー =====
+				//===== Copy string =====
 				memcpy((*self), string, stringLength);
-				//===== 文字列のポインタを返す =====
+				//===== Return pointer of concatenated string =====
 				return (*self);
 				}
 			//===== Error handling =====

@@ -31,24 +31,25 @@
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
+ * Open the file in writable type (="a+b").<br>
  *
- * @param filePath	ファイル設置パスを示す文字列
- * @return			オープンしたファイルの入出力オブジェクト or NULL（エラーの場合）
+ * @param filePath	String indicating file pathname to open
+ * @return			Opened file object or NULL (in case of error)
  */
-static FILE *this_openAppendFile (const unsigned char *filePath)
+static FILE *this_openFileInAppendType (const unsigned char *filePath)
 	{
-	//========== 変数 ==========
+	//========== Variable ==========
 	FILE *file = NULL;
 
-	//===== ファイルを追記型で開く（存在しない場合は新規作成) =====
+	//===== Open the file as writable type (create if it doesn't exist) =====
 	if ((file=fopen(filePath, "a+b"))!=NULL)
 		{
 		return file;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		return NULL;
@@ -57,21 +58,21 @@ static FILE *this_openAppendFile (const unsigned char *filePath)
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたファイルを閉じる。<br>
+ * Close the file specified by the argument.<br>
  *
- * @param file	ファイルオブジェクト
+ * @param[in,out] file	FILE structure object
  */
 void M2MFile_close (FILE *file)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (file!=NULL)
 		{
 		fclose(file);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		}
@@ -80,20 +81,20 @@ void M2MFile_close (FILE *file)
 
 
 /**
- * 引数で指定されたパスのファイルが存在するかどうか確認する。<br>
+ * Tests whether the file denoted by argument pathname exists.<br>
  *
- * @param filePath	存在を確認するファイルの絶対パス
- * @return			true : ファイルが存在, false : ファイルが存在しない
+ * @param[in] filePath	Absolute pathname of the file to check for existence
+ * @return				true: if the file denoted by pathname, false: otherwise
  */
 bool M2MFile_exists (const unsigned char *filePath)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct stat fileStatus;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (filePath!=NULL)
 		{
-		//===== 指定さたファイルの存在を確認 =====
+		//===== Confirm existence of specified file =====
 		if (stat(filePath, &fileStatus)==0 && S_ISREG(fileStatus.st_mode))
 			{
 			return true;
@@ -103,7 +104,7 @@ bool M2MFile_exists (const unsigned char *filePath)
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return false;
@@ -112,19 +113,19 @@ bool M2MFile_exists (const unsigned char *filePath)
 
 
 /**
- * 引数で指定されたファイルのファイルディスクリプタ（iノードを示す整数）を取得する。<br>
+ * Get file descriptor (indicating inode) of the argument file.<br>
  *
- * @param[in] file	ファイルオブジェクト
- * @return			引数で指定されたファイルのiノードを示す整数 or -1（エラーの場合）
+ * @param[in] file	FILE structure object
+ * @return			Integer indicating the inode of the file or -1 (in case of error)
  */
 int M2MFile_getFileDescriptor (const FILE *file)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (file!=NULL)
 		{
 		return fileno((FILE *)file);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return -1;
@@ -133,31 +134,31 @@ int M2MFile_getFileDescriptor (const FILE *file)
 
 
 /**
- * 引数で指定されたファイルの大きさ[バイト]を返す。<br>
+ * Return the size of the file[bytes].<br>
  *
- * @param file	ファイルオブジェクト
- * @return		ファイルの大きさを示す整数[バイト] or 0(エラーの場合)
+ * @param[in] file	FILE structure object
+ * @return			Integer indicating file size[byte] or 0 (in case of error)
  */
 unsigned long M2MFile_length (const FILE *file)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct stat fileStatus;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (file!=NULL)
 		{
-		//===== ファイル状態の取得 =====
+		//===== Get file status object =====
 		if (fstat(M2MFile_getFileDescriptor(file), &fileStatus)==0)
 			{
 			return fileStatus.st_size;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return 0;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return 0;
@@ -166,42 +167,42 @@ unsigned long M2MFile_length (const FILE *file)
 
 
 /**
- * 引数で指定されたパスのファイルを開く。<br>
+ * Open the file with the argument pathname in readable & writable type.<br>
  *
- * @param filePath	ファイルパスを示す文字列
- * @param append	ファイルを開く際の追記の有無を示すフラグ
- * @return			ファイルオブジェクト or NULL（エラーの場合）
+ * @param[in] filePath	Absolute pathname of the file to open
+ * @param[in] append	Flag indicating presence or absence of additional mode
+ * @return				FILE structure object or NULL (in case of error)
  */
 FILE *M2MFile_open (const unsigned char *filePath, const bool append)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (filePath!=NULL)
 		{
-		//===== 追記有りの場合 =====
+		//===== In case of additional writable permission =====
 		if (append==true)
 			{
-			//===== ファイルを追記型で開く =====
-			return this_openAppendFile(filePath);
+			//===== Open the file in additional writing mode =====
+			return this_openFileInAppendType(filePath);
 			}
-		//===== 追記無しの場合 =====
+		//===== In the case of no additional mode =====
 		else
 			{
-			//===== 既存のファイルの存在有無を確認 =====
+			//===== Confirm existence of existing file =====
 			if (M2MFile_exists(filePath)==true)
 				{
-				//===== ファイルを削除 =====
+				//===== Delete the file because prohibited additional writing =====
 				M2MFile_remove(filePath);
 				}
-			//===== 既存ファイルが存在しない場合 =====
+			//===== When there is no existing file =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== ファイルを追記型で開く =====
-			return this_openAppendFile(filePath);
+			//===== Open the file in additional writing mode =====
+			return this_openFileInAppendType(filePath);
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -210,11 +211,11 @@ FILE *M2MFile_open (const unsigned char *filePath, const bool append)
 
 
 /**
- * 指定されたファイルからデータを読み取る。<br>
+ * Read data from the file and copy to the buffer.<br>
  *
- * @param[in] file		UNIX/Linuxファイル構造体オブジェクト
- * @param[out] data		ファイル入力用バッファ
- * @return				ファイル入力用バッファのポインタ or NULL(エラーの場合)
+ * @param[in] file		FILE structure object
+ * @param[out] data		Buffer for copying the file data
+ * @return				Buffer pointer or NULL (in case of error)
  */
 unsigned char *M2MFile_read (const FILE *file, unsigned char **data)
 	{
@@ -313,28 +314,28 @@ unsigned char *M2MFile_read (const FILE *file, unsigned char **data)
 
 
 /**
- * 引数で指定されたパスのファイルを削除する。<br>
+ * Deletes a file of the argument pathname.<br>
  *
- * @param filePath	削除対象のファイルパスを示す文字列
+ * @param[in] filePath	String indicating the file pathname to be deleted
  */
 void M2MFile_remove (const unsigned char *filePath)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (filePath!=NULL)
 		{
-		//===== ファイルが存在する場合 =====
+		//===== When the file exists =====
 		if (M2MFile_exists(filePath)==true)
 			{
-			//===== ファイルを削除 =====
+			//===== Delete the file =====
 			unlink(filePath);
 			}
-		//===== ファイルが存在しない場合 =====
+		//===== If the file does not exist =====
 		else
 			{
-			// 何もしない
+			// do nothing
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		}
@@ -343,57 +344,57 @@ void M2MFile_remove (const unsigned char *filePath)
 
 
 /**
- * 指定されたファイルにデータを出力する。<br>
+ * Output data to the specified file as argument.<br>
  *
- * @param[in] file			UNIX/Linuxファイル構造体オブジェクト
- * @param[in] data			ファイル出力データ
- * @param[in] dataLength	ファイル出力データサイズ[Byte]
- * @return					true : ファイル出力に成功, false : ファイル出力に失敗
+ * @param[in] file			FILE structure object
+ * @param[in] data			Output data
+ * @param[in] dataLength	Size of output data[Byte]
+ * @return					true: Success to file output, false: Failed to file output
  */
 bool M2MFile_write (const FILE *file, const unsigned char *data, const size_t dataLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	ssize_t writtenDataLength = 0;
 	size_t result = 0;
 	unsigned int errorCounter = 0;
 	const unsigned int MAX_ERROR = 5;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (file!=NULL && data!=NULL)
 		{
-		//===== 引数で指定されたデータ全てをファイル出力するまで繰り返し =====
+		//===== Repeat until all data is output to file =====
 		for (result=0; result<dataLength; result=result+(size_t)writtenDataLength)
 			{
-			//===== ファイル出力 =====
+			//===== Output to file =====
 			if ((writtenDataLength=write(M2MFile_getFileDescriptor(file), data, dataLength-result))>0)
 				{
 				}
-			//===== ファイル出力に失敗した場合 =====
+			//===== In the case of failed to file output =====
 			else if (writtenDataLength==0)
 				{
-				//===== エラー回数をカウント =====
+				//===== Count error number =====
 				errorCounter++;
-				//===== エラー回数が制限以内の場合 =====
+				//===== When the number of errors is within the limit =====
 				if (errorCounter<MAX_ERROR)
 					{
-					// 何もしない
+					// do nothing
 					}
-				//===== エラー回数が制限を超過した場合 =====
+				//===== When the number of errors exceeds the limit =====
 				else
 					{
 					return false;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				return false;
 				}
 			}
-		//===== ファイル出力に成功 =====
+		//===== Success to file output =====
 		return true;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (file==NULL)
 		{
 		return false;

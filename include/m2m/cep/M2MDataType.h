@@ -34,6 +34,7 @@
 
 
 
+#include "m2m/lang/M2MString.h"
 #include "m2m/util/logging/M2MLogger.h"
 
 
@@ -80,7 +81,7 @@ typedef enum
  * @param[in] self	Enumerator for data type
  * @return			String indicating the name of the enumerator or NULL (In case of error)
  */
-unsigned char *M2MDataType_toString (const M2MDataType self);
+M2MString *M2MDataType_toString (const M2MDataType self);
 
 
 

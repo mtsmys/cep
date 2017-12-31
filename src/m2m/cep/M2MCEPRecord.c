@@ -44,7 +44,7 @@ static void this_deleteColumnName (M2MCEPRecord *self)
 		//===== ヒープメモリ領域を解放 =====
 		M2MHeap_free(self->columnName);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 #ifdef DEBUG
@@ -66,7 +66,7 @@ static void this_deleteNewRecordList (M2MCEPRecord *self)
 		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
 		M2MList_delete(self->newRecordList);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 #ifdef DEBUG
@@ -88,7 +88,7 @@ static void this_deleteOldRecordList (M2MCEPRecord *self)
 		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
 		M2MList_delete(self->oldRecordList);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 #ifdef DEBUG
@@ -113,7 +113,7 @@ static void this_deleteTableName (M2MCEPRecord *self)
 		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
 		M2MHeap_free(self->tableName);
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 #ifdef DEBUG
@@ -135,12 +135,12 @@ static void this_deleteTableName (M2MCEPRecord *self)
  */
 static M2MCEPRecord *this_detectM2MCEPRecord (M2MCEPRecord *self, const M2MString *tableName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 #ifdef DEBUG
 	M2MString MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
 #ifdef DEBUG
@@ -199,14 +199,14 @@ static M2MCEPRecord *this_detectM2MCEPRecord (M2MCEPRecord *self, const M2MStrin
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_detectM2MCEPRecord()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"から取得した先頭ノードがNULLです", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_detectM2MCEPRecord()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"がNULLです", NULL);
@@ -226,7 +226,7 @@ static M2MCEPRecord *this_detectM2MCEPRecord (M2MCEPRecord *self, const M2MStrin
  */
 static M2MCEPRecord *this_end (M2MCEPRecord *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 末端ノードに辿り着くまで繰り返し =====
@@ -236,7 +236,7 @@ static M2MCEPRecord *this_end (M2MCEPRecord *self)
 			}
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -249,11 +249,11 @@ static M2MCEPRecord *this_end (M2MCEPRecord *self)
  */
 static void this_init (M2MCEPRecord *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MList *newRecordList = NULL;
 	M2MList *oldRecordList = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== メンバ変数の初期化 =====
@@ -272,7 +272,7 @@ static void this_init (M2MCEPRecord *self)
 			//===== 正常終了 =====
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_init()", __LINE__, (M2MString *)"新規に挿入したレコード情報を格納するためのリスト構造オブジェクトの作成に失敗しました", NULL);
@@ -285,7 +285,7 @@ static void this_init (M2MCEPRecord *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_init()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"がNULLです", NULL);
@@ -300,11 +300,11 @@ static void this_init (M2MCEPRecord *self)
  */
 static unsigned int this_length (M2MCEPRecord *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int length = 0;
 	M2MString *tableName = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 先頭ノードの取得 =====
@@ -317,7 +317,7 @@ static unsigned int this_length (M2MCEPRecord *self)
 				//=====  =====
 				length++;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				}
@@ -330,21 +330,21 @@ static unsigned int this_length (M2MCEPRecord *self)
 					{
 					length++;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					}
 				}
 			return length;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_length()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから先頭ノードの取得に失敗しました", NULL);
 			return 0;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_length()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
@@ -361,7 +361,7 @@ static unsigned int this_length (M2MCEPRecord *self)
  */
 static M2MCEPRecord *this_setColumnName (M2MCEPRecord *self, const M2MString *csv, const size_t lineLength)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && csv!=NULL && lineLength>0 && lineLength<=M2MString_length(csv))
 		{
 		//===== 初期化（ヒープメモリ領域の解放） =====
@@ -373,14 +373,14 @@ static M2MCEPRecord *this_setColumnName (M2MCEPRecord *self, const M2MString *cs
 			memcpy(self->columnName, csv, lineLength);
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setColumnName()", __LINE__, (M2MString *)"CSV形式のカラム名を示す文字列をコピーするための, ヒープメモリ領域の獲得に失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setColumnName()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"がNULLです", NULL);
@@ -413,7 +413,7 @@ static M2MCEPRecord *this_setColumnName (M2MCEPRecord *self, const M2MString *cs
  */
 static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString *csv)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	int numberOfRecord = 0;
 	M2MString *lineHead = NULL;
 	M2MString *lineEnd = NULL;
@@ -423,7 +423,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 	M2MString MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (newRecordList!=NULL && csv!=NULL && M2MString_length(csv)>0)
 		{
 		//===== 1行目のヘッダ行を無視する =====
@@ -444,13 +444,13 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 						//===== コピーしたレコード行数をインクリメント =====
 						numberOfRecord++;
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトへ格納する処理に失敗しました．．．処理を継続します", NULL);
 						}
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 //					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"CSV形式の文字列の文字列数が0[Byte]以下です．．．処理を継続します", NULL);
@@ -474,7 +474,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 #endif // DEBUG
 					return numberOfRecord;
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"CSV形式の文字列をレコード情報オブジェクトへ格納する処理に失敗しました", NULL);
@@ -490,7 +490,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 						}
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 //				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"CSV形式の文字列の文字列数が0[Byte]以下です", NULL);
@@ -513,7 +513,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 			return -1;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (newRecordList==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"引数で指定された新規挿入用のレコード情報オブジェクトがNULLです", NULL);
@@ -536,10 +536,10 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
  */
 static M2MCEPRecord *this_setTableName (M2MCEPRecord *self, const M2MString *tableName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int tableNameLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && (tableNameLength=M2MString_length(tableName))>0)
 		{
 		//===== テーブル名の初期化 =====
@@ -551,13 +551,13 @@ static M2MCEPRecord *this_setTableName (M2MCEPRecord *self, const M2MString *tab
 			memcpy(self->tableName, tableName, tableNameLength);
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -580,7 +580,7 @@ static M2MCEPRecord *this_setTableName (M2MCEPRecord *self, const M2MString *tab
  */
 M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 先頭ノードに辿り着くまで繰り返し =====
@@ -591,7 +591,7 @@ M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self)
 			}
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -611,10 +611,10 @@ M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self)
  */
 void M2MCEPRecord_delete (M2MCEPRecord **self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MCEPRecord *next = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
 		//===== 先頭のM2MList構造体オブジェクトの取得 =====
@@ -649,13 +649,13 @@ void M2MCEPRecord_delete (M2MCEPRecord **self)
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_delete()", __LINE__, (M2MString *)"内部エラー！引数で指定された\"M2MCEPRecord *\"のノードの中にNULLが混入しています", NULL);
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_delete()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"の先頭ノードの取得に失敗しました", NULL);
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_delete()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"がNULLです", NULL);
@@ -673,12 +673,12 @@ void M2MCEPRecord_delete (M2MCEPRecord **self)
  */
 M2MString *M2MCEPRecord_getColumnName (const M2MCEPRecord *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->columnName;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_getColumnName()", __LINE__, (M2MString *)"レコード管理オブジェクトが保持するCSV形式のカラム名がNULLです", NULL);
@@ -716,12 +716,12 @@ M2MList *M2MCEPRecord_getNewRecordList (const M2MCEPRecord *self)
  */
 M2MList *M2MCEPRecord_getOldRecordList (const M2MCEPRecord *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->oldRecordList;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -738,12 +738,12 @@ M2MList *M2MCEPRecord_getOldRecordList (const M2MCEPRecord *self)
  */
 M2MString *M2MCEPRecord_getTableName (const M2MCEPRecord *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->tableName;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_getTableName()", __LINE__, (M2MString *)"レコード管理オブジェクトが保持するテーブル名がNULLです", NULL);
@@ -763,7 +763,7 @@ M2MString *M2MCEPRecord_getTableName (const M2MCEPRecord *self)
  */
 void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MList *newRecordList = NULL;
 	M2MList *oldRecordList = NULL;
 	void *value = NULL;
@@ -773,7 +773,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 	M2MString MESSAGE[256];
 #endif // DEBUG
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 新旧レコード情報オブジェクトの取得 =====
@@ -795,13 +795,13 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 							{
 							counter++;
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトを過去のレコード情報オブジェクトへコピーする処理でエラーが発生しました", NULL);
 							}
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
@@ -818,13 +818,13 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 						{
 						counter++;
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトを過去のレコード情報オブジェクトへコピーする処理でエラーが発生しました", NULL);
 						}
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
@@ -838,14 +838,14 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 #endif // DEBUG
 				return;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"から取得した\"newRecordList\"の先頭ノードがNULLです", NULL);
 				return;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"から取得した\"newRecordList\"がNULLです", NULL);
@@ -857,7 +857,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"引数で指定された\"M2MCEPRecord *\"がNULLです", NULL);
@@ -875,7 +875,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
  */
 M2MCEPRecord *M2MCEPRecord_new ()
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MCEPRecord *self = NULL;
 
 	//===== ヒープメモリ領域の獲得 =====
@@ -893,7 +893,7 @@ M2MCEPRecord *M2MCEPRecord_new ()
 #endif // DEBUG
 				return self;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_new()", __LINE__, (M2MString *)"挿入済みレコード情報を管理するオブジェクトの作成に失敗しました", NULL);
@@ -903,7 +903,7 @@ M2MCEPRecord *M2MCEPRecord_new ()
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_new()", __LINE__, (M2MString *)"新規レコード情報を管理するオブジェクトの作成に失敗しました", NULL);
@@ -912,7 +912,7 @@ M2MCEPRecord *M2MCEPRecord_new ()
 			return NULL;
 			}
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_new()", __LINE__, (M2MString *)"レコード管理オブジェクトの作成に失敗しました", NULL);
@@ -970,12 +970,12 @@ M2MCEPRecord *M2MCEPRecord_previous (const M2MCEPRecord *self)
  */
 void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MCEPRecord *record = NULL;
 	M2MCEPRecord *previous = NULL;
 	M2MCEPRecord *next = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
 		//===== レコード管理オブジェクトノードを取得 =====
@@ -1025,13 +1025,13 @@ void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName)
 				}
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return;
@@ -1071,7 +1071,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 	size_t lineLength = 0;
 	int numberOfRecord = -1;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL
 			&& tableName!=NULL && M2MString_length(tableName)>0
 			&& csv!=NULL && M2MString_length(csv)>0)
@@ -1085,7 +1085,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 				//===== 新規レコード情報管理オブジェクトにCSV形式のレコードをセット =====
 				return this_setCSVIntoNewRecordList(newRecordList, csv);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから新規レコード情報リストが取得出来ません", NULL);
@@ -1112,7 +1112,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 							{
 							return numberOfRecord;
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトセットするのに失敗しました", NULL);
@@ -1121,7 +1121,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 							return -1;
 							}
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列の1行目のヘッダ行取得に失敗しました", NULL);
@@ -1130,7 +1130,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 						return -1;
 						}
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"新規レコード情報オブジェクトの作成に失敗しました", NULL);
@@ -1162,7 +1162,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 							//===== セットしたレコード数を返す =====
 							return numberOfRecord;
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"レコード管理オブジェクトへCSV形式のレコードをセットするのに失敗しました", NULL);
@@ -1171,7 +1171,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 							return -1;
 							}
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"レコード管理オブジェクトにカラム名をセットするのに失敗しました", NULL);
@@ -1180,7 +1180,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 						return -1;
 						}
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"新規レコード情報リストの作成処理に失敗しました", NULL);
@@ -1191,7 +1191,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 				}
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
@@ -1258,10 +1258,10 @@ void M2MCEPRecord_setPreviousRecord (M2MCEPRecord *self, M2MCEPRecord *previousR
  */
 unsigned int M2MCEPRecord_size (M2MCEPRecord *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int size = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== 先頭ノードの取得 =====
@@ -1276,13 +1276,13 @@ unsigned int M2MCEPRecord_size (M2MCEPRecord *self)
 			//===== 要素数を返す =====
 			return size;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return 0;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return 0;

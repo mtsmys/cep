@@ -31,7 +31,7 @@
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
  * 引数で指定されたカラム構造体オブジェクトがメンバ変数として保持しているカラム名<br>
@@ -41,10 +41,10 @@
  */
 static void this_deleteName (M2MColumn *self)
 	{
-	//========== ローカル変数 ==========
-	unsigned char *name = NULL;
+	//========== Variable ==========
+	M2MString *name = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== カラム名の存在を確認 =====
@@ -53,15 +53,15 @@ static void this_deleteName (M2MColumn *self)
 			//===== ヒープメモリ領域を解放 =====
 			M2MHeap_free(name);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn.this_deleteName()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn.this_deleteName()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
 		}
 	return;
 	}
@@ -86,7 +86,7 @@ void M2MColumn_delete (M2MColumn **self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_delete()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn **\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_delete()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn **\"がNULLです", NULL);
 		}
 	return;
 	}
@@ -101,15 +101,15 @@ void M2MColumn_delete (M2MColumn **self)
  */
 unsigned char *M2MColumn_getName (const M2MColumn *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->name;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getName()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getName()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
 		return NULL;
 		}
 	}
@@ -126,7 +126,7 @@ M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getDataType()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getDataType()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return M2M_DATA_TYPE_ERROR;
 		}
 	}
@@ -143,7 +143,7 @@ bool M2MColumn_getPrimaryKey (const M2MColumn *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getPrimaryKey()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getPrimaryKey()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return false;
 		}
 	}
@@ -160,7 +160,7 @@ bool M2MColumn_getAutoIncrement (const M2MColumn *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getAutoIncrement()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getAutoIncrement()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return false;
 		}
 	}
@@ -177,7 +177,7 @@ bool M2MColumn_getAllowNULL (const M2MColumn *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getAllowNULL()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getAllowNULL()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return false;
 		}
 	}
@@ -194,7 +194,7 @@ bool M2MColumn_getUnique (const M2MColumn *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_getUnique()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getUnique()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return false;
 		}
 	}
@@ -208,7 +208,7 @@ bool M2MColumn_getUnique (const M2MColumn *self)
  */
 M2MColumn *M2MColumn_new ()
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MColumn *self = NULL;
 
 	//===== ヒープメモリ領域の獲得 =====
@@ -221,10 +221,10 @@ M2MColumn *M2MColumn_new ()
 		M2MColumn_setUnique(self, false);
 		return self;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setName()", __LINE__, (M2MString *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 		return NULL;
 		}
 	}
@@ -247,7 +247,7 @@ M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setAutoIncrement()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setAutoIncrement()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	}
@@ -270,7 +270,7 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setAllowNULL()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setAllowNULL()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	}
@@ -293,7 +293,7 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setDataType()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setDataType()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	}
@@ -307,42 +307,42 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
  * @param[in] name		カラム名を示す文字列
  * @return				カラム名をセットされたカラム情報オブジェクト or NULL（エラーの場合）
  */
-M2MColumn *M2MColumn_setName (M2MColumn *self, const unsigned char *name)
+M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
 	{
 	size_t nameLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && name!=NULL && (nameLength=M2MString_length(name))>0)
 		{
 		//===== 初期化 =====
 		this_deleteName(self);
 		//===== ヒープメモリ領域の新規獲得 =====
-		if ((self->name=(unsigned char *)M2MHeap_malloc(nameLength+1))!=NULL)
+		if ((self->name=(M2MString *)M2MHeap_malloc(nameLength+1))!=NULL)
 			{
 			memcpy(self->name, name, nameLength);
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"name\"文字列をコピーするため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
+			M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setName()", __LINE__, (M2MString *)"引数で指定された\"name\"文字列をコピーするため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setName()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	else if (name==NULL)
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"name\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setName()", __LINE__, (M2MString *)"引数で指定された\"name\"がNULLです", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"name\"文字列の長さが0以下です", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setName()", __LINE__, (M2MString *)"引数で指定された\"name\"文字列の長さが0以下です", NULL);
 		return NULL;
 		}
 	}
@@ -365,7 +365,7 @@ M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setPrimaryKey()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setPrimaryKey()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	}
@@ -388,7 +388,7 @@ M2MColumn *M2MColumn_setUnique (M2MColumn *self, const bool unique)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setUnique()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setUnique()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
 		return NULL;
 		}
 	}

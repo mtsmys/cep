@@ -59,17 +59,17 @@ extern "C"
 
 
 /**
- * CEP(Complex Event Processing)実行オブジェクト<br>
+ * CEP (Complex Event Processing) execution structure object.<br>
  *
- * @param databaseName		データベース名を示す文字列
- * @param tableBuilder		テーブル構築オブジェクト
- * @param memoryDatabase	メモリ上のSQLite3データベース
- * @param fileDatabase		ファイル上のSQLite3データベース
- * @param record			レコード情報オブジェクト
- * @param maxRecord			メモリ上のテーブルの最大レコード数[行]
- * @param vacuumRecord		SQLite3データベースに対してバキューム処理を実行するレコード数（0の場合は自動バキューム設定)[行]
- * @param recordCounter		SQLite3データベースに対してバキューム処理を実行するためのレコード数カウンタ[行]
- * @param persistence		ファイル上のSQLite3データベースへの永続性可否を示すフラグ
+ * @param databaseName		String indicating database name
+ * @param tableBuilder		Database table construction structure object
+ * @param memoryDatabase	SQLite3 database on memory
+ * @param fileDatabase		SQLite3 database on file
+ * @param record			Record information structure object
+ * @param maxRecord			Maximum record number of table in memory
+ * @param vacuumRecord		Number of records to execute database vacuum processing (auto vacuum setting in case of 0)
+ * @param recordCounter		Record number counter for executing vacuum process of database
+ * @param persistence		Flag indicating permanence of SQLite3 database on file
  */
 #ifndef M2MCEP
 typedef struct
@@ -92,11 +92,11 @@ typedef struct
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたCEP構造体オブジェクトのメモリ領域を解放する．<br>
- * この関数呼び出し後は引数で師弟されたCEP構造体オブジェクトにアクセス出来なく<br>
- * なる事に注意する．<br>
+ * Release the heap memory of CEP structure object. <br>
+ * Note that after calling this function, caller will not be able to access <br>
+ * the CEP structure object appointed by argument.<br>
  *
- * @param[in,out] self	メモリ領域解放対象のCEP構造体オブジェクト
+ * @param[in,out] self	CEP structure object to be freed of memory area
  */
 void M2MCEP_delete (M2MCEP **self);
 

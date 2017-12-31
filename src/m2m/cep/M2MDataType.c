@@ -39,27 +39,27 @@
  * @param[in] self	Enumerator for data type
  * @return			String indicating the name of the enumerator or NULL (In case of error)
  */
-unsigned char *M2MDataType_toString (const M2MDataType self)
+M2MString *M2MDataType_toString (const M2MDataType self)
 	{
 	if (self==M2M_DATA_TYPE_BLOB)
 		{
-		return (unsigned char *)"BLOB";
+		return (M2MString *)"BLOB";
 		}
 	else if (self==M2M_DATA_TYPE_BOOL)
 		{
-		return (unsigned char *)"BOOL";
+		return (M2MString *)"BOOL";
 		}
 	else if (self==M2M_DATA_TYPE_CHAR)
 		{
-		return (unsigned char *)"CHAR";
+		return (M2MString *)"CHAR";
 		}
 	else if (self==M2M_DATA_TYPE_DATETIME)
 		{
-		return (unsigned char *)"DATETIME";
+		return (M2MString *)"DATETIME";
 		}
 	else if (self==M2M_DATA_TYPE_DOUBLE)
 		{
-		return (unsigned char *)"DOUBLE";
+		return (M2MString *)"DOUBLE";
 		}
 	else if (self==M2M_DATA_TYPE_ERROR)
 		{
@@ -67,27 +67,27 @@ unsigned char *M2MDataType_toString (const M2MDataType self)
 		}
 	else if (self==M2M_DATA_TYPE_FLOAT)
 		{
-		return (unsigned char *)"FLOAT";
+		return (M2MString *)"FLOAT";
 		}
 	else if (self==M2M_DATA_TYPE_INTEGER)
 		{
-		return (unsigned char *)"INTEGER";
+		return (M2MString *)"INTEGER";
 		}
 	else if (self==M2M_DATA_TYPE_NUMERIC)
 		{
-		return (unsigned char *)"NUMERIC";
+		return (M2MString *)"NUMERIC";
 		}
 	else if (self==M2M_DATA_TYPE_REAL)
 		{
-		return (unsigned char *)"REAL";
+		return (M2MString *)"REAL";
 		}
 	else if (self==M2M_DATA_TYPE_TEXT)
 		{
-		return (unsigned char *)"TEXT";
+		return (M2MString *)"TEXT";
 		}
 	else if (self==M2M_DATA_TYPE_VARCHAR)
 		{
-		return (unsigned char *)"VARCHAR";
+		return (M2MString *)"VARCHAR";
 		}
 	else
 		{

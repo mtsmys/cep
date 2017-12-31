@@ -91,7 +91,7 @@ static M2MTableBuilder *this_previous (const M2MTableBuilder *self);
  */
 static M2MTableBuilder *this_begin (M2MTableBuilder *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		while (this_previous(self)!=self)
@@ -100,7 +100,7 @@ static M2MTableBuilder *this_begin (M2MTableBuilder *self)
 			}
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_begin()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -117,10 +117,10 @@ static M2MTableBuilder *this_begin (M2MTableBuilder *self)
  */
 static void this_deleteColumnList (M2MTableBuilder *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MColumnList *columnList = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== カラム構造体オブジェクトの存在を確認 =====
@@ -128,12 +128,12 @@ static void this_deleteColumnList (M2MTableBuilder *self)
 			{
 			M2MColumnList_delete(columnList);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_deleteColumnList()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -150,10 +150,10 @@ static void this_deleteColumnList (M2MTableBuilder *self)
  */
 static void this_deleteTableName (M2MTableBuilder *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *tableName = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		//===== テーブル名を示す文字列の存在を確認 =====
@@ -161,12 +161,12 @@ static void this_deleteTableName (M2MTableBuilder *self)
 			{
 			M2MHeap_free(tableName);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_deleteTableName()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -182,13 +182,13 @@ static void this_deleteTableName (M2MTableBuilder *self)
  */
 static unsigned char *this_getColumnDefinition (const M2MColumnList *columnList, unsigned char **columnDefinition)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MColumn *column = NULL;
 	unsigned char *columnName = NULL;
 	M2MDataType dataType = 0;
 	unsigned char *dataTypeString = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (columnList!=NULL && columnDefinition!=NULL)
 		{
 		//===== カラム情報オブジェクトの取得 =====
@@ -249,7 +249,7 @@ static unsigned char *this_getColumnDefinition (const M2MColumnList *columnList,
 			//===== カラム定義を示す文字列を返す =====
 			return (*columnDefinition);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else if (column==NULL)
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_getColumnDefinition()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumnList *\"から取得した\"M2MColumn *\"がNULLです", NULL);
@@ -266,7 +266,7 @@ static unsigned char *this_getColumnDefinition (const M2MColumnList *columnList,
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (columnList==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_getColumnDefinition()", __LINE__, (unsigned char *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
@@ -289,12 +289,12 @@ static unsigned char *this_getColumnDefinition (const M2MColumnList *columnList,
  */
 static M2MColumnList *this_getColumnList (const M2MTableBuilder *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->columnList;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_getColumnList()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -310,14 +310,14 @@ static M2MColumnList *this_getColumnList (const M2MTableBuilder *self)
  */
 static unsigned char *this_getTableCreateSQL (const M2MTableBuilder *self, unsigned char **sql)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned char *tableName = NULL;
 	M2MColumnList *columnList = NULL;
 	unsigned int columnListLength = 0;
 	unsigned int i = 0;
 	unsigned char *columnDefinition = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && sql!=NULL)
 		{
 		//===== テーブル情報の取得 =====
@@ -369,13 +369,13 @@ static unsigned char *this_getTableCreateSQL (const M2MTableBuilder *self, unsig
 			//===== SQL文を返す =====
 			return (*sql);
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_getTableCreateSQL()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -397,12 +397,12 @@ static unsigned char *this_getTableCreateSQL (const M2MTableBuilder *self, unsig
  */
 static unsigned char *this_getTableName (const M2MTableBuilder *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->tableName;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_getTableName()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -421,7 +421,7 @@ static unsigned char *this_getTableName (const M2MTableBuilder *self)
  */
 static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
 	unsigned char sql[256];
 	unsigned char *tableName = NULL;
@@ -429,7 +429,7 @@ static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database
 	unsigned char MESSAGE[256];
 #endif /* DEBUG */
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && database!=NULL)
 		{
 		//===== 配列の初期化 =====
@@ -465,11 +465,11 @@ static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database
 					return false;
 					}
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_isExistingTable()", __LINE__, sqlite3_errmsg(database), NULL);
 			return false;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_isExistingTable()", __LINE__, sqlite3_errmsg(database), NULL);
@@ -477,7 +477,7 @@ static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_isExistingTable()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -499,12 +499,12 @@ static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database
  */
 static M2MTableBuilder *this_next (const M2MTableBuilder *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->next;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_next()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -521,12 +521,12 @@ static M2MTableBuilder *this_next (const M2MTableBuilder *self)
  */
 static M2MTableBuilder *this_previous (const M2MTableBuilder *self)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->previous;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_previous()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -545,13 +545,13 @@ static M2MTableBuilder *this_previous (const M2MTableBuilder *self)
  */
 static M2MTableBuilder *this_setColumnList (M2MTableBuilder *self, M2MColumnList *columnList)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && columnList!=NULL)
 		{
 		self->columnList = columnList;
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_begin()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -575,13 +575,13 @@ static M2MTableBuilder *this_setColumnList (M2MTableBuilder *self, M2MColumnList
  */
 static M2MTableBuilder *this_setNext (M2MTableBuilder *self, M2MTableBuilder *next)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->next = next;
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_setNext()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -600,13 +600,13 @@ static M2MTableBuilder *this_setNext (M2MTableBuilder *self, M2MTableBuilder *ne
  */
 static M2MTableBuilder *this_setPrevious (M2MTableBuilder *self, M2MTableBuilder *previous)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && previous!=NULL)
 		{
 		self->previous = previous;
 		return self;
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_setPrevious()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -629,10 +629,10 @@ static M2MTableBuilder *this_setPrevious (M2MTableBuilder *self, M2MTableBuilder
  */
 static M2MTableBuilder *this_setTableName (M2MTableBuilder *self, const unsigned char *tableName)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	size_t tableNameLength = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
 		//===== テーブル名を示す文字列の長さを取得 =====
@@ -647,21 +647,21 @@ static M2MTableBuilder *this_setTableName (M2MTableBuilder *self, const unsigned
 				memcpy(self->tableName, tableName, tableNameLength);
 				return self;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_setTableName()", __LINE__, (unsigned char *)"テーブル名を示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_setTableName()", __LINE__, (unsigned char *)"引数で指定された\"tableName\"の文字列の大きさが0以下です", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder.this_setTableName()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -687,13 +687,13 @@ static M2MTableBuilder *this_setTableName (M2MTableBuilder *self, const unsigned
  */
 void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MTableBuilder *next = NULL;
 	bool executeUpdate = false;
 	unsigned char *sql = NULL;
 	unsigned char MESSAGE[256];
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && database!=NULL)
 		{
 		//===== テーブル構築オブジェクトの先頭ノードを取得 =====
@@ -736,7 +736,7 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 							M2MLogger_printDebugMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, (unsigned char *)"CEPテーブル構築のためのCREATE文を実行しました");
 #endif // DEBUG
 							}
-						//===== エラー処理 =====
+						//===== Error handling =====
 						else
 							{
 							M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, (unsigned char *)sqlite3_errmsg(database), NULL);
@@ -744,7 +744,7 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 						//===== SQL文のヒープメモリ領域を解放 =====
 						M2MHeap_free(sql);
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						memset(MESSAGE, 0, sizeof(MESSAGE));
@@ -789,7 +789,7 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 						M2MLogger_printDebugMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, (unsigned char *)"CEPテーブル構築のためのCREATE文を実行しました");
 #endif // DEBUG
 						}
-					//===== エラー処理 =====
+					//===== Error handling =====
 					else
 						{
 						M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, sqlite3_errmsg(database), NULL);
@@ -797,7 +797,7 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 					//===== SQL文のヒープメモリ領域を解放 =====
 					M2MHeap_free(sql);
 					}
-				//===== エラー処理 =====
+				//===== Error handling =====
 				else
 					{
 					memset(MESSAGE, 0, sizeof(MESSAGE));
@@ -822,14 +822,14 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
 			//===== 正常終了 =====
 			return;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"から先頭ノードを取得するのに失敗しました", NULL);
 			return;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_createTable()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
@@ -851,10 +851,10 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database)
  */
 void M2MTableBuilder_delete (M2MTableBuilder **self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MTableBuilder *next = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
 		//===== テーブル構築オブジェクトの先頭ノード取得 =====
@@ -881,19 +881,19 @@ void M2MTableBuilder_delete (M2MTableBuilder **self)
 				M2MLogger_printDebugMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"CEPテーブル構築オブジェクトのメモリ領域を解放しました");
 #endif // DEBUG
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"CEPテーブル構築オブジェクトの末端ノードがNULLのため, メモリ領域を解放出来ません", NULL);
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"CEPテーブル構築オブジェクトのメモリ領域を解放する処理において先頭ノードの取得に失敗しました", NULL);
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"引数で指定されたCEPテーブル構築オブジェクトがNULLです", NULL);
@@ -911,7 +911,7 @@ void M2MTableBuilder_delete (M2MTableBuilder **self)
  */
 M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsigned char *tableName)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
 		//===== 先頭ノードの取得 =====
@@ -946,13 +946,13 @@ M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsig
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -970,12 +970,12 @@ M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsig
  */
 unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, unsigned char **sql)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	size_t tableNameLength = 0;
 	const unsigned char *FORMAT = (unsigned char *)"PRAGMA table_info(%s)";
 	const size_t FORMAT_LENGTH = M2MString_length(FORMAT);
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (tableName!=NULL && sql!=NULL)
 		{
 		//===== テーブル名の取得 =====
@@ -988,21 +988,21 @@ unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, 
 				snprintf((*sql), FORMAT_LENGTH+tableNameLength, FORMAT, tableName);
 				return (*sql);
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_getTableInfoSQL()", __LINE__, (unsigned char *)"SQL文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
 				return NULL;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_getTableInfoSQL()", __LINE__, (unsigned char *)"引数で指定された\"tableName\"が示す文字列の長さが0以下です", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (tableName==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_getTableInfoSQL()", __LINE__, (unsigned char *)"引数で指定された\"tableName\"がNULLです", NULL);
@@ -1023,7 +1023,7 @@ unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, 
  */
 M2MTableBuilder *M2MTableBuilder_new ()
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MTableBuilder *self = NULL;
 
 	//===== ヒープメモリ領域の獲得 =====
@@ -1037,7 +1037,7 @@ M2MTableBuilder *M2MTableBuilder_new ()
 #endif // DEBUG
 		return self;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_new()", __LINE__, (unsigned char *)"ヒープメモリ領域の獲得に失敗しました", NULL);
@@ -1057,7 +1057,7 @@ M2MTableBuilder *M2MTableBuilder_new ()
  */
 M2MTableBuilder *M2MTableBuilder_setConfig (M2MTableBuilder *self, const unsigned char *tableName, M2MColumnList *columnList)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && columnList!=NULL)
 		{
 		//===== メンバ変数へセット =====
@@ -1066,14 +1066,14 @@ M2MTableBuilder *M2MTableBuilder_setConfig (M2MTableBuilder *self, const unsigne
 			{
 			return self;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_setConfig()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"にテーブル名, もしくはカラム構造体オブジェクトをセットするのに失敗しました", NULL);
 			return NULL;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_setConfig()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"がNULLです", NULL);
