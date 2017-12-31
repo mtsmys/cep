@@ -34,7 +34,7 @@
 
 
 #include "m2m/lang/M2MString.h"
-#include "m2m/cep/M2MColumn.h"
+#include "m2m/db/M2MColumn.h"
 
 
 

@@ -34,7 +34,7 @@
 
 
 #include "m2m/cep/M2MCEPRecord.h"
-#include "m2m/cep/M2MTableBuilder.h"
+#include "m2m/db/M2MTableManager.h"
 #include "m2m/util/M2MBase64.h"
 #include <signal.h>
 
@@ -62,7 +62,7 @@ extern "C"
  * CEP (Complex Event Processing) execution structure object.<br>
  *
  * @param databaseName		String indicating database name
- * @param tableBuilder		Database table construction structure object
+ * @param tableManager		Database table manager structure object
  * @param memoryDatabase	SQLite3 database on memory
  * @param fileDatabase		SQLite3 database on file
  * @param record			Record information structure object
@@ -75,7 +75,7 @@ extern "C"
 typedef struct
 	{
 	M2MString *databaseName;
-	M2MTableBuilder *tableBuilder;
+	M2MTableManager *tableManager;
 	sqlite3 *memoryDatabase;
 	sqlite3 *fileDatabase;
 	M2MCEPRecord *record;
@@ -131,7 +131,7 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
  * @param[in] tableBuilder	SQLite3データベースのテーブルを構築するためのオブジェクト
  * @return					CEP構造体オブジェクト or NULL（エラーの場合）
  */
-M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableBuilder);
+M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableBuilder);
 
 
 /**

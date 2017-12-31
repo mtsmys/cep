@@ -1,5 +1,5 @@
 /*******************************************************************************
- * M2MTableBuilder.h
+ * M2MTableManager.h
  *
  * Copyright (c) 2014, Akihisa Yasuda
  * All rights reserved.
@@ -29,11 +29,11 @@
 
 #pragma once
 
-#ifndef M2MTABLEBUILDER_H_
-#define M2MTABLEBUILDER_H_
+#ifndef M2MTABLEMANAGER_H_
+#define M2MTABLEMANAGER_H_
 
 
-#include "m2m/cep/M2MColumnList.h"
+#include "m2m/db/M2MColumnList.h"
 #include "m2m/db/SQLRunner.h"
 
 
@@ -58,15 +58,15 @@ extern "C"
  * @param tableName		String indicating table name
  * @param columnList	List structure object containing table column informations
  */
-#ifndef M2MTableBuilder
-typedef struct M2MTableBuilder
+#ifndef M2MTableManager
+typedef struct M2MTableManager
 	{
-	struct M2MTableBuilder *previous;
-	struct M2MTableBuilder *next;
+	struct M2MTableManager *previous;
+	struct M2MTableManager *next;
 	unsigned char *tableName;
 	M2MColumnList *columnList;
-	} M2MTableBuilder;
-#endif /* M2MTableBuilder */
+	} M2MTableManager;
+#endif /* M2MTableManager */
 
 
 /*******************************************************************************
@@ -78,7 +78,7 @@ typedef struct M2MTableBuilder
  * @param[in] self		（カラム情報挿入済みの）テーブル構築オブジェクト
  * @param[in] database	テーブル作成対象のSQLite3データベース
  */
-void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database);
+void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database);
 
 
 /**
@@ -87,7 +87,7 @@ void M2MTableBuilder_createTable (M2MTableBuilder *self, sqlite3 *database);
  *
  * @param[in,out] self	（ヒープ）メモリ領域解放対象のテーブル構築オブジェクト
  */
-void M2MTableBuilder_delete (M2MTableBuilder **self);
+void M2MTableManager_delete (M2MTableManager **self);
 
 
 /**
@@ -97,7 +97,7 @@ void M2MTableBuilder_delete (M2MTableBuilder **self);
  * @param tableName	テーブル名を示す文字列
  * @return			テーブル名が一致したカラム構造体オブジェクト or NULL（エラーの場合)
  */
-M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsigned char *tableName);
+M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const unsigned char *tableName);
 
 
 /**
@@ -108,7 +108,7 @@ M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsig
  * @param[out] sql		SQL文をコピーするためのポインタ（バッファリングは関数内部で実行する）
  * @return				引数のポインタにコピーした文字列 or NULL（エラーの場合）
  */
-unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, unsigned char **sql);
+unsigned char *M2MTableManager_getTableInfoSQL (const unsigned char *tableName, unsigned char **sql);
 
 
 /**
@@ -116,7 +116,7 @@ unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, 
  *
  * @return		新規作成したテーブル構築オブジェクト
  */
-M2MTableBuilder *M2MTableBuilder_new ();
+M2MTableManager *M2MTableManager_new ();
 
 
 /**
@@ -128,7 +128,7 @@ M2MTableBuilder *M2MTableBuilder_new ();
  * @param[in] columnList	カラム設定情報を格納したカラム構造体オブジェクト
  * @return					カラム設定情報を含むテーブル構築オブジェクト or NULL（エラーの場合)
  */
-M2MTableBuilder *M2MTableBuilder_setConfig (M2MTableBuilder *self, const unsigned char *tableName, M2MColumnList *columnList);
+M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const unsigned char *tableName, M2MColumnList *columnList);
 
 
 
@@ -138,4 +138,4 @@ M2MTableBuilder *M2MTableBuilder_setConfig (M2MTableBuilder *self, const unsigne
 
 
 
-#endif /* M2MTABLEBUILDER_H_ */
+#endif /* M2MTABLEMANAGER_H_ */
