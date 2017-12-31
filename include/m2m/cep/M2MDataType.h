@@ -46,10 +46,10 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * データベースのデータ型を示す列挙型オブジェクト．<br>
+ * Enumerated object indicating the data type of the database<br>
  */
 #ifndef M2MDataType
 typedef enum
@@ -72,13 +72,13 @@ typedef enum
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定された列挙子を文字列に変換して返す。<br>
+ * Convert the argument enumerator to a string.<br>
  *
- * @param[in] self	データ型を示す列挙子
- * @return			列挙子の名前を示す文字列
+ * @param[in] self	Enumerator for data type
+ * @return			String indicating the name of the enumerator or NULL (In case of error)
  */
 unsigned char *M2MDataType_toString (const M2MDataType self);
 

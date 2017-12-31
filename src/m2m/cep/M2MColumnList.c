@@ -230,7 +230,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const unsigned char *colu
 				//===== エラー処理 =====
 				else
 					{
-					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため、ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 					return NULL;
 					}
 
@@ -273,12 +273,12 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const unsigned char *colu
 					}
 				else if (newNode==NULL)
 					{
-					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム構造体オブジェクトを新規作成するため、ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム構造体オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 					return NULL;
 					}
 				else
 					{
-					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため、ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage((unsigned char *)"M2MColumnList_add()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 					M2MColumnList_delete(newNode);
 					return NULL;
 					}
@@ -435,7 +435,7 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
  * する。<br>
  *
  * @param[in] self	カラム構造体オブジェクト
- * @return			true : 値が1つも存在しない、false : 値を1つ以上保有している
+ * @return			true : 値が1つも存在しない, false : 値を1つ以上保有している
  */
 bool M2MColumnList_isEmpty (M2MColumnList *self)
 	{
@@ -527,7 +527,7 @@ M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 
 
 /**
- * ヒープ領域のメモリを獲得し、M2MColumnList構造体オブジェクトを新規作成する。<br>
+ * ヒープ領域のメモリを獲得し, M2MColumnList構造体オブジェクトを新規作成する。<br>
  *
  * @return	新規作成したM2MColumnList構造体オブジェクト
  */
@@ -555,7 +555,7 @@ M2MColumnList *M2MColumnList_new ()
 /**
  * 引数で指定されたカラム構造体オブジェクトの1つ手前に存在するカラム構造体<br>
  * オブジェクトを取得して返す。<br>
- * 引数で指定されたカラム構造体オブジェクトが先頭ノードの場合、同じポインタを示す。<br>
+ * 引数で指定されたカラム構造体オブジェクトが先頭ノードの場合, 同じポインタを示す。<br>
  *
  * @param[in] self	カラム構造体オブジェクト
  * @return			1つ手前に存在するカラム構造体オブジェクト or NULL（エラーの場合）

@@ -119,7 +119,7 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
  * Add the argument string after the "self" string. <br>
  * The length [Byte] of the additional string is specified by "stringLength".<br>
  *
- * @param[in,out] self		文字列を追加する、元の文字列（追加後の文字列は self = "self + string" となる）
+ * @param[in,out] self		文字列を追加する, 元の文字列（追加後の文字列は self = "self + string" となる）
  * @param[in] string		追加する文字列
  * @param[in] stringLength	追加する文字列の長さを示す整数[Byte]（文字列の一部のみを追加する場合に有効)
  * @return					文字列が追加されたバッファのポインタ or NULL（エラーの場合）
@@ -200,11 +200,11 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 
 
 /**
- * 引数で指定された2つの文字列を比較し、その結果を返す。<br>
+ * 引数で指定された2つの文字列を比較し, その結果を返す。<br>
  *
  * @param[in] self		比較対象の片方の文字列
  * @param[in] string	比較対象のもう一方の文字列
- * @return				0：2つが等しい場合、負：辞書的にthis<stringの場合、正：辞書的にthis>stringの場合
+ * @return				0：2つが等しい場合, 負：辞書的にthis<stringの場合, 正：辞書的にthis>stringの場合
  */
 signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
@@ -225,7 +225,7 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 
 
 /**
- * 引数で指定された入力データに対し，文字コードをCRLFに変換して返す．<br>
+ * 引数で指定された入力データに対し, 文字コードをCRLFに変換して返す．<br>
  *
  * @param[in] self		入力ファイルから取得した文字列
  * @param[out] string	改行コードを補正したCSV形式の文字列を格納するポインタ（バッファリング自体は関数内部で実行)
@@ -314,10 +314,10 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 
 
 /**
- * 引数で指定された“double”値を文字列に変換し、引数で指定されたポインタにコピー<br>
+ * 引数で指定された“double”値を文字列に変換し, 引数で指定されたポインタにコピー<br>
  * する。<br>
- * 配列のバッファリングはこの関数内部で実行するため、呼び出し側では文字列利用後、<br>
- * メモリーリークを防止するため、必ず“M2MHeap_free()”関数を呼ぶ事。<br>
+ * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
+ * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
  *
  * @param[in] number	文字列変換対象の実数
  * @param[out] string	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
@@ -365,9 +365,9 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 
 
 /**
- * 引数で指定された“int”値を文字列に変換し、引数で指定されたポインタにコピーする。<br>
- * 配列のバッファリングはこの関数内部で実行するため、呼び出し側では文字列利用後、<br>
- * メモリーリークを防止するため、必ず“M2MHeap_free()”関数を呼ぶ事。<br>
+ * 引数で指定された“int”値を文字列に変換し, 引数で指定されたポインタにコピーする。<br>
+ * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
+ * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
  *
  * @param[in] number	文字列変換対象の整数
  * @param[out] string	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
@@ -415,10 +415,10 @@ M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MStr
 
 
 /**
- * 引数で指定された“long int”値を文字列に変換し、引数で指定されたポインタにコピー<br>
+ * 引数で指定された“long int”値を文字列に変換し, 引数で指定されたポインタにコピー<br>
  * する。<br>
- * 配列のバッファリングはこの関数内部で実行するため、呼び出し側では文字列利用後、<br>
- * メモリーリークを防止するため、必ず“M2MHeap_free()”関数を呼ぶ事。<br>
+ * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
+ * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
  *
  * @param[in]	文字列変換対象の整数
  * @param[out]	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
@@ -552,12 +552,12 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 
 
 /**
- * 2つの文字列を比較し、同一であるかどうかを確認する。<br>
+ * 2つの文字列を比較し, 同一であるかどうかを確認する。<br>
  *
  * @param[in] one		比較対象の文字列
  * @param[in] another	比較対象のもう一つの文字列
  * @param[in] length	比較対象の文字列の長さ[バイト]
- * @return				true : 同一の場合、false : 異なる場合
+ * @return				true : 同一の場合, false : 異なる場合
  */
 bool M2MString_equals (const M2MString *one, const M2MString *another, const size_t length)
 	{
@@ -586,12 +586,12 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
 /**
  * 引数で指定された”buffer”配列にローカルカレンダーの時間を示す文字列をコピー<br>
  * する。<br>
- * なお、この関数内部でバッファリングは行わないため、呼び出し側でメモリ領域を<br>
+ * なお, この関数内部でバッファリングは行わないため, 呼び出し側でメモリ領域を<br>
  * 確保する事。<br>
  *
  * @param[out] buffer		ローカルカレンダーの時間を示す文字列をコピーするためのバッファ
  * @param[in] bufferLength	引数で指定されたバッファの大きさを示す整数[バイト]
- * @return					バッファにコピーした、ローカル時間を示す文字列の大きさを示す整数[バイト]
+ * @return					バッファにコピーした, ローカル時間を示す文字列の大きさを示す整数[バイト]
  */
 unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int bufferLength)
 	{
@@ -658,13 +658,13 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 
 
 /**
- * 引数で指定された文字列の中からキーワードを検索し、発見した場合は当該キーワード<br>
+ * 引数で指定された文字列の中からキーワードを検索し, 発見した場合は当該キーワード<br>
  * の開始位置を示すポインタを返す。<br>
  * 検索に失敗した場合は NULL を返す。<br>
  *
  * @param[in] string	検索対象の文字列
  * @param[in] keyword	キーワード文字列
- * @return				検索対象の文字列のうち、キーワード開始位置を示すポインタ or NULL（エラーの場合）
+ * @return				検索対象の文字列のうち, キーワード開始位置を示すポインタ or NULL（エラーの場合）
  */
 M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 	{
@@ -683,7 +683,7 @@ M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 
 
 /**
- * 引数で指定された比較対象の文字列の中に、検出用の文字列が最後に現れる場所を<br>
+ * 引数で指定された比較対象の文字列の中に, 検出用の文字列が最後に現れる場所を<br>
  * 返す。<br>
  * 検出用文字列が見つからなかった場合は NULL を返す。<br>
  *

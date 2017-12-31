@@ -73,27 +73,30 @@ typedef struct M2MList
  * Public function
  ******************************************************************************/
 /**
- * Add a new node with a value to the link of the list structure object.<br>
+ * Add a new node to the next position of argument list structure object.<br>
+ * Then, as the member variable of the new node, the value is copied <br>
+ * (deep copy). <br>
+ * Therefore, to delete the added node, use the M2MList_remove() function.<br>
  *
  * @param[in,out] self		List structure object
- * @param[in] value			リスト構造体オブジェクトに格納させる値
- * @param[in] valueLength	値の大きさ[バイト]
- * @return					新規追加されたリスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] value			The value of added node stored in list structure object
+ * @param[in] valueLength	Size of value[Byte]
+ * @return					Pointer of added list structure object or NULL (In case of error)
  */
 M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの1つ先に位置するノードを取得する。<br>
+ * Get the node located ahead of the link of the list structure object.<br>
  *
  * @param[in] self	List structure object
- * @return			リスト構造体オブジェクトのリンクの先頭ノード or NULL（エラーの場合）
+ * @return			First node of link of list structure object or NULL (in case of error)
  */
 M2MList *M2MList_begin (M2MList *self);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの全ノードのメモリ領域を解放する。<br>
+ * Release the memory of all nodes of list structure object.<br>
  *
  * @param[in,out] self	List structure object
  */
@@ -101,107 +104,113 @@ void M2MList_delete (M2MList *self);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンク配列において、引数のインデックス<br>
- * に該当するリスト構造体オブジェクトを返す。<br>
+ * Returns the list structure object corresponding to the index.<br>
  *
  * @param[in] self		List structure object
- * @param[in] index		インデックスを示す整数（0 〜 n-1）
- * @return 				リスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] index		An integer indicating an index (0 to n-1)
+ * @return 				List structure object or NULL (in case of error)
  */
 M2MList *M2MList_detect (M2MList *self, const unsigned int index);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
+ * Get the node located at the end of the list structure object.<br>
  *
  * @param[in,out] self	List structure object
- * @return				リスト構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
+ * @return				End node of the list structure object or NULL (in case of error)
  */
 M2MList *M2MList_end (M2MList *self);
 
 
 /**
- * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値を返す。<br>
+ * Return value of the list structure object existing at the index position.<br>
  *
  * @param[in] self	List structure object
- * @return			リスト構造体オブジェクトに格納されている値 or NULL（エラーの場合）
+ * @return			Value stored in list structure object or NULL (in case of error)
  */
 void *M2MList_getValue (M2MList *self);
 
 
 /**
- * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値の大きさ<br>
- * を示す整数を返す。<br>
+ * Return value length of the list structure object at the index position.<br>
  *
  * @param[in] self	List structure object
- * @return			値のサイズ[バイト] or 0（エラーの場合）
+ * @return			Value length stored in list structure object or NULL (in case of error)
  */
 size_t M2MList_getValueLength (M2MList *self);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
- * する。<br>
+ * Check whether the list structure object has at least one value.<br>
  *
  * @param[in] self	List structure object
- * @return			true : 値が1つも存在しない、false : 値を1つ以上保有している
+ * @return			true: In case of no value, false: In case of having values
  */
 bool M2MList_isEmpty (M2MList *self);
 
 
 /**
- * リスト構造体オブジェクトのノード数を示す整数を返す。<br>
+ * Return number indicating length of nodes in the list structure object.<br>
  *
  * @param[in] self	List structure object
- * @return			リンクされているリスト構造体オブジェクトのノード数を示す整数
+ * @return			The number of nodes of the linked list structure object
  */
 unsigned int M2MList_length (M2MList *self);
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ後ろに位置するリスト構造体<br>
- * オブジェクトを返す。<br>
+ * Return a list structure object located after the argument one.<br>
  *
  * @param[in] self	List structure object
- * @return next 	1つ後ろに位置するリスト構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
+ * @return next 	List structure object located behind or NULL (if the position of argument node is end)
  */
 M2MList *M2MList_next (const M2MList *self);
 
 
 /**
- * ヒープ領域のメモリを獲得し、M2MList構造体オブジェクトを新規作成する。<br>
+ * Get heap memory and create a new M2MList structure object.<br>
  *
- * @return	新規作成したM2MList構造体オブジェクト
+ * @return	Created M2MList structure object
  */
 M2MList *M2MList_new ();
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ手前に存在するリスト構造体<br>
- * オブジェクトを取得して返す。<br>
- * 引数で指定されたリスト構造体オブジェクトが先頭ノードの場合、同じポインタを示す。<br>
+ * Get the list structure object existing one before the argument.<br>
+ * If the argument object is the first node, returns the same pointer.<br>
  *
  * @param[in] self	List structure object
- * @return			1つ手前に存在するリスト構造体オブジェクト or NULL（エラーの場合）
+ * @return			List structure object that located before or NULL (in case of argument error)
  */
 M2MList *M2MList_previous (const M2MList *self);
 
 
 /**
- * 引数で指定されたインデックスの位置に存在するリスト構造体オブジェクトを削除する。<br>
+ * Deletes a list structure object existing at the position of argument. <br>
+ * If there is only one, delete only the value itself, not the object itself. <br>
+ * <br>
+ * [Caution]<br>
+ * When calling this method, the caller must always receive the return <br>
+ * value. <br>
+ * This is because if the memory area of the node itself of the list <br>
+ * structure object given by the argument is released, there is no way <br>
+ * for receiving the link of the remaining node, resulting in an error.<br>
  *
- * @param[in,out] self	削除対象のリスト構造体オブジェクト
+ * @param[in,out] self	List structure objects to be deleted
  */
 M2MList *M2MList_remove (M2MList *self);
 
 
 /**
- * 引数で指定されたインデックス位置のリスト構造体オブジェクトの値を変更する。<br>
+ * Copy (deep copy) argument value as the variable of the list structure object.<br>
+ * Therefore, even if releasing the heap memory with the "value" after <br>
+ * calling the function, it does not affect the member variables of the <br>
+ * list structure object at all.<br>
  *
  * @param[in,out] self		List structure object
- * @param[in] value			変更する値
- * @param[in] valueLength	値の大きさを示す整数[バイト]
- * @return					値を変更したリスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] value			The value of set to the list structure object
+ * @param[in] valueLength	Size of value[Byte]
+ * @return					Pointer of list structure object set value or NULL (In case of error)
  */
 M2MList *M2MList_set (M2MList *self, const void *value, const size_t valueLength);
 

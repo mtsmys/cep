@@ -52,9 +52,9 @@ extern "C"
 /**
  * This method allocate new memory with using "calloc()".<br>
  *
- * @param[in] count	repeat number of base size
- * @param[in] base	base size of allocation(allocation size = count * base[Byte])[Byte]
- * @return			allocated memory or NULL(means allocation error)
+ * @param[in] count	Repeat number of base size
+ * @param[in] base	Base size of allocation(allocation size = count * base[Byte])[Byte]
+ * @return			Allocated memory or NULL (In case of error)
  */
 void *M2MHeap_calloc (const size_t count, const size_t base);
 
@@ -63,7 +63,7 @@ void *M2MHeap_calloc (const size_t count, const size_t base);
  * This method delete indicated heap memory with using "free()".<br>
  * If indicated memory is NULL, do nothing.<br>
  *
- * @param[in,out] var	memory release target variable
+ * @param[in,out] var	Memory release target variable
  */
 #ifndef M2MHeap_free
 #define M2MHeap_free( var ) {if( var != NULL ) free( var); var = NULL;}
@@ -73,8 +73,8 @@ void *M2MHeap_calloc (const size_t count, const size_t base);
 /**
  * This method allocate new memory with using "malloc()".<br>
  *
- * @param[in] size	allocation size[Byte]
- * @return			allocated memory or NULL(means allocation error)
+ * @param[in] size	Allocation size[Byte]
+ * @return			Allocated memory or NULL (In case of error)
  */
 void *M2MHeap_malloc (const size_t size);
 

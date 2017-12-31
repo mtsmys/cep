@@ -73,8 +73,7 @@ void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned in
  * Output error message to the standard error output.<br>
  * Error message is based on the function name, line number, and message.<br>
  * Also, when a pointer for copying error message is specified as argument, <br>
- * buffering is performed inside this function without copying to standard <br>
- * error output, and error message is copied.<br>
+ * buffering is performed inside this function, and error message is copied.<br>
  *
  * @param[in] methodName					String indicating function name
  * @param[in] lineNumber					Line number in source file (can be embedded with "__LINE__")

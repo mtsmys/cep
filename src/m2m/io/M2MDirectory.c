@@ -31,13 +31,13 @@
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
- * 引数から所有者のアクセス権を示す値を算出して返す．<br>
+ * Return the value indicating the owner's access permission from the argument.<br>
  *
- * @param number	パーミッションを示す整数(=1〜7)
- * @return			規程の当該ユーザーパーミッション数
+ * @param number	An integer indicating permission (= 1 to 7)
+ * @return			Number of user permission
  */
 static mode_t this_getUserPermission (const unsigned int number)
 	{
@@ -70,10 +70,10 @@ static mode_t this_getUserPermission (const unsigned int number)
 
 
 /**
- * 引数からグループのアクセス権を示す値を算出して返す．<br>
+ * Return the value indicating the group's access permission from the argument.<br>
  *
- * @param number	パーミッションを示す整数(=1〜7)
- * @return			規程の当該グループパーミッション数
+ * @param number	An integer indicating permission (= 1 to 7)
+ * @return			Number of group permission
  */
 static mode_t this_getGroupPermission (const unsigned int number)
 	{
@@ -106,10 +106,10 @@ static mode_t this_getGroupPermission (const unsigned int number)
 
 
 /**
- * 引数から所有者以外のユーザーのアクセス権を示す値を算出して返す．<br>
+ * Return the value indicating the other user's access permission from the argument.<br>
  *
- * @param number	パーミッションを示す整数(=1〜7)
- * @return			規程の当該他ユーザーパーミッション数
+ * @param number	An integer indicating permission (= 1 to 7)
+ * @return			Number of other user permission
  */
 static mode_t this_getOthersPermission (const unsigned int number)
 	{
@@ -141,22 +141,20 @@ static mode_t this_getOthersPermission (const unsigned int number)
 	}
 
 
-
-
 /**
  * @param[in] mode
  * @return
  */
 static mode_t this_getPermission (const M2MString *mode)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString number[2];
 	size_t modeLength = 0;
 	unsigned int userPermission = 0;
 	unsigned int groupPermission = 0;
 	unsigned int othersPermission = 0;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (mode!=NULL && ((modeLength=M2MString_length(mode))==3 || modeLength==4))
 		{
 		//=====  =====
@@ -187,7 +185,7 @@ static mode_t this_getPermission (const M2MString *mode)
 			}
 		return this_getUserPermission(userPermission) | this_getGroupPermission(groupPermission) | this_getOthersPermission(othersPermission);
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return S_IRUSR | S_IWUSR | S_IXUSR;
@@ -197,23 +195,23 @@ static mode_t this_getPermission (const M2MString *mode)
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたパスのディレクトリが存在するかどうか確認する。<br>
+ * Tests whether the directory denoted by this abstract pathname exists.<br>
  *
- * @param directoryPath	存在を確認するディレクトリの絶対パス
- * @return				true : ディレクトリが存在, false : ディレクトリが存在しない
+ * @param directoryPath	Directory pathname string
+ * @return				true: if the directory exists, false: otherwise
  */
 bool M2MDirectory_exists (const M2MString *directoryPath)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct stat fileStatus;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (directoryPath!=NULL)
 		{
-		//===== ディレクトリの所在を確認 =====
+		//===== Check the existence of directory =====
 		if (stat(directoryPath, &fileStatus)==0 && S_ISDIR(fileStatus.st_mode))
 			{
 			return true;
@@ -223,7 +221,7 @@ bool M2MDirectory_exists (const M2MString *directoryPath)
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return false;
@@ -232,22 +230,22 @@ bool M2MDirectory_exists (const M2MString *directoryPath)
 
 
 /**
- * 環境変数で設定されているホームディレクトリを示すパス文字列を返す。<br>
+ * Get pathname string indicating the home directory set in environment.<br>
  *
- * @return ホームディレクトリを示すパス文字列
+ * @return 	Pathname string indicating home directory
  */
 M2MString *M2MDirectory_getHomeDirectoryPath ()
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MString *homeDirectoryPath = NULL;
 	const M2MString *HOME = (M2MString *)"HOME";
 
-	//===== ホームディレクトリを示すパス文字列の取得 =====
+	//===== Get pathname string indicating home directory =====
 	if ((homeDirectoryPath=(M2MString *)getenv(HOME))!=NULL)
 		{
 		return homeDirectoryPath;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		return NULL;
@@ -256,22 +254,22 @@ M2MString *M2MDirectory_getHomeDirectoryPath ()
 
 
 /**
- * 引数で指定されたパスがディレクトリであるかどうかを確認する。<br>
+ * Tests whether the pathname is directory.<br>
  *
- * @param directoryPath	ディレクトリパスを示す文字列
- * @return				true : ディレクトリの場合, false : ディレクトリでない場合
+ * @param directoryPath	String indicating the directory pathname
+ * @return				true: if the pathname is directory, false: otherwise
  */
 bool M2MDirectory_isDirectory (const M2MString *directoryPath)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	struct stat STATUS;
 
-	//===== ディレクトリの存在を確認 =====
+	//===== Check the existence of directory =====
 	if (directoryPath!=NULL && stat(directoryPath, &STATUS)==0 && S_ISDIR(STATUS.st_mode))
 		{
 		return true;
 		}
-	//===== ディレクトリが存在しない場合 =====
+	//===== Error handling =====
 	else
 		{
 		return false;
@@ -280,35 +278,35 @@ bool M2MDirectory_isDirectory (const M2MString *directoryPath)
 
 
 /**
- * 引数で指定されたパスに対し、ディレクトリを作成する。<br>
- * もし、指定パスに対し、途中のディレクトリが存在しない場合はエラーとなる。<br>
+ * Create new directory for the pathname.<br>
+ * If there is no intermediate directory, an error occurs.<br>
  *
- * @param[in] directoryPath	ディレクトリパスを示す文字列
- * @param[in] mode			パーミッションモードを示す3桁の整数文字列（例）"533"）
- * @return					true : ディレクトリの作成に成功, false : ディレクトリの作成に失敗
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @param[in] mode			Three-digit integer string indicating the permission mode (example) "533")
+ * @return					true: Success to create new directory, false : Failed to create
  */
 bool M2MDirectory_mkdir (const M2MString *directoryPath, const M2MString *mode)
 	{
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (directoryPath!=NULL)
 		{
-		//===== ディレクトリの存在を確認 =====
+		//===== Check the existence of directory =====
 		if (M2MDirectory_isDirectory(directoryPath)==true)
 			{
 			return true;
 			}
-		//===== ディレクトリが存在しない場合は新規作成 =====
+		//===== If not existing, create new directory =====
 		else if (mkdir(directoryPath, this_getPermission(mode))==0)
 			{
 			return true;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
 		return false;
@@ -317,43 +315,42 @@ bool M2MDirectory_mkdir (const M2MString *directoryPath, const M2MString *mode)
 
 
 /**
- * 引数で指定されたパスに対し、途中の親ディレクトリを含め、全てのディレクトリを作成<br>
- * する。<br>
+ * Create all directories including intermediate parent directory.<br>
  *
- * @param[in] directoryPath	ディレクトリパスを示す文字列
- * @param[in] mode			パーミッションモードを示す3桁の整数文字列（例）"533"）
- * @return					true : ディレクトリの作成に成功, false : ディレクトリの作成に失敗
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @param[in] mode			Three-digit integer string indicating the permission mode (example) "533")
+ * @return					true: Success to create new directory, false : Failed to create
  */
 bool M2MDirectory_mkdirs (const M2MString *directoryPath, const M2MString *mode)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const M2MString *CANONICAL_PATH = directoryPath;
 	const unsigned int CANONICAL_PATH_LENGTH = M2MString_length(CANONICAL_PATH);
 	M2MString path[FILENAME_MAX+1];
 	M2MString *pointer = M2MString_indexOf(CANONICAL_PATH, M2MDirectory_SEPARATOR);
 
-	//===== 初期化 =====
+	//===== Initialize variable =====
 	pointer++;
 	memset(path, 0, sizeof(path));
-	//===== 指定ディレクトリに辿り着くまで繰り返し =====
+	//===== Loop while not reaching the directory =====
 	while ((pointer=M2MString_indexOf(pointer, M2MDirectory_SEPARATOR))!=NULL)
 		{
-		//===== 親ディレクトリを示す文字列をコピー =====
+		//===== Copy pathname string of parent directory =====
 		memset(path, 0, sizeof(path));
 		memcpy(path, CANONICAL_PATH, CANONICAL_PATH_LENGTH - M2MString_length(pointer));
-		//===== 親ディレクトリの作成 =====
+		//===== Create new parent directory =====
 		if (M2MDirectory_mkdir(path, mode)==true)
 			{
 			pointer++;
 			continue;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			return false;
 			}
 		}
-	//===== 指定ディレクトリの作成 =====
+	//===== Create new directory which is the last of pathname =====
 	return M2MDirectory_mkdir(CANONICAL_PATH, mode);
 	}
 

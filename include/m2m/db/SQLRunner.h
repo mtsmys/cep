@@ -53,22 +53,22 @@ extern "C"
  * This function starts transaction with indicated SQLite3 database as an argument.<br>
  *
  * @param[in] database	SQLite3 database manager object
- * @return				true : success，false : failure
+ * @return				true: success，false: failure
  */
 bool SQLRunner_beginTransaction (sqlite3 *database);
 
 
 /**
- * 指定されたSQLite3データベース管理オブジェクトのトランザクションをコミットする．<br>
+ * Commit the transaction of the specified SQLite3 database object.<br>
  *
  * @param[in] database	SQLite3 database manager object
- * @return				true : success，false : failure
+ * @return				true: success，false: failure
  */
 bool SQLRunner_commitTransaction (sqlite3 *database);
 
 
 /**
- * 引数で指定されたSQLite3データベース管理オブジェクトに対してSQL文を実行する．<br>
+ * Execute the SQL statement in the SQLite3 database object.<br>
  * <br>
  * [Caution!]<br>
  * This function needs many times, so don't use this for "INSERT" SQL or <br>
@@ -76,7 +76,7 @@ bool SQLRunner_commitTransaction (sqlite3 *database);
  *
  * @param database	SQLite3 database manager object
  * @param sql		SQL string
- * @return			true : success，false : failuer
+ * @return			true: success，false: failuer
  */
 bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 

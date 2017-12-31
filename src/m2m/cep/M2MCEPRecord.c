@@ -125,7 +125,7 @@ static void this_deleteTableName (M2MCEPRecord *self)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクト（群）の中から、指定されたテーブル名<br>
+ * 引数で指定されたレコード管理オブジェクト（群）の中から, 指定されたテーブル名<br>
  * と一致するノードを取得して返す。<br>
  * 見つからなかった場合はNULLを返す。<br>
  *
@@ -376,7 +376,7 @@ static M2MCEPRecord *this_setColumnName (M2MCEPRecord *self, const M2MString *cs
 		//===== エラー処理 =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setColumnName()", __LINE__, (M2MString *)"CSV形式のカラム名を示す文字列をコピーするための、ヒープメモリ領域の獲得に失敗しました", NULL);
+			M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setColumnName()", __LINE__, (M2MString *)"CSV形式のカラム名を示す文字列をコピーするための, ヒープメモリ領域の獲得に失敗しました", NULL);
 			return NULL;
 			}
 		}
@@ -521,7 +521,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列がNULL，もしくは空白です", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord.this_setCSVIntoNewRecordList()", __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列がNULL, もしくは空白です", NULL);
 		return -1;
 		}
 	}
@@ -603,9 +603,9 @@ M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self)
  * 引数で指定されたレコード管理オブジェクトのメモリ領域を全て解放する．<br>
  * <br>
  * 【注意】<br>
- * レコード管理オブジェクトはメンバ変数として、リンク構造となっているポインタ<br>
- * を保持している。そのため、ヒープメモリの解放の際、ポインタのポインタとする必要<br>
- * は無く、内部で保持しているポインタを通して正しいアドレスを取得する事が出来る。<br>
+ * レコード管理オブジェクトはメンバ変数として, リンク構造となっているポインタ<br>
+ * を保持している。そのため, ヒープメモリの解放の際, ポインタのポインタとする必要<br>
+ * は無く, 内部で保持しているポインタを通して正しいアドレスを取得する事が出来る。<br>
  *
  * @param[in,out] self	メモリ領域解放対象のレコード管理オブジェクト
  */
@@ -688,11 +688,11 @@ M2MString *M2MCEPRecord_getColumnName (const M2MCEPRecord *self)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する、新規に<br>
+ * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 新規に<br>
  * 挿入されたレコードリストを返す．<br>
  *
  * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する、新規に挿入された（未だメモリーDB未挿入の）レコードリスト
+ * @return				引数で指定されたレコード管理オブジェクトが保持する, 新規に挿入された（未だメモリーDB未挿入の）レコードリスト
  */
 M2MList *M2MCEPRecord_getNewRecordList (const M2MCEPRecord *self)
 	{
@@ -708,11 +708,11 @@ M2MList *M2MCEPRecord_getNewRecordList (const M2MCEPRecord *self)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する、過去に<br>
+ * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 過去に<br>
  * 挿入されたレコードリストを返す．<br>
  *
  * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する、過去に挿入された（メモリーDB挿入済みの）レコードリスト
+ * @return				引数で指定されたレコード管理オブジェクトが保持する, 過去に挿入された（メモリーDB挿入済みの）レコードリスト
  */
 M2MList *M2MCEPRecord_getOldRecordList (const M2MCEPRecord *self)
 	{
@@ -754,9 +754,9 @@ M2MString *M2MCEPRecord_getTableName (const M2MCEPRecord *self)
 
 /**
  * 引数で指定されたレコード管理オブジェクトの“新規に挿入したレコード情報”<br>
- * 構造体オブジェクトのレコード情報を、“過去に挿入されたレコード情報”構造体<br>
+ * 構造体オブジェクトのレコード情報を, “過去に挿入されたレコード情報”構造体<br>
  * オブジェクトへコピーする。<br>
- * この操作は、メモリ上のSQLite3データベースへレコードを挿入した後、ファイル上の<br>
+ * この操作は, メモリ上のSQLite3データベースへレコードを挿入した後, ファイル上の<br>
  * SQLite3データベースへ永続化のためデータを整理するために実行する。<br>
  *
  * @param[in,out] self
@@ -804,7 +804,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 					//===== エラー処理 =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL、もしくはレコードサイズが0[Byte]以下です", NULL);
+						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
 						}
 					//===== 新規レコード情報オブジェクトから移動済みレコードを削除して次のノードへ移動 =====
 					newRecordList = M2MList_remove(newRecordList);
@@ -827,7 +827,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 				//===== エラー処理 =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL、もしくはレコードサイズが0[Byte]以下です", NULL);
+					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_moveFromNewRecordListToOldRecordList()", __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
 					}
 				//===== 新規レコード情報オブジェクトから移動済みレコードを削除 =====
 				self->newRecordList = M2MList_remove(newRecordList);
@@ -867,8 +867,8 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self)
 
 
 /**
- * ヒープメモリ領域を新規に獲得し，レコード管理オブジェクトを生成する．<br>
- * このレコード管理オブジェクトの前方ノードは自分自身のポインタ、後方ノードは<br>
+ * ヒープメモリ領域を新規に獲得し, レコード管理オブジェクトを生成する．<br>
+ * このレコード管理オブジェクトの前方ノードは自分自身のポインタ, 後方ノードは<br>
  * NULLに初期化されている点に留意する事。<br>
  *
  * @return	新規に生成したレコード管理オブジェクト
@@ -922,11 +922,11 @@ M2MCEPRecord *M2MCEPRecord_new ()
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する，1つ後ろの<br>
+ * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 1つ後ろの<br>
  * レコード管理オブジェクトを返す．<br>
  *
  * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ後ろのレコード管理オブジェクト
+ * @return				引数で指定されたレコード管理オブジェクトが保持する, 1つ後ろのレコード管理オブジェクト
  */
 M2MCEPRecord *M2MCEPRecord_next (const M2MCEPRecord *self)
 	{
@@ -942,11 +942,11 @@ M2MCEPRecord *M2MCEPRecord_next (const M2MCEPRecord *self)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する，1つ手前の<br>
+ * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 1つ手前の<br>
  * レコード管理オブジェクトを返す．<br>
  *
  * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ手前のレコード管理オブジェクト
+ * @return				引数で指定されたレコード管理オブジェクトが保持する, 1つ手前のレコード管理オブジェクト
  */
 M2MCEPRecord *M2MCEPRecord_previous (const M2MCEPRecord *self)
 	{
@@ -962,7 +962,7 @@ M2MCEPRecord *M2MCEPRecord_previous (const M2MCEPRecord *self)
 
 
 /**
- * 引数で指定されたテーブル名に該当するレコード管理オブジェクトだけ，メモリ領域<br>
+ * 引数で指定されたテーブル名に該当するレコード管理オブジェクトだけ, メモリ領域<br>
  * を解放する（ポインタで接続された他のレコード管理オブジェクトは存続する）．<br>
  *
  * @param[in,out] self
@@ -1006,7 +1006,7 @@ void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName)
 					// 何もしない
 					}
 				}
-			//===== 指定のレコード管理オブジェクトが末端ノードの場合（但し、前方ノードは必ず存在する） =====
+			//===== 指定のレコード管理オブジェクトが末端ノードの場合（但し, 前方ノードは必ず存在する） =====
 			else if (next==NULL)
 				{
 				//===== ノード間の連結を切り離し =====
@@ -1040,16 +1040,16 @@ void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName)
 
 
 /**
- * 引数で指定されたテーブル名をメンバ変数に持つレコード管理オブジェクトに対し，<br>
+ * 引数で指定されたテーブル名をメンバ変数に持つレコード管理オブジェクトに対し, <br>
  * CSV形式の文字列データをリスト構造体オブジェクトに格納する．<br>
- * テーブル名をメンバ変数に持つレコード管理オブジェクトが存在しなかった場合、<br>
- * レコード管理オブジェクトを新たに生成し、CSV形式の文字列データをセットして<br>
+ * テーブル名をメンバ変数に持つレコード管理オブジェクトが存在しなかった場合, <br>
+ * レコード管理オブジェクトを新たに生成し, CSV形式の文字列データをセットして<br>
  * 引数で指定されたレコード管理オブジェクトに追加する。<br>
  * <br>
  * CSV形式の文字列は以下の仕様に従っている事。<br>
  * ・文字コード：UTF-8<br>
  * ・改行コード："\r\n"<br>
- * ・1行目にカラム名を示すヘッダ，2行目以降がデータとなる<br>
+ * ・1行目にカラム名を示すヘッダ, 2行目以降がデータとなる<br>
  * <br>
  * [引数にセットするCSV形式の文字列例]<br>
  * date,temperature,humidity\r\n	← ヘッダ行<br>
@@ -1211,7 +1211,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し，1つ後ろのレコード管理<br>
+ * 引数で指定されたレコード管理オブジェクトに対し, 1つ後ろのレコード管理<br>
  * オブジェクトをセットする．<br>
  *
  * @param[in] self			レコード管理オブジェクト
@@ -1231,7 +1231,7 @@ void M2MCEPRecord_setNextRecord (M2MCEPRecord *self, M2MCEPRecord *nextRecord)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し，1つ手前のレコード管理<br>
+ * 引数で指定されたレコード管理オブジェクトに対し, 1つ手前のレコード管理<br>
  * オブジェクトをセットする．<br>
  *
  * @param[in,out] self			レコード管理オブジェクト

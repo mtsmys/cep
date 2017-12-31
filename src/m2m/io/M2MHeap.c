@@ -31,14 +31,14 @@
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * “calloc()”関数を使って新規にメモリをアロケートして返す。<br>
+ * This method allocate new memory with using "calloc()".<br>
  *
- * @param[in] count	基本サイズ（＝base[Byte]）の繰り返し回数[回]
- * @param[in] base	アロケーションの基本サイズ[Byte]
- * @return			アロケートしたメモリ（= count * base[Byte]） or NULL(エラーの場合)
+ * @param[in] count	Repeat number of base size
+ * @param[in] base	Base size of allocation(allocation size = count * base[Byte])[Byte]
+ * @return			Allocated memory or NULL (In case of error)
  */
 void *M2MHeap_calloc (const size_t count, const size_t base)
 	{
@@ -47,24 +47,24 @@ void *M2MHeap_calloc (const size_t count, const size_t base)
 
 
 /**
- * “malloc()”関数を使って新規にメモリをアロケートして返す。<br>
+ * This method allocate new memory with using "malloc()".<br>
  *
- * @param[in] size	アロケートするメモリサイズ[Byte]
- * @return			アロケートしたメモリ or NULL(エラーの場合)
+ * @param[in] size	Allocation size[Byte]
+ * @return			Allocated memory or NULL (In case of error)
  */
 void *M2MHeap_malloc (const size_t size)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	void *memory = NULL;
 
-	//===== ヒープメモリの取得 =====
+	//===== Get heap memory =====
 	if ((memory=malloc(size))!=NULL)
 		{
-		//===== メモリ領域の初期化 =====
+		//===== Initialize heap memory =====
 		memset(memory, 0, size);
 		return memory;
 		}
-	//===== エラー処理 =====
+	//===== Error handling =====
 	else
 		{
 		return NULL;

@@ -31,107 +31,107 @@
 
 
 /*******************************************************************************
- * 公開メソッド
+ * Public function
  ******************************************************************************/
 /**
- * 指定されたSQLite3データベース管理オブジェクトに対し、トランザクションを開始する．<br>
+ * This function starts transaction with indicated SQLite3 database as argument.<br>
  *
- * @param[in] database	SQLite3データベース管理オブジェクト
- * @return				true : 成功，false : 失敗
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
  */
 bool SQLRunner_beginTransaction (sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const M2MString *BEGIN_SQL = (M2MString *)"BEGIN ";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
-		//===== SQL実行 =====
+		//===== Execute SQL =====
 		if (SQLRunner_executeUpdate(database, BEGIN_SQL)==true)
 			{
 #ifdef DEBUG
-			M2MLogger_printDebugMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"SQLite3データベースに対してトランザクションを開始しました");
+			M2MLogger_printDebugMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"Transaction started for SQLite3 database");
 #endif // DEBUG
 			return true;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"SQLite3データベースに対してトランザクションの開始に失敗しました", NULL);
+			M2MLogger_printErrorMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"Failed to the start of transaction in SQLite3 database", NULL);
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_beginTransaction()", __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * 指定されたSQLite3データベース管理オブジェクトのトランザクションをコミットする．<br>
+ * Commit the transaction of the specified SQLite3 database object.<br>
  *
- * @param[in] database	SQLite3データベース
- * @return				true : 成功，false : 失敗
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
  */
 bool SQLRunner_commitTransaction (sqlite3 *database)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	const M2MString *COMMIT_SQL = (M2MString *)"COMMIT ";
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL)
 		{
-		//===== コミット =====
+		//===== Commit =====
 		if (SQLRunner_executeUpdate(database, COMMIT_SQL)==true)
 			{
 #ifdef DEBUG
-			M2MLogger_printDebugMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"SQLite3データベースに対する操作をコミットしました");
+			M2MLogger_printDebugMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"Success to the commit in SQLite3 database");
 #endif // DEBUG
 			return true;
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"SQLite3データベースに対するコミットに失敗しました", NULL);
+			M2MLogger_printErrorMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"Failed to the commit in SQLite3 database", NULL);
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_commitTransaction()", __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * 引数で指定されたSQLite3データベース管理オブジェクトに対してSQL文を実行する．<br>
+ * Execute the SQL statement in the SQLite3 database object.<br>
  * <br>
- * 【注意】<br>
- * この処理は完了まで時間が掛かるため，通常の"INSERT"や"UPDATE"の目的では利用<br>
- * しない事．<br>
+ * [Caution!]<br>
+ * This function needs many times, so don't use this for "INSERT" SQL or <br>
+ * "UPDATE" SQL.<br>
  *
- * @param database	SQLite3データベース管理オブジェクト
- * @param sql		SQL文を示す文字列
- * @return			true : 成功，false : 失敗
+ * @param database	SQLite3 database manager object
+ * @param sql		SQL string
+ * @return			true: success, false: failuer
  */
 bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
 
-	//===== 引数の確認 =====
+	//===== Check argument =====
 	if (database!=NULL && sql!=NULL)
 		{
-		//===== SQL文をVDBE（内部実行形式）へ変換 =====
+		//===== Convert SQL statement to VDBE (internal execution format) =====
 		if (sqlite3_prepare(database, sql, -1, &statement, NULL)==SQLITE_OK)
 			{
-			//===== SQL実行 =====
+			//===== Execute SQL =====
 			while (sqlite3_step(statement)==SQLITE_BUSY)
 				{
 				}
@@ -139,29 +139,29 @@ bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 				{
 				return true;
 				}
-			//===== エラー処理 =====
+			//===== Error handling =====
 			else
 				{
 				M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
 				return false;
 				}
 			}
-		//===== エラー処理 =====
+		//===== Error handling =====
 		else
 			{
 			M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
 			return false;
 			}
 		}
-	//===== 引数エラー =====
+	//===== Argument error =====
 	else if (database==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)"引数で指定されたSQLite3データベース管理オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" is NULL", NULL);
 		return false;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)"引数で指定されたSQL文を示す文字列がNULLです", NULL);
+		M2MLogger_printErrorMessage((M2MString *)"SQLRunner_executeUpdate()", __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL", NULL);
 		return false;
 		}
 	}

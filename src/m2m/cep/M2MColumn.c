@@ -72,7 +72,7 @@ static void this_deleteName (M2MColumn *self)
  ******************************************************************************/
 /**
  * デストラクタ。<br>
- * 引数で指定されたカラム情報オブジェクトのヒープメモリ領域を解放し、オブジェクト<br>
+ * 引数で指定されたカラム情報オブジェクトのヒープメモリ領域を解放し, オブジェクト<br>
  * を削除する。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト
@@ -202,7 +202,7 @@ bool M2MColumn_getUnique (const M2MColumn *self)
 
 /**
  * コンストラクタ。<br>
- * ヒープメモリ領域を獲得し、カラム情報オブジェクトを新規に作成する。<br>
+ * ヒープメモリ領域を獲得し, カラム情報オブジェクトを新規に作成する。<br>
  *
  * @return	カラム情報オブジェクト
  */
@@ -224,14 +224,14 @@ M2MColumn *M2MColumn_new ()
 	//===== エラー処理 =====
 	else
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため、ヒープメモリ領域を獲得するのに失敗しました", NULL);
+		M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトにメンバ変数として、自動インクリメントの<br>
+ * 引数で指定されたカラム情報オブジェクトにメンバ変数として, 自動インクリメントの<br>
  * 可否を示すフラグをセットする。<br>
  *
  * @param[in,out] self		カラム情報オブジェクト
@@ -254,7 +254,7 @@ M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として、レコードにNULLの可否<br>
+ * 引数で指定されたカラム情報オブジェクトのメンバ変数として, レコードにNULLの可否<br>
  * を示すフラグをセットする。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト
@@ -277,7 +277,7 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として、データ型を示す列挙子<br>
+ * 引数で指定されたカラム情報オブジェクトのメンバ変数として, データ型を示す列挙子<br>
  * をセットする。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト
@@ -300,7 +300,7 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトに対し、カラム名を示す文字列をメンバ変数<br>
+ * 引数で指定されたカラム情報オブジェクトに対し, カラム名を示す文字列をメンバ変数<br>
  * としてセットする。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト
@@ -325,7 +325,7 @@ M2MColumn *M2MColumn_setName (M2MColumn *self, const unsigned char *name)
 		//===== エラー処理 =====
 		else
 			{
-			M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"name\"文字列をコピーするため、ヒープメモリ領域を獲得するのに失敗しました", NULL);
+			M2MLogger_printErrorMessage((unsigned char *)"M2MColumn_setName()", __LINE__, (unsigned char *)"引数で指定された\"name\"文字列をコピーするため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
 			return NULL;
 			}
 		}
@@ -349,7 +349,7 @@ M2MColumn *M2MColumn_setName (M2MColumn *self, const unsigned char *name)
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として、主キーか否かを示す<br>
+ * 引数で指定されたカラム情報オブジェクトのメンバ変数として, 主キーか否かを示す<br>
  * フラグをセットする。<br>
  *
  * @param[in,out] self		カラム情報オブジェクト
@@ -372,7 +372,7 @@ M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として、レコードのユニーク性<br>
+ * 引数で指定されたカラム情報オブジェクトのメンバ変数として, レコードのユニーク性<br>
  * を示すフラグをセットする。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト

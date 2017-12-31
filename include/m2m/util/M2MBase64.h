@@ -99,11 +99,11 @@ size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLeng
  * If you want to put all the converted character strings on one line, <br>
  * set "chunk" to false.<br>
  *
- * @param src		Base64変換対象のバイナリーデータ
- * @param srcLength	Base64変換対象のバイナリーデータサイズ[Byte]
- * @param string	Base64で変換された文字列の格納ポインタ（バッファリング自体は関数内で実行する）
- * @param chunk		true : 76文字毎に改行コード（\r\n)を挿入する，false : 改行コードを挿入しない
- * @return			Base64で変換された文字列のポインタ or NULL（エラーの場合)
+ * @param src		Binary data to be converted to Base64 string
+ * @param srcLength	Binary data size[Byte]
+ * @param string	Pointer of converted Base64 string (buffering is executed within this function)
+ * @param chunk		true: Insert a line feed code (="\r\n") every 76 characters，false: Don't insert a line feed code
+ * @return			Pointer of converted Base64 string or NULL (in case of error)
  */
 M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M2MString **string, const bool chunk);
 

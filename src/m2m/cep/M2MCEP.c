@@ -31,11 +31,11 @@
 
 
 /*******************************************************************************
- * The definition of internal function
+ * Declaration of private function
  ******************************************************************************/
 /**
- * 引数で指定されたSQLite3データベースファイル名を示す文字列から、データベース<br>
- * ファイルパスを示す文字列を作成し、引数で指定されたバッファにコピーする。<br>
+ * 引数で指定されたSQLite3データベースファイル名を示す文字列から, データベース<br>
+ * ファイルパスを示す文字列を作成し, 引数で指定されたバッファにコピーする。<br>
  * 処理に失敗した場合は戻り値として NULL を返す。<br>
  *
  * @param[in] databaseName			SQLite3データベースファイル名を示す文字列
@@ -112,7 +112,7 @@ static sqlite3 *this_getMemoryDatabase (M2MCEP *self);
 
 
 /**
- * 引数で指定されたCEP構造体オブジェクトから、永続性の可否を示すフラグを取得する．<br>
+ * 引数で指定されたCEP構造体オブジェクトから, 永続性の可否を示すフラグを取得する．<br>
  *
  * @param[in,out] self		CEP構造体オブジェクト
  * @return					永続性の可否を示すフラグ
@@ -143,10 +143,10 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトが保持する、CEPレコード管理オブジェクトの<br>
- * “メモリ上のSQLite3データベースに挿入済み”のレコードに対し、規定している最大<br>
- * レコード数を超過している場合、超過分のレコードをファイル上のSQLite3データベース<br>
- * に挿入し、永続化を行う。<br>
+ * 引数で指定されたCEP実行オブジェクトが保持する, CEPレコード管理オブジェクトの<br>
+ * “メモリ上のSQLite3データベースに挿入済み”のレコードに対し, 規定している最大<br>
+ * レコード数を超過している場合, 超過分のレコードをファイル上のSQLite3データベース<br>
+ * に挿入し, 永続化を行う。<br>
  *
  * @param[in,out] self	CEP実行オブジェクト
  * @return				処理に成功したCEP実行オブジェクト or NULL（挿入エラーの場合）
@@ -155,8 +155,8 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self);
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトのメンバ変数が保有する、メモリ上のSQLite3<br>
- * データベースに未挿入のレコード（＝CEPRecord->newRecordList）に対し、メモリ<br>
+ * 引数で指定されたCEP実行オブジェクトのメンバ変数が保有する, メモリ上のSQLite3<br>
+ * データベースに未挿入のレコード（＝CEPRecord->newRecordList）に対し, メモリ<br>
  * 上のSQLite3データベースへ一括挿入処理を行う。<br>
  *
  * @param[in] self	CEP実行オブジェクト
@@ -166,7 +166,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self);
 
 
 /**
- * 引数で指定されたパスに、同じく引数で指定されたパーミッションのディレクトリを<br>
+ * 引数で指定されたパスに, 同じく引数で指定されたパーミッションのディレクトリを<br>
  * 作成する。<br>
  *
  * @param[in] directoryPath		ディレクトリパスを示す文字列
@@ -178,7 +178,7 @@ static unsigned char *this_makeDirectory (const unsigned char *directoryPath, co
 
 /**
  * 引数で指定されたデータベース名のSQLite3データベースファイルを規定ディレクトリ下<br>
- * に作成し、当該データベースオブジェクトを返す。<br>
+ * に作成し, 当該データベースオブジェクトを返す。<br>
  * 作成に失敗した場合は NULL を返す。<br>
  *
  * @param[in] databaseName	データベース名を示す文字列
@@ -201,10 +201,10 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableBuilder *tableBuilder, co
 
 
 /**
- * 引数で指定されたデータベースに対し，自動バキュームを設定する．<br>
+ * 引数で指定されたデータベースに対し, 自動バキュームを設定する．<br>
  *
  * @param[in] database	自動バキュームを設定するSQLite3データベースオブジェクト
- * @param[in] flag		true : 自動バキュームを有効にする，false : 自動バキュームを無効にする
+ * @param[in] flag		true : 自動バキュームを有効にする, false : 自動バキュームを無効にする
  */
 static void this_setAutoVacuum (sqlite3 *database, const bool flag);
 
@@ -221,7 +221,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として、SQLite3<br>
+ * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として, SQLite3<br>
  * ファイルデータベース管理オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -232,7 +232,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase);
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として、メモリー上の<br>
+ * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として, メモリー上の<br>
  * SQLite3データベース管理オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -243,7 +243,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase);
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトに対し、メンバ変数としてテーブル構築<br>
+ * 引数で指定されたCEP実行オブジェクトに対し, メンバ変数としてテーブル構築<br>
  * オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -254,7 +254,7 @@ static M2MCEP *this_setTableBuilder (M2MCEP *self, const M2MTableBuilder *tableB
 
 
 /**
- * 引数で指定されたデータベースに対し、文字コードをUTF-8に設定する。<br>
+ * 引数で指定されたデータベースに対し, 文字コードをUTF-8に設定する。<br>
  *
  * @param[in] database	文字コードをUTF-8に設定するSQLite3データベースオブジェクト
  */
@@ -275,7 +275,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
  * SQLite3データベースのジャーナルモードをWAL(Write Ahead Logging)にセットする．<br>
  *
  * @param[in] database		WAL設定対象のSQLite3データベース管理オブジェクト
- * @param[in] synchronous	true : 同期モード，false : 非同期モード
+ * @param[in] synchronous	true : 同期モード, false : 非同期モード
  */
 static void this_setWAL (sqlite3 *database, const bool synchronous);
 
@@ -299,12 +299,12 @@ static void this_vacuum (sqlite3 *database);
 
 
 /*******************************************************************************
- * Internal function
+ * Private function
  ******************************************************************************/
 /**
- * メモリ上のSQLite3データベースに対し、引数で指定されたテーブルのレコード数が<br>
+ * メモリ上のSQLite3データベースに対し, 引数で指定されたテーブルのレコード数が<br>
  * 上限値を超えていない事を確認する。<br>
- * もし上限値を超えている場合、挿入されたレコードの先頭順に、レコード数が上限値<br>
+ * もし上限値を超えている場合, 挿入されたレコードの先頭順に, レコード数が上限値<br>
  * に一致するまでレコードを削除する。<br>
  *
  * @param[in] self		CEP実行オブジェクト
@@ -419,8 +419,8 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const unsigned char *
 
 
 /**
- * 挿入したレコード数を確認し，既定値に達した場合はバキューム処理を実行する．<br>
- * バキューム処理について，メモリ上のSQLite3データベースとファイル上のSQLite3<br>
+ * 挿入したレコード数を確認し, 既定値に達した場合はバキューム処理を実行する．<br>
+ * バキューム処理について, メモリ上のSQLite3データベースとファイル上のSQLite3<br>
  * データベース両者に対して実行する．<br>
  *
  * @param self	CEP実行オブジェクト
@@ -436,7 +436,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 		//===== バキューム処理を実行するレコード数を確認 =====
 		if ((vacuumRecord=this_getVacuumRecord(self))>0)
 			{
-			//===== バキューム処理を行う，規程のレコード数に達した場合 =====
+			//===== バキューム処理を行う, 規程のレコード数に達した場合 =====
 			if (vacuumRecord<this_getRecordCounter(self))
 				{
 #ifdef DEBUG
@@ -467,7 +467,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 				//===== カウンターを初期化 =====
 				this_updateRecordCounter(self, 0);
 				}
-			//===== バキューム処理を行う，規程のレコード数に達していない場合 =====
+			//===== バキューム処理を行う, 規程のレコード数に達していない場合 =====
 			else
 				{
 				// 何もしない
@@ -491,7 +491,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 
 /**
  * 引数で指定されたCEP実行オブジェクトが管理するSQLite3ファイルデータベースを終了<br>
- * し、ヒープメモリ領域を解放する。<br>
+ * し, ヒープメモリ領域を解放する。<br>
  *
  * @param[in,out] self	CEP実行オブジェクト
  */
@@ -544,7 +544,7 @@ static void this_closeFileDatabase (M2MCEP *self)
 
 /**
  * 引数で指定されたCEP実行オブジェクトが管理するSQLite3メモリデータベースを終了<br>
- * し、ヒープメモリ領域を解放する。<br>
+ * し, ヒープメモリ領域を解放する。<br>
  *
  * @param[in,out] self	CEP実行オブジェクト
  */
@@ -736,7 +736,7 @@ static void this_deleteDatabaseName (M2MCEP *self)
 /**
  * 引数で指定されたCEP実行オブジェクトがメンバ変数として保持しているテーブル<br>
  * 構築オブジェクトのヒープメモリ領域を解放する。<br>
- * 当該メソッド呼び出し後、テーブル構築オブジェクトにはアクセス出来なくなる事に<br>
+ * 当該メソッド呼び出し後, テーブル構築オブジェクトにはアクセス出来なくなる事に<br>
  * 留意する事。<br>
  *
  * @param[in,out] self	CEP実行オブジェクト
@@ -904,8 +904,8 @@ static unsigned char *this_getDatabaseDirectoryPath (unsigned char **directoryPa
 
 
 /**
- * 引数で指定されたSQLite3データベースファイル名を示す文字列から、データベース<br>
- * ファイルパスを示す文字列を作成し、引数で指定されたバッファにコピーする。<br>
+ * 引数で指定されたSQLite3データベースファイル名を示す文字列から, データベース<br>
+ * ファイルパスを示す文字列を作成し, 引数で指定されたバッファにコピーする。<br>
  * 処理に失敗した場合は戻り値として NULL を返す。<br>
  *
  * @param[in] databaseName			SQLite3データベースファイル名を示す文字列
@@ -975,7 +975,7 @@ static unsigned char *this_getDatabaseFilePath (const unsigned char *databaseNam
 	//===== 引数エラー =====
 	else if (databaseName==NULL || databaseNameLength<=0)
 		{
-		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseFilePath()", __LINE__, (unsigned char *)"引数で指定された\"databaseName\"がNULL、または文字列数が0以下です", NULL);
+		M2MLogger_printErrorMessage((unsigned char *)"M2MCEP.this_getDatabaseFilePath()", __LINE__, (unsigned char *)"引数で指定された\"databaseName\"がNULL, または文字列数が0以下です", NULL);
 		return NULL;
 		}
 	else
@@ -1082,7 +1082,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const unsi
  * 引数で指定されたCEP実行オブジェクトが管理しているファイル上のSQLite3データベース<br>
  * オブジェクトを取得して返す。<br>
  * もしCEP実行オブジェクトがファイル上のSQLite3データベース管理オブジェクトを<br>
- * 保持していなかった場合、且つレコード永続化のフラグが立っている場合、新規に<br>
+ * 保持していなかった場合, 且つレコード永続化のフラグが立っている場合, 新規に<br>
  * ファイル上のSQLite3データベース管理オブジェクトを取得して返す．<br>
  *
  * @param[in] self	CEP実行オブジェクト
@@ -1143,7 +1143,7 @@ static sqlite3 *this_getFileDatabase (M2MCEP *self)
 		else
 			{
 #ifdef DEBUG
-			M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_getFileDatabase()", __LINE__, (unsigned char *)"レコード永続化は無効のため，ファイル上のSQLite3データベース管理オブジェクトを取得しません");
+			M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_getFileDatabase()", __LINE__, (unsigned char *)"レコード永続化は無効のため, ファイル上のSQLite3データベース管理オブジェクトを取得しません");
 #endif // DEBUG
 			return NULL;
 			}
@@ -1253,7 +1253,7 @@ static sqlite3 *this_getMemoryDatabase (M2MCEP *self)
 
 
 /**
- * 引数で指定されたCEP構造体オブジェクトから、永続性の可否を示すフラグを取得する．<br>
+ * 引数で指定されたCEP構造体オブジェクトから, 永続性の可否を示すフラグを取得する．<br>
  *
  * @param[in,out] self		CEP構造体オブジェクト
  * @return					永続性の可否を示すフラグ
@@ -1643,7 +1643,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 			{
 #ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (unsigned char *)"メモリ上のSQLite3データベースの\"%s\"テーブルに挿入済みレコード数(=\"%u\")が規定のレコード数最大値(=\"%u\")以内のため，レコードの削除は実行しません", tableName, oldRecordListLength, maxRecord);
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (unsigned char *)"メモリ上のSQLite3データベースの\"%s\"テーブルに挿入済みレコード数(=\"%u\")が規定のレコード数最大値(=\"%u\")以内のため, レコードの削除は実行しません", tableName, oldRecordListLength, maxRecord);
 			M2MLogger_printDebugMessage((unsigned char *)"M2MCEP.this_insertOldRecordList()", __LINE__, MESSAGE);
 #endif // DEBUG
 			return;
@@ -1702,7 +1702,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 	//===== 引数の確認 =====
 	if (database!=NULL && tableBuilder!=NULL && record!=NULL && (recordList=M2MList_begin(recordList))!=NULL)
 		{
-		//===== テーブル名、カラム名CSVと挿入対象の新規レコード情報オブジェクトの取得 =====
+		//===== テーブル名, カラム名CSVと挿入対象の新規レコード情報オブジェクトの取得 =====
 		if ((tableName=M2MCEPRecord_getTableName(record))!=NULL
 				&& (columnNameCSV=M2MCEPRecord_getColumnName(record))!=NULL
 				&& (columnList=M2MTableBuilder_getColumnList(tableBuilder, tableName))!=NULL
@@ -1880,10 +1880,10 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトが保持する、CEPレコード管理オブジェクトの<br>
- * “メモリ上のSQLite3データベースに挿入済み”のレコードに対し、規定している最大<br>
- * レコード数を超過している場合、超過分のレコードをファイル上のSQLite3データベース<br>
- * に挿入し、永続化を行う。<br>
+ * 引数で指定されたCEP実行オブジェクトが保持する, CEPレコード管理オブジェクトの<br>
+ * “メモリ上のSQLite3データベースに挿入済み”のレコードに対し, 規定している最大<br>
+ * レコード数を超過している場合, 超過分のレコードをファイル上のSQLite3データベース<br>
+ * に挿入し, 永続化を行う。<br>
  *
  * @param[in,out] self	CEP実行オブジェクト
  * @return				処理に成功したCEP実行オブジェクト or NULL（挿入エラーの場合）
@@ -1972,8 +1972,8 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトのメンバ変数が保有する、メモリ上のSQLite3<br>
- * データベースに未挿入のレコード（＝CEPRecord->newRecordList）に対し、メモリ<br>
+ * 引数で指定されたCEP実行オブジェクトのメンバ変数が保有する, メモリ上のSQLite3<br>
+ * データベースに未挿入のレコード（＝CEPRecord->newRecordList）に対し, メモリ<br>
  * 上のSQLite3データベースへ一括挿入処理を行う。<br>
  *
  * @param[in] self	CEP実行オブジェクト
@@ -2068,7 +2068,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 
 
 /**
- * 引数で指定されたパスに、同じく引数で指定されたパーミッションのディレクトリを<br>
+ * 引数で指定されたパスに, 同じく引数で指定されたパーミッションのディレクトリを<br>
  * 作成する。<br>
  *
  * @param[in] directoryPath		ディレクトリパスを示す文字列
@@ -2090,7 +2090,7 @@ static unsigned char *this_makeDirectory (const unsigned char *directoryPath, co
 
 /**
  * 引数で指定されたデータベース名のSQLite3データベースファイルを規定ディレクトリ下<br>
- * に作成し、当該データベースオブジェクトを返す。<br>
+ * に作成し, 当該データベースオブジェクトを返す。<br>
  * 作成に失敗した場合は NULL を返す。<br>
  *
  * @param[in] databaseName	データベース名を示す文字列
@@ -2249,10 +2249,10 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableBuilder *tableBuilder, co
 
 
 /**
- * 引数で指定されたデータベースに対し，自動バキュームを設定する．<br>
+ * 引数で指定されたデータベースに対し, 自動バキュームを設定する．<br>
  *
  * @param[in] database	自動バキュームを設定するSQLite3データベースオブジェクト
- * @param[in] flag		true : 自動バキュームを有効にする，false : 自動バキュームを無効にする
+ * @param[in] flag		true : 自動バキュームを有効にする, false : 自動バキュームを無効にする
  */
 static void this_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
@@ -2393,7 +2393,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const unsigned char *database
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として、SQLite3<br>
+ * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として, SQLite3<br>
  * ファイルデータベース管理オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -2426,7 +2426,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として、メモリー上の<br>
+ * 引数で指定されたCEP実行オブジェクトの保有するメンバー変数として, メモリー上の<br>
  * SQLite3データベース管理オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -2459,7 +2459,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトに対し、メンバ変数としてテーブル構築<br>
+ * 引数で指定されたCEP実行オブジェクトに対し, メンバ変数としてテーブル構築<br>
  * オブジェクトをセットする。<br>
  *
  * @param[in,out] self		CEP実行オブジェクト
@@ -2495,7 +2495,7 @@ static M2MCEP *this_setTableBuilder (M2MCEP *self, const M2MTableBuilder *tableB
 
 
 /**
- * 引数で指定されたデータベースに対し、文字コードをUTF-8に設定する。<br>
+ * 引数で指定されたデータベースに対し, 文字コードをUTF-8に設定する。<br>
  *
  * @param[in] database	文字コードをUTF-8に設定するSQLite3データベースオブジェクト
  */
@@ -2743,7 +2743,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
  * SQLite3データベースのジャーナルモードをWAL(Write Ahead Logging)にセットする．<br>
  *
  * @param[in] database		WAL設定対象のSQLite3データベース管理オブジェクト
- * @param[in] synchronous	true : 同期モード，false : 非同期モード
+ * @param[in] synchronous	true : 同期モード, false : 非同期モード
  */
 static void this_setWAL (sqlite3 *database, const bool synchronous)
 	{
@@ -2893,7 +2893,7 @@ static void this_vacuum (sqlite3 *database)
 
 
 /*******************************************************************************
- * External function
+ * Public function
  ******************************************************************************/
 /**
  * 引数で指定されたCEP実行オブジェクトのヒープメモリ領域を解放する．<br>
@@ -2951,14 +2951,14 @@ void M2MCEP_delete (M2MCEP **self)
  * に挿入する．<br>
  * 内部の処理手順は下記の通りである．<br>
  * <br>
- * 1)CSV形式の文字列をパースし，CEPレコード情報オブジェクトに取り込む．<br>
- * 2)メモリー上のSQLite3データベース内の（引数で指定された）テーブルに、CEPデータを挿入する．<br>
- * 3)メモリー上のSQLite3データベースのテーブルの現在のレコード数を確認し，規定値を<br>
+ * 1)CSV形式の文字列をパースし, CEPレコード情報オブジェクトに取り込む．<br>
+ * 2)メモリー上のSQLite3データベース内の（引数で指定された）テーブルに, CEPデータを挿入する．<br>
+ * 3)メモリー上のSQLite3データベースのテーブルの現在のレコード数を確認し, 規定値を<br>
  *   超過した場合は古いレコードから削除する．<br>
  * 4)メモリー上のSQLite3データベースのテーブルから削除したレコードと同じデータを<br>
- *   CEPレコード情報オブジェクトから取得し，（永続化のために）ファイル上のSQLite3<br>
+ *   CEPレコード情報オブジェクトから取得し, （永続化のために）ファイル上のSQLite3<br>
  *   データベースに挿入する．<br>
- * 5)CEPレコード情報オブジェクトのレコードデータから、ファイル上のSQLite3データベース<br>
+ * 5)CEPレコード情報オブジェクトのレコードデータから, ファイル上のSQLite3データベース<br>
  *   に挿入して永続化した超過分のレコードを削除する．<br>
  *
  * @param[in,out] self	CEP構造体オブジェクト
@@ -3033,9 +3033,9 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 
 
 /**
- * CEP構造体オブジェクトを新規作成し、SQLite3データベース処理のための準備を行う．<br>
- * テーブルについては、メモリ上のSQLite3データベースは"M2MCEP"オブジェクトが作成<br>
- * される度に毎回構築する必要があるため、必ず指定する事。<br>
+ * CEP構造体オブジェクトを新規作成し, SQLite3データベース処理のための準備を行う．<br>
+ * テーブルについては, メモリ上のSQLite3データベースは"M2MCEP"オブジェクトが作成<br>
+ * される度に毎回構築する必要があるため, 必ず指定する事。<br>
  *
  * @param[in] databaseName	SQLite3データベース名
  * @param[in] tableBuilder	SQLite3データベースのテーブルを構築するためのオブジェクト
@@ -3097,22 +3097,22 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableBuilder *tableB
 
 
 /**
- * メモリ上のSQLite3データベースに対し，引数で指定されたSELECT文を実行し，<br>
+ * メモリ上のSQLite3データベースに対し, 引数で指定されたSELECT文を実行し, <br>
  * その結果をCSV形式の文字列で返す．<br>
- * 実行結果であるCSV形式の文字列は，1行めにカラム名文字列，2行目以降がデータとなる．<br>
+ * 実行結果であるCSV形式の文字列は, 1行めにカラム名文字列, 2行目以降がデータとなる．<br>
  * <br>
  * 【注意事項】<br>
- * この関数を実行するためには、SQLite3のコンパイル時のオプション設定として、<br>
+ * この関数を実行するためには, SQLite3のコンパイル時のオプション設定として, <br>
  * "SQLITE_ENABLE_COLUMN_METADATA"が有効になっていなければならない。<br>
- * 何故ならば、この関数はSELECT結果からテーブル情報を取得しないと、結果<br>
+ * 何故ならば, この関数はSELECT結果からテーブル情報を取得しないと, 結果<br>
  * として出力するCSV形式の文字列が作成出来ないからである。<br>
- * もし、"SQLITE_ENABLE_COLUMN_METADATA"が有効でない場合、この関数にて<br>
+ * もし, "SQLITE_ENABLE_COLUMN_METADATA"が有効でない場合, この関数にて<br>
  * コンパイルエラーとなる事に留意する事(未定義関数を呼び出しているため)。<br>
  *
  * @param[in] self		CEP構造体オブジェクト（データベース管理に使用する）
  * @param[in] sql		SELECT文を示す文字列
  * @param[out] result	実行結果であるCSV形式の文字列をコピーするためのバッファ
- * @return				バッファにコピーした、実行結果のCSV形式の文字列のポインタ or NULL（エラーの場合）
+ * @return				バッファにコピーした, 実行結果のCSV形式の文字列のポインタ or NULL（エラーの場合）
  */
 M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result)
 	{
@@ -3156,9 +3156,9 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 					//===== 列数で繰り返し =====
 					for (i=0; i<columnLength; i++)
 						{
-						//===== （参考コード：）エイリアスではない、本来のテーブル名(UTF-8)を取得 =====
+						//===== （参考コード：）エイリアスではない, 本来のテーブル名(UTF-8)を取得 =====
 //						sqlite3_column_table_name(statement, 1);
-						//===== エイリアスではない、本来の列名（UTF-8）を取得 =====
+						//===== エイリアスではない, 本来の列名（UTF-8）を取得 =====
 						if ((columnName=(M2MString *)sqlite3_column_origin_name(statement, i))!=NULL
 								&& (columnNameLength=M2MString_length(columnName))>0)
 							{
@@ -3331,7 +3331,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 /**
  * メモリに存在するSQLite3データベース内の各テーブルに格納可能なレコード数上限値<br>
  * を引数で指定された整数値に変更する．<br>
- * なお，レコード数上限値には 500 [件]以上の整数を設定する事は出来ない．<br>
+ * なお, レコード数上限値には 500 [件]以上の整数を設定する事は出来ない．<br>
  *
  * @param[in,out] self		最大レコード数変更対象のCEP実行オブジェクト
  * @param[in] maxRecord		1つのテーブルにおけるレコード数上限値を示す整数 or 0（エラーの場合）
@@ -3377,7 +3377,7 @@ M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
 
 
 /**
- * 共有ライブラリ（libcep.so)利用時に強制終了した場合、当該シグナルを取得して<br>
+ * 共有ライブラリ（libcep.so)利用時に強制終了した場合, 当該シグナルを取得して<br>
  * 終了処理を行うためにイベントハンドラーをセットする．<br>
  *
  * @param[in] self	CEP実行オブジェクト
@@ -3427,11 +3427,11 @@ void M2MCEP_setSignalHandler (const M2MCEP *self)
 
 
 /**
- * 引数で指定されたCEP構造体オブジェクトに対し、永続性（ファイル上のSQLite3<br>
+ * 引数で指定されたCEP構造体オブジェクトに対し, 永続性（ファイル上のSQLite3<br>
  * データベースへの記録)の可否を示すフラグをセットする．<br>
- * true を設定した場合、M2MCEP_insertCSV() で挿入されたレコードは全て、<br>
+ * true を設定した場合, M2MCEP_insertCSV() で挿入されたレコードは全て, <br>
  * ファイル上のSQLite3データベースへ記録する．<br>
- * false を設定した場合、ファイル上のSQLite3データベースへの記録は実行しない．<br>
+ * false を設定した場合, ファイル上のSQLite3データベースへの記録は実行しない．<br>
  *
  * @param[in,out] self		CEP構造体オブジェクト
  * @param[in] persistence	永続性（ファイル上のSQLite3データベースへの記録)の可否を示すフラグ
@@ -3478,11 +3478,11 @@ M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence)
 
 /**
  * SQLite3データベースのバキューム処理を行うレコード数を設定する．<br>
- * このバキューム処理設定については，メモリ上のSQLite3データベースとファイル上の
+ * このバキューム処理設定については, メモリ上のSQLite3データベースとファイル上の
  * SQLite3データベース共用の設定となる．<br>
  *
  * @param self			バキューム処理のレコード数設定対象のCEP実行オブジェクト
- * @param vacuumRecord	バキューム処理のレコード数を示す整数値（0を指定した場合，自動バキューム設定となる)
+ * @param vacuumRecord	バキューム処理のレコード数を示す整数値（0を指定した場合, 自動バキューム設定となる)
  * @return				バキューム処理を行うレコード数を設定したCEP実行オブジェクト or NULL（エラーの場合）
  */
 M2MCEP *M2MCEP_setVacuumRecord (M2MCEP *self, const unsigned int vacuumRecord)

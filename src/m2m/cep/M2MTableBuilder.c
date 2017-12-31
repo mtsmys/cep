@@ -413,11 +413,11 @@ static unsigned char *this_getTableName (const M2MTableBuilder *self)
 
 /**
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するテーブル名を<br>
- * 示す文字列に対し、同一名のテーブルがデータベースに存在するかどうかを確認する。<br>
+ * 示す文字列に対し, 同一名のテーブルがデータベースに存在するかどうかを確認する。<br>
  *
  * @param[in] self		テーブル構築オブジェクト
  * @param[in] database	テーブル名確認対象のSQLite3データベース
- * @return				true : 同一テーブル名のテーブルが存在、false : 同一テーブル名のテーブルは存在しない
+ * @return				true : 同一テーブル名のテーブルが存在, false : 同一テーブル名のテーブルは存在しない
  */
 static bool this_isExistingTable (const M2MTableBuilder *self, sqlite3 *database)
 	{
@@ -536,7 +536,7 @@ static M2MTableBuilder *this_previous (const M2MTableBuilder *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトのメンバ変数として、カラム構造体<br>
+ * 引数で指定されたテーブル構築オブジェクトのメンバ変数として, カラム構造体<br>
  * オブジェクトをセットする。<br>
  *
  * @param[in] self			テーブル構築オブジェクト
@@ -566,7 +566,7 @@ static M2MTableBuilder *this_setColumnList (M2MTableBuilder *self, M2MColumnList
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトに対し、1つ後ろに位置するテーブル構築<br>
+ * 引数で指定されたテーブル構築オブジェクトに対し, 1つ後ろに位置するテーブル構築<br>
  * オブジェクトのノードをセットする。<br>
  *
  * @param[in,out] self	テーブル構築オブジェクト
@@ -591,7 +591,7 @@ static M2MTableBuilder *this_setNext (M2MTableBuilder *self, M2MTableBuilder *ne
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトに対し、1つ前に位置するテーブル構築<br>
+ * 引数で指定されたテーブル構築オブジェクトに対し, 1つ前に位置するテーブル構築<br>
  * オブジェクトのノードをセットする。<br>
  *
  * @param[in,out] self	テーブル構築オブジェクト
@@ -680,7 +680,7 @@ static M2MTableBuilder *this_setTableName (M2MTableBuilder *self, const unsigned
  * 公開メソッド
  ******************************************************************************/
 /**
- * 引数で指定されたSQLite3データベースに対し、テーブルを作成する。<br>
+ * 引数で指定されたSQLite3データベースに対し, テーブルを作成する。<br>
  *
  * @param[in] self		（テーブル情報挿入済みの）テーブル構築オブジェクト
  * @param[in] database	テーブル作成対象のSQLite3データベース
@@ -884,7 +884,7 @@ void M2MTableBuilder_delete (M2MTableBuilder **self)
 			//===== エラー処理 =====
 			else
 				{
-				M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"CEPテーブル構築オブジェクトの末端ノードがNULLのため、メモリ領域を解放出来ません", NULL);
+				M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_delete()", __LINE__, (unsigned char *)"CEPテーブル構築オブジェクトの末端ノードがNULLのため, メモリ領域を解放出来ません", NULL);
 				}
 			}
 		//===== エラー処理 =====
@@ -961,8 +961,8 @@ M2MColumnList *M2MTableBuilder_getColumnList (M2MTableBuilder *self, const unsig
 
 
 /**
- * 引数で指定されたテーブル名に対し、テーブル情報（フィールド名）を表示するための<br>
- * SQL文を構築し、引数で指定されたポインタにコピーする。<br>
+ * 引数で指定されたテーブル名に対し, テーブル情報（フィールド名）を表示するための<br>
+ * SQL文を構築し, 引数で指定されたポインタにコピーする。<br>
  *
  * @param[in] tableName	テーブル名を示す文字列
  * @param[out] sql		SQL文をコピーするためのポインタ（バッファリングは関数内部で実行する）
@@ -1017,7 +1017,7 @@ unsigned char *M2MTableBuilder_getTableInfoSQL (const unsigned char *tableName, 
 
 
 /**
- * ヒープメモリ領域を獲得し，新規にテーブル構築オブジェクトを作成する．<br>
+ * ヒープメモリ領域を獲得し, 新規にテーブル構築オブジェクトを作成する．<br>
  *
  * @return		新規作成したテーブル構築オブジェクト
  */
@@ -1047,7 +1047,7 @@ M2MTableBuilder *M2MTableBuilder_new ()
 
 
 /**
- * 引数で指定されたカラム情報を、同じく引数で指定されたテーブル構築オブジェクトに<br>
+ * 引数で指定されたカラム情報を, 同じく引数で指定されたテーブル構築オブジェクトに<br>
  * 格納する。<br>
  *
  * @param[in,out] self		テーブル作成のためのカラム設定情報を格納したテーブル構築オブジェクト
@@ -1069,7 +1069,7 @@ M2MTableBuilder *M2MTableBuilder_setConfig (M2MTableBuilder *self, const unsigne
 		//===== エラー処理 =====
 		else
 			{
-			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_setConfig()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"にテーブル名、もしくはカラム構造体オブジェクトをセットするのに失敗しました", NULL);
+			M2MLogger_printErrorMessage((unsigned char *)"M2MTableBuilder_setConfig()", __LINE__, (unsigned char *)"引数で指定された\"M2MTableBuilder *\"にテーブル名, もしくはカラム構造体オブジェクトをセットするのに失敗しました", NULL);
 			return NULL;
 			}
 		}

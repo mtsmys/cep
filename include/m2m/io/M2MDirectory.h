@@ -50,10 +50,10 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
- * M2M処理に関わるディレクトリ
+ * Directory name related to M2M processing(=".m2m")
  */
 #ifndef M2MDIRECTORY
 #define M2MDIRECTORY (unsigned char *)".m2m"
@@ -61,7 +61,7 @@ extern "C"
 
 
 /**
- * パス分割文字(＝"/")<br>
+ * Pathname division character(＝"/")<br>
  */
 #ifndef M2MDirectory_SEPARATOR
 #define M2MDirectory_SEPARATOR (unsigned char *)"/"
@@ -70,52 +70,51 @@ extern "C"
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたパスのディレクトリが存在するかどうか確認する。<br>
+ * Tests whether the directory denoted by this abstract pathname exists.<br>
  *
- * @param directoryPath	存在を確認するディレクトリの絶対パス
- * @return				true : ディレクトリが存在, false : ディレクトリが存在しない
+ * @param directoryPath	Directory pathname string
+ * @return				true: if the directory exists, false: otherwise
  */
 bool M2MDirectory_exists (const M2MString *directoryPath);
 
 
 /**
- * 環境変数で設定されているホームディレクトリを示すパス文字列を返す。<br>
+ * Get pathname string indicating the home directory set in environment.<br>
  *
- * @return 			ホームディレクトリを示すパス文字列
+ * @return 	Pathname string indicating home directory
  */
 M2MString *M2MDirectory_getHomeDirectoryPath ();
 
 
 /**
- * 引数で指定されたパスがディレクトリであるかどうかを確認する。<br>
+ * Tests whether the pathname is directory.<br>
  *
- * @param directoryPath	ディレクトリパスを示す文字列
- * @return				true : ディレクトリの場合, false : ディレクトリでない場合
+ * @param directoryPath	String indicating the directory pathname
+ * @return				true: if the pathname is directory, false: otherwise
  */
 bool M2MDirectory_isDirectory (const M2MString *directoryPath);
 
 
 /**
- * 引数で指定されたパスに対し、ディレクトリを作成する。<br>
- * もし、指定パスに対し、途中のディレクトリが存在しない場合はエラーとなる。<br>
+ * Create new directory for the pathname.<br>
+ * If there is no intermediate directory, an error occurs.<br>
  *
- * @param[in] directoryPath	ディレクトリパスを示す文字列
- * @param[in] mode			パーミッションモードを示す3桁の整数文字列（例）"533"）
- * @return					true : ディレクトリの作成に成功, false : ディレクトリの作成に失敗
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @param[in] mode			Three-digit integer string indicating the permission mode (example) "533")
+ * @return					true: Success to create new directory, false : Failed to create
  */
 bool M2MDirectory_mkdir (const M2MString *directoryPath, const M2MString *mode);
 
 
 /**
- * 引数で指定されたパスに対し、途中の親ディレクトリを含め、全てのディレクトリを作成<br>
- * する。<br>
+ * Create all directories including intermediate parent directory.<br>
  *
- * @param[in] directoryPath	ディレクトリパスを示す文字列
- * @param[in] mode			パーミッションモードを示す3桁の整数文字列（例）"533"）
- * @return					true : ディレクトリの作成に成功, false : ディレクトリの作成に失敗
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @param[in] mode			Three-digit integer string indicating the permission mode (example) "533")
+ * @return					true: Success to create new directory, false : Failed to create
  */
 bool M2MDirectory_mkdirs (const M2MString *directoryPath, const M2MString *mode);
 

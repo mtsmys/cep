@@ -31,7 +31,7 @@
 
 
 /*******************************************************************************
- * Declaration of function
+ * Declaration of private function
  ******************************************************************************/
 /**
  * Set the size of the value held in the list structure.<br>
@@ -47,16 +47,18 @@ static M2MList *this_setValueLength (M2MList *self, const size_t valueLength);
  * Private function
  ******************************************************************************/
 /**
- * 引数で指定されたリスト構造体オブジェクトが保持する値のヒープメモリ領域を解放する。<br>
+ * Releases the heap memory of value held by list structure object.<br>
  *
  * @param[in,out] self	List structure object
  */
 static void this_deleteValue (M2MList *self)
 	{
-	//===== 値の存在を確認 =====
+	//===== Check the existence of value =====
 	if (M2MList_getValue(self)!=NULL)
 		{
+		//===== Release heap memory =====
 		M2MHeap_free(self->value);
+		//===== Initialize value length =====
 		this_setValueLength(self, 0);
 		}
 	//===== Error handling =====
@@ -91,12 +93,11 @@ static M2MList *this_setValueLength (M2MList *self, const size_t valueLength)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ後ろに位置するリスト構造体オブジェクト<br>
- * をセットする。<br>
+ * Set a list structure object located next position of the argument.<br>
  *
  * @param[in,out] self	List structure object
- * @param[in] next		リスト構造体オブジェクト
- * @return				リスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] next		List structure object for setting
+ * @return				List structure object or NULL (In case of error)
  */
 static M2MList *this_setNext (M2MList *self, M2MList *next)
 	{
@@ -115,12 +116,11 @@ static M2MList *this_setNext (M2MList *self, M2MList *next)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ前に位置するリスト構造体オブジェクト<br>
- * をセットする。<br>
+ * Set a list structure object located behind position of the argument.<br>
  *
  * @param[in,out] self	List structure object
- * @param[in] previous	リスト構造体オブジェクト
- * @return				リスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] previous	List structure object for setting
+ * @return				List structure object or NULL (In case of error)
  */
 static M2MList *this_setPrevious (M2MList *self, M2MList *previous)
 	{
@@ -147,43 +147,42 @@ static M2MList *this_setPrevious (M2MList *self, M2MList *previous)
  * Public function
  ******************************************************************************/
 /**
- * リスト構造体オブジェクトのリンクに新規ノードを追加する。<br>
- * そして、当該新規ノードのメンバ変数として、同じく引数で指定された値をコピー<br>
- * （ディープコピー）する。<br>
- * そのため、当該関数呼び出し後に "value" の値のヒープメモリ領域を解放したと<br>
- * しても、リスト構造体オブジェクトのノードのメンバ変数には全く影響を及ぼさない。<br>
+ * Add a new node to the next position of argument list structure object.<br>
+ * Then, as the member variable of the new node, the value is copied <br>
+ * (deep copy). <br>
+ * Therefore, to delete the added node, use the M2MList_remove() function.<br>
  *
  * @param[in,out] self		List structure object
- * @param[in] value			リスト構造体オブジェクトに格納させる値
- * @param[in] valueLength	値の大きさ[バイト]
- * @return					新規追加されたリスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] value			The value of added node stored in list structure object
+ * @param[in] valueLength	Size of value[Byte]
+ * @return					Pointer of added list structure object or NULL (In case of error)
  */
 M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MList *node = NULL;
 
 	//===== Check argument =====
 	if (self!=NULL && value!=NULL && 0<valueLength)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
-			//===== 先頭ノードに値が格納されている場合 =====
+			//===== In the case of existing a value in the first node =====
 			if (M2MList_getValue(self)!=NULL)
 				{
-				//===== 末端のノードまで移動 =====
+				//===== Move to end node =====
 				self = M2MList_end(self);
-				//===== 新規ノードの作成 =====
+				//===== Create new node =====
 				node = M2MList_new();
 				this_setPrevious(node, self);
 				this_setNext(node, NULL);
 				M2MList_set(node, value, valueLength);
-				//===== 新規ノードをリスト構造の末端に追加 =====
+				//===== Add a new node to the end of the list structure =====
 				this_setNext(self, node);
 				return node;
 				}
-			//===== 先頭ノードに値が格納されていない場合 =====
+			//===== In the case of not existing a value in the first node =====
 			else
 				{
 				return M2MList_set(self, value, valueLength);
@@ -212,21 +211,20 @@ M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの1つ先に位置するノードを取得<br>
- * する。<br>
+ * Get the node located ahead of the link of the list structure object.<br>
  *
  * @param[in] self	List structure object
- * @return			リスト構造体オブジェクトのリンクの先頭ノード or NULL（エラーの場合）
+ * @return			First node of link of list structure object or NULL (in case of error)
  */
 M2MList *M2MList_begin (M2MList *self)
 	{
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードでない場合 =====
+		//===== When it is not the first node =====
 		while (M2MList_previous(self)!=self)
 			{
-			//===== 1つ前に位置するノードへ移動 =====
+			//===== Move to the previous node =====
 			self = M2MList_previous(self);
 			}
 		return self;
@@ -240,32 +238,31 @@ M2MList *M2MList_begin (M2MList *self)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの全ノードのメモリ領域を解放<br>
- * する。<br>
+ * Release the memory of all nodes of list structure object.<br>
  *
  * @param[in,out] self	List structure object
  */
 void M2MList_delete (M2MList *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MList *next = NULL;
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get first node =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while ((next=M2MList_next(self))!=NULL)
 				{
-				//===== リスト構造体オブジェクトのノードの削除 =====
+				//===== Delete a node of list structure object =====
 				this_deleteValue(self);
 				M2MHeap_free(self);
-				//===== 1つ後ろのノードへ移動e =====
+				//===== Move to the next node =====
 				self = next;
 				}
-			//===== 末端ノードの削除 =====
+			//===== Delete the end node =====
 			this_deleteValue(self);
 			M2MHeap_free(self);
 			}
@@ -283,38 +280,37 @@ void M2MList_delete (M2MList *self)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンク配列において、引数のインデックス<br>
- * に該当するリスト構造体オブジェクトを返す。<br>
+ * Returns the list structure object corresponding to the index.<br>
  *
  * @param[in] self		List structure object
- * @param[in] index		インデックスを示す整数（0 ? n-1）
- * @return 				リスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] index		An integer indicating an index (0 to n-1)
+ * @return 				List structure object or NULL (in case of error)
  */
 M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int position = 0;
 
 	//===== Check argument =====
 	if (self!=NULL && index<M2MList_length(self))
 		{
-		//===== リスト構造体オブジェクトの先頭ノードを取得 =====
+		//===== Get the first node of the list structure object =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
-			//===== 末端ノードへ辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (self!=NULL)
 				{
-				//===== インデックスが一致するかどうか確認 =====
+				//===== Check index number matching =====
 				if (index==position)
 					{
 					return self;
 					}
-				//===== インデックスが不一致の場合 =====
+				//===== When the index does not match =====
 				else
 					{
-					//===== リスト構造体の次のノードへ移動 =====
+					//===== Move to next node of list structure =====
 					self = M2MList_next(self);
-					//===== インデックス番号をインクリメント =====
+					//===== Increment index number =====
 					position++;
 					}
 				}
@@ -339,23 +335,22 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンクの末端に位置するノードを取得<br>
- * する。<br>
+ * Get the node located at the end of the list structure object.<br>
  *
  * @param[in,out] self	List structure object
- * @return				リスト構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
+ * @return				End node of the list structure object or NULL (in case of error)
  */
 M2MList *M2MList_end (M2MList *self)
 	{
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 末端ノードに辿り着くまで繰り返し =====
+		//===== Repeat until reaching the end node =====
 		while (M2MList_next(self)!=NULL)
 			{
 			self = M2MList_next(self);
 			}
-		//===== 末端ノードを返す =====
+		//===== Return the end node =====
 		return self;
 		}
 	//===== Argument error =====
@@ -367,10 +362,10 @@ M2MList *M2MList_end (M2MList *self)
 
 
 /**
- * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値を返す。<br>
+ * Return value of the list structure object existing at the index position.<br>
  *
  * @param[in] self	List structure object
- * @return			リスト構造体オブジェクトに格納されている値 or NULL（エラーの場合）
+ * @return			Value stored in list structure object or NULL (in case of error)
  */
 void *M2MList_getValue (M2MList *self)
 	{
@@ -388,11 +383,10 @@ void *M2MList_getValue (M2MList *self)
 
 
 /**
- * 引数で指定されたインデックス位置に存在するリスト構造体オブジェクトの値の大きさ<br>
- * を示す整数を返す。<br>
+ * Return value length of the list structure object at the index position.<br>
  *
  * @param[in] self	List structure object
- * @return			値のサイズ[バイト] or 0（エラーの場合）
+ * @return			Value length[Byte] stored in list structure object or NULL (in case of error)
  */
 size_t M2MList_getValueLength (M2MList *self)
 	{
@@ -410,42 +404,40 @@ size_t M2MList_getValueLength (M2MList *self)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのリンク内の全てのノードに値が格納され<br>
- * ていないかどうか確認する。<br>
- * もし値が格納されたノードが一つも存在しない場合は true を返す。<br>
+ * Check whether the list structure object has at least one value.<br>
  *
  * @param[in] self	List structure object
- * @return			true : 全てのノードに値が格納されていない場合、false : 値が格納されたノードが一つでも存在する場合
+ * @return			true: In case of no value, false: In case of having values
  */
 bool M2MList_isEmpty (M2MList *self)
 	{
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get begin node =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
-			//===== 末端ノードに移動するまで繰り返し =====
+			//===== Repeat until moving to the end node =====
 			while (M2MList_next(self)!=NULL)
 				{
-				//===== 値の有無を確認 =====
+				//===== Confirm existence of value =====
 				if (M2MList_getValue(self)!=NULL)
 					{
 					return false;
 					}
-				//===== 値が格納されていない場合 =====
+				//===== When the value is not stored =====
 				else
 					{
-					//===== 次のノードへ移動 =====
+					//===== Move to next node =====
 					self = M2MList_next(self);
 					}
 				}
-			//===== 末端ノードの値の有無を確認 =====
+			//===== Confirm existence of value of end node =====
 			if (M2MList_getValue(self)!=NULL)
 				{
 				return false;
 				}
-			//===== 末端ノードに値が格納されていない場合 =====
+			//===== In the case of end node hasn't value =====
 			else
 				{
 				return true;
@@ -466,51 +458,51 @@ bool M2MList_isEmpty (M2MList *self)
 
 
 /**
- * リスト構造体オブジェクトのノード数を示す整数を返す。<br>
+ * Return number indicating length of nodes in the list structure object.<br>
  *
  * @param[in] self	List structure object
- * @return			リンクされているリスト構造体オブジェクトのノード数を示す整数
+ * @return			The number of nodes of the linked list structure object
  */
 unsigned int M2MList_length (M2MList *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int length = 0;
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get begin node =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
-			//===== 値の有無を確認 =====
+			//===== Confirm existence of value =====
 			if (M2MList_getValue(self)!=NULL)
 				{
-				//===== ノード数をカウント =====
+				//===== Count the number of nodes =====
 				length++;
 				}
-			//===== 値を保持していない場合 =====
+			//===== When the value is not held =====
 			else
 				{
 				// 何もしない
 				}
-			//===== 値の有無を確認 =====
+			//===== Confirm existence of value =====
 			while (M2MList_next(self)!=NULL)
 				{
-				//===== 値の有無を確認 =====
+				//===== Confirm existence of value =====
 				if (M2MList_getValue(self)!=NULL)
 					{
-					//===== ノード数をカウント =====
+					//===== Count the number of nodes =====
 					length++;
 					}
-				//===== 値を保持していない場合 =====
+				//===== When the value is not held =====
 				else
 					{
-					// 何もしない
+					// do nothing
 					}
-				//===== 次のノードへ移動 =====
+				//===== Move to next node =====
 				self = M2MList_next(self);
 				}
-			//===== リスト構造体オブジェクトの数を返す =====
+			//===== Return the number of list structure objects =====
 			return length;
 			}
 		//===== Argument error =====
@@ -528,11 +520,10 @@ unsigned int M2MList_length (M2MList *self)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ後ろに位置するリスト構造体<br>
- * オブジェクトを返す。<br>
+ * Return a list structure object located after the argument one.<br>
  *
  * @param[in] self	List structure object
- * @return next 	1つ後ろに位置するリスト構造体オブジェクト（末端の場合はNULLを返す）
+ * @return next 	List structure object located behind or NULL (if the position of argument node is end)
  */
 M2MList *M2MList_next (const M2MList *self)
 	{
@@ -550,19 +541,19 @@ M2MList *M2MList_next (const M2MList *self)
 
 
 /**
- * ヒープ領域のメモリを獲得し、M2MList構造体オブジェクトを新規作成する。<br>
+ * Get heap memory and create a new M2MList structure object.<br>
  *
- * @return	新規作成したM2MList構造体オブジェクト
+ * @return	Created M2MList structure object
  */
 M2MList *M2MList_new ()
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	M2MList *self = NULL;
 
-	//===== ヒープメモリの獲得 =====
+	//===== Get heap memory =====
 	if ((self=(M2MList *)M2MHeap_malloc(sizeof(M2MList)))!=NULL)
 		{
-		//===== 初期化 =====
+		//===== Initialize created object =====
 		this_setPrevious(self, self);
 		this_setNext(self, NULL);
 		return self;
@@ -576,12 +567,11 @@ M2MList *M2MList_new ()
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトの1つ手前に存在するリスト構造体<br>
- * オブジェクトを取得して返す。<br>
- * 引数で指定されたリスト構造体オブジェクトが先頭ノードの場合、同じポインタを示す。<br>
+ * Get the list structure object existing one before the argument.<br>
+ * If the argument object is the first node, returns the same pointer.<br>
  *
  * @param[in] self	List structure object
- * @return			1つ手前に存在するリスト構造体オブジェクト or NULL（エラーの場合）
+ * @return			List structure object that located before or NULL (in case of argument error)
  */
 M2MList *M2MList_previous (const M2MList *self)
 	{
@@ -599,58 +589,58 @@ M2MList *M2MList_previous (const M2MList *self)
 
 
 /**
- * 引数で指定されたインデックスの位置に存在するリスト構造体オブジェクトを削除する。<br>
- * もしリスト構造体オブジェクトのノードが1つであった場合、オブジェクト自体は削除<br>
- * せず、値のみ削除する。<br>
+ * Deletes a list structure object existing at the position of argument. <br>
+ * If there is only one, delete only the value itself, not the object itself. <br>
  * <br>
- * 【注意】<br>
- * このメソッドを呼び出した場合、呼び出し側では必ず戻り値を受け取らなければならない。<br>
- * 何故なら、引数で与えたリスト構造体オブジェクトのノード自体のメモリ領域を解放<br>
- * した場合、残りのノードのリンクを受け取る手段が無くなり、エラーとなるからである。<br>
+ * [Caution]<br>
+ * When calling this method, the caller must always receive the return <br>
+ * value. <br>
+ * This is because if the memory area of the node itself of the list <br>
+ * structure object given by the argument is released, there is no way <br>
+ * for receiving the link of the remaining node, resulting in an error.<br>
  *
- * @param[in,out] self	List structure object
- * @return				リスト構造体オブジェクト
+ * @param[in,out] self	List structure objects to be deleted
  */
 M2MList *M2MList_remove (M2MList *self)
 	{
-	//========== ローカル変数 ==========
+	//========== Variable ==========
 	unsigned int length = 0;
 	M2MList *previous = NULL;
 	M2MList *next = NULL;
 
-	//===== 指定されたインデックスのリスト構造体オブジェクトの取得 =====
+	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 値を持ったノードが1つも無い場合 =====
+		//===== When there is no node having a value =====
 		if ((length=M2MList_length(self))==0)
 			{
-			//===== 前後のリンク情報の初期化 =====
+			//===== Initialize previous and next link information =====
 			this_setPrevious(self, self);
 			this_setNext(self, NULL);
 			return self;
 			}
-		//===== 値を持ったノードが1つの場合 =====
+		//===== When there is only one node having value =====
 		else if (length==1)
 			{
-			//===== 値の削除 =====
+			//===== Delete the value =====
 			this_deleteValue(self);
-			//===== 前後のリンク情報の初期化 =====
+			//===== Initialize previous and next link information =====
 			this_setPrevious(self, self);
 			this_setNext(self, NULL);
 			return self;
 			}
-		//===== 値を持ったノードが2つ以上の場合 =====
+		//===== When there are two or more nodes with values =====
 		else
 			{
-			//===== 先頭ノードであった場合 =====
+			//===== In the case of first node =====
 			if (M2MList_previous(self)==self)
 				{
-				//===== 次のノードを取得 =====
+				//===== Get next node =====
 				if ((next=M2MList_next(self))!=NULL)
 					{
-					//===== 先頭ノードをリンクから外す =====
+					//===== Remove the first node from the link =====
 					this_setPrevious(next, next);
-					//===== ノードの削除 =====
+					//===== Delete the node =====
 					this_deleteValue(self);
 					M2MHeap_free(self);
 					return next;
@@ -661,15 +651,15 @@ M2MList *M2MList_remove (M2MList *self)
 					return self;
 					}
 				}
-			//===== 末端ノードであった場合 =====
+			//===== When it is an end node =====
 			else if (M2MList_next(self)==NULL)
 				{
-				//===== 前のノードを取得 =====
+				//===== Get the previous node =====
 				if ((previous=M2MList_previous(self))!=NULL)
 					{
-					//===== 末端ノードの変更 =====
+					//===== Replace the end node =====
 					this_setNext(previous, NULL);
-					//===== ノードの削除 =====
+					//===== Delete the node =====
 					this_deleteValue(self);
 					M2MHeap_free(self);
 					return previous;
@@ -680,17 +670,17 @@ M2MList *M2MList_remove (M2MList *self)
 					return self;
 					}
 				}
-			//===== 中間ノードであった場合 =====
+			//===== When it is an intermediate node =====
 			else
 				{
-				//===== 1つ前後のノードを取得 =====
+				//===== Get previous and next node =====
 				if ((previous = M2MList_previous(self))!=NULL
 						&& (next = M2MList_next(self))!=NULL)
 					{
-					//===== 前後のノードを相互に連結 =====
+					//===== Connect previous node and next node each other =====
 					this_setNext(previous, next);
 					this_setPrevious(next, previous);
-					//===== ノードの削除 =====
+					//===== Delete the node =====
 					this_deleteValue(self);
 					M2MHeap_free(self);
 					return previous;
@@ -703,7 +693,7 @@ M2MList *M2MList_remove (M2MList *self)
 				}
 			}
 		}
-	//===== Error handling =====
+	//===== Argument error =====
 	else
 		{
 		return self;
@@ -712,27 +702,27 @@ M2MList *M2MList_remove (M2MList *self)
 
 
 /**
- * 引数で指定されたリスト構造体オブジェクトのメンバ変数として、同じく引数で指定<br>
- * された値をコピー（ディープコピー）する。<br>
- * そのため、当該関数呼び出し後に "value" の値のヒープメモリ領域を解放したと<br>
- * しても、リスト構造体オブジェクトのメンバ変数には全く影響を及ぼさない。<br>
+ * Copy (deep copy) argument value as the variable of the list structure object.<br>
+ * Therefore, even if releasing the heap memory with the "value" after <br>
+ * calling the function, it does not affect the member variables of the <br>
+ * list structure object at all.<br>
  *
  * @param[in,out] self		List structure object
- * @param[in] value			値（を示すオブジェクト）
- * @param[in] valueLength	値の大きさを示す整数[バイト]
- * @return					値を変更したリスト構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] value			The value of set to the list structure object
+ * @param[in] valueLength	Size of value[Byte]
+ * @return					Pointer of list structure object set value or NULL (In case of error)
  */
 M2MList *M2MList_set (M2MList *self, const void *value, const size_t valueLength)
 	{
 	//===== Check argument =====
 	if (self!=NULL && value!=NULL && 0<valueLength)
 		{
-		//===== ノードの初期化 =====
+		//===== Initialize list node =====
 		this_deleteValue(self);
-		//===== ヒープメモリの獲得 =====
+		//===== Get heap memory =====
 		if ((self->value=M2MHeap_malloc(valueLength+1))!=NULL)
 			{
-			//===== 値のセット =====
+			//===== Set value of list node =====
 			memcpy(self->value, value, valueLength);
 			this_setValueLength(self, valueLength);
 			return self;
