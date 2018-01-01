@@ -31,83 +31,92 @@
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
  *
- * @param self
+ * @param[in] self
  */
 static void this_deleteColumn (M2MColumnList *self)
 	{
+	//========== Variable ==========
 	M2MColumn *column = NULL;
 
+	//===== Check argument =====
 	if (self!=NULL)
 		{
+		//===== Get column information structure =====
 		if ((column=M2MColumnList_getColumn(self))!=NULL)
 			{
+			//===== Delete =====
 			M2MColumn_delete(&column);
 			}
+		//===== In the case of having no column structure =====
 		else
 			{
+			// do nothing
 			}
 		}
+	//===== Argument error =====
 	else
 		{
+		// do nothing
 		}
 	return;
 	}
 
 
 /**
- * @param[in] self
+ * @param[in,out] self
  * @param[in] columnName
  * @return
  */
 static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnName)
 	{
+	//========== Variable ==========
 	size_t columnNameLength = 0;
 	M2MColumn *column = NULL;
 
 	//===== Check argument =====
 	if (self!=NULL && columnName!=NULL && (columnNameLength=M2MString_length(columnName))>0)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MColumnList_begin(self))!=NULL)
 			{
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (M2MColumnList_next(self)!=NULL)
 				{
-				//=====  =====
+				//===== When there is a node matching the column name =====
 				if ((column=M2MColumnList_getColumn(self))!=NULL
 						&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
 					{
 					return self;
 					}
-				//=====  =====
+				//===== Move to next node =====
 				else
 					{
 					self = M2MColumnList_next(self);
 					}
 				}
-			//=====  =====
+			//===== When there is a node matching the column name =====
 			if ((column=M2MColumnList_getColumn(self))!=NULL
 					&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
 				{
 				return self;
 				}
-			//=====  =====
+			//===== If there is no node matching the column name =====
 			else
 				{
 				return NULL;
 				}
 			}
-		//=====  =====
+		//===== Error handling =====
 		else
 			{
 			return NULL;
 			}
 		}
-	//=====  =====
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -115,6 +124,12 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 	}
 
 
+/**
+ *
+ * @param[in,out] self
+ * @param[in] column
+ * @return
+ */
 static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 	{
 	//===== Check argument =====
@@ -124,6 +139,7 @@ static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 		self->column = column;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -138,11 +154,13 @@ static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
  */
 static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->next = next;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -157,11 +175,13 @@ static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
  */
 static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *previous)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->previous = previous;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		return NULL;
@@ -170,7 +190,7 @@ static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *prev
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
  * カラム構造体オブジェクトのリンクに新規ノードを追加する。<br>
@@ -307,6 +327,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
  */
 M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		while (M2MColumnList_previous(self)!=self)
@@ -315,6 +336,7 @@ M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 			}
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_length()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);

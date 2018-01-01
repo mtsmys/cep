@@ -68,7 +68,7 @@ static void this_deleteName (M2MColumn *self)
 
 
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
  * デストラクタ。<br>
@@ -79,11 +79,14 @@ static void this_deleteName (M2MColumn *self)
  */
 void M2MColumn_delete (M2MColumn **self)
 	{
+	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
+		//=====  =====
 		this_deleteName((*self));
 		M2MHeap_free((*self));
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_delete()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn **\"がNULLです", NULL);
@@ -120,10 +123,12 @@ unsigned char *M2MColumn_getName (const M2MColumn *self)
  */
 M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->dataType;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getDataType()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -137,10 +142,12 @@ M2MDataType M2MColumn_getDataType (const M2MColumn *self)
  */
 bool M2MColumn_getPrimaryKey (const M2MColumn *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->primaryKey;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getPrimaryKey()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -154,10 +161,12 @@ bool M2MColumn_getPrimaryKey (const M2MColumn *self)
  */
 bool M2MColumn_getAutoIncrement (const M2MColumn *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->autoIncrement;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getAutoIncrement()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -171,10 +180,12 @@ bool M2MColumn_getAutoIncrement (const M2MColumn *self)
  */
 bool M2MColumn_getAllowNULL (const M2MColumn *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->allowNULL;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getAllowNULL()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -188,10 +199,12 @@ bool M2MColumn_getAllowNULL (const M2MColumn *self)
  */
 bool M2MColumn_getUnique (const M2MColumn *self)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->unique;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_getUnique()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -240,11 +253,13 @@ M2MColumn *M2MColumn_new ()
  */
 M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->autoIncrement = autoIncrement;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setAutoIncrement()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -263,11 +278,13 @@ M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement
  */
 M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->allowNULL = allowNULL;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setAllowNULL()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -286,11 +303,13 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
  */
 M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->dataType = dataType;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setDataType()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -309,6 +328,7 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
  */
 M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
 	{
+	//========== Variable ==========
 	size_t nameLength = 0;
 
 	//===== Check argument =====
@@ -358,11 +378,13 @@ M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
  */
 M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->primaryKey = primaryKey;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setPrimaryKey()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
@@ -381,11 +403,13 @@ M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
  */
 M2MColumn *M2MColumn_setUnique (M2MColumn *self, const bool unique)
 	{
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->unique = unique;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
 		M2MLogger_printErrorMessage((M2MString *)"M2MColumn_setUnique()", __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);

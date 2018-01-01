@@ -35,8 +35,12 @@
 
 #include "m2m/cep/M2MCEPRecord.h"
 #include "m2m/db/M2MTableManager.h"
+#include "m2m/db/M2MSQLiteConfig.h"
+#include "m2m/db/M2MSQLRunner.h"
+#include "m2m/lang/M2MString.h"
 #include "m2m/util/M2MBase64.h"
 #include <signal.h>
+#include <sqlite3.h>
 
 
 
@@ -54,7 +58,7 @@ extern "C"
  * CEP処理に関わるディレクトリ
  */
 #ifndef M2MCEP_DIRECTORY
-#define M2MCEP_DIRECTORY (unsigned char *)".m2m/cep"
+#define M2MCEP_DIRECTORY (M2MString *)".m2m/cep"
 #endif /* M2MCEP_DIRECTORY */
 
 

@@ -722,7 +722,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 						M2MLogger_printDebugMessage((M2MString *)"M2MTableManager_createTable()", __LINE__, (M2MString *)"CEPテーブルの構築処理を開始します");
 #endif // DEBUG
 						//===== トランザクション開始 =====
-						SQLRunner_beginTransaction(database);
+						M2MSQLRunner_beginTransaction(database);
 						//===== フラグを立てる =====
 						executeUpdate = true;
 						}
@@ -730,7 +730,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					if (this_getTableCreateSQL(self, &sql)!=NULL)
 						{
 						//===== SQL実行 =====
-						if (SQLRunner_executeUpdate(database, sql)==true)
+						if (M2MSQLRunner_executeUpdate(database, sql)==true)
 							{
 #ifdef DEBUG
 							M2MLogger_printDebugMessage((M2MString *)"M2MTableManager_createTable()", __LINE__, (M2MString *)"CEPテーブル構築のためのCREATE文を実行しました");
@@ -775,7 +775,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					M2MLogger_printDebugMessage((M2MString *)"M2MTableManager_createTable()", __LINE__, (M2MString *)"CEPテーブルの構築処理を開始します");
 #endif // DEBUG
 					//===== トランザクション開始 =====
-					SQLRunner_beginTransaction(database);
+					M2MSQLRunner_beginTransaction(database);
 					//===== フラグを立てる =====
 					executeUpdate = true;
 					}
@@ -783,7 +783,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				if (this_getTableCreateSQL(self, &sql)!=NULL)
 					{
 					//===== SQL実行 =====
-					if (SQLRunner_executeUpdate(database, sql)==true)
+					if (M2MSQLRunner_executeUpdate(database, sql)==true)
 						{
 #ifdef DEBUG
 						M2MLogger_printDebugMessage((M2MString *)"M2MTableManager_createTable()", __LINE__, (M2MString *)"CEPテーブル構築のためのCREATE文を実行しました");
@@ -809,7 +809,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 			if (executeUpdate==true)
 				{
 				//===== トランザクション終了 =====
-				SQLRunner_commitTransaction(database);
+				M2MSQLRunner_commitTransaction(database);
 #ifdef DEBUG
 				M2MLogger_printDebugMessage((M2MString *)"M2MTableManager_createTable()", __LINE__, (M2MString *)"CEPテーブル構築処理を終了します");
 #endif // DEBUG

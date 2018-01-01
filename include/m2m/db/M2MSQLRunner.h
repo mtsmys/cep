@@ -1,5 +1,5 @@
 /*******************************************************************************
- * SQLRunner.h
+ * M2MSQLRunner.h
  *
  * Copyright (c) 2014, Akihisa Yasuda
  * All rights reserved.
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef SQLRUNNER_H_
-#define SQLRUNNER_H_
+#ifndef M2MSQLRUNNER_H_
+#define M2MSQLRUNNER_H_
 
 
 
@@ -55,7 +55,7 @@ extern "C"
  * @param[in] database	SQLite3 database manager object
  * @return				true: success，false: failure
  */
-bool SQLRunner_beginTransaction (sqlite3 *database);
+bool M2MSQLRunner_beginTransaction (sqlite3 *database);
 
 
 /**
@@ -64,7 +64,7 @@ bool SQLRunner_beginTransaction (sqlite3 *database);
  * @param[in] database	SQLite3 database manager object
  * @return				true: success，false: failure
  */
-bool SQLRunner_commitTransaction (sqlite3 *database);
+bool M2MSQLRunner_commitTransaction (sqlite3 *database);
 
 
 /**
@@ -78,7 +78,7 @@ bool SQLRunner_commitTransaction (sqlite3 *database);
  * @param sql		SQL string
  * @return			true: success，false: failuer
  */
-bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
+bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 
 
 
@@ -89,4 +89,4 @@ bool SQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 
 
 
-#endif /* SQLRUNNER_H_ */
+#endif /* M2MSQLRUNNER_H_ */
