@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MBASE64_H_
-#define M2MBASE64_H_
+#ifndef M2M_UTIL_M2MBASE64_H_
+#define M2M_UTIL_M2MBASE64_H_
 
 
 #include "m2m/lang/M2MString.h"
@@ -115,4 +115,4 @@ M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M
 
 
 
-#endif /* M2MBASE64_H_ */
+#endif /* M2M_UTIL_M2MBASE64_H_ */

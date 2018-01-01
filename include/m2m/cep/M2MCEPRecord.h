@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MCEPRECORD_H_
-#define M2MCEPRECORD_H_
+#ifndef M2M_CEP_M2MCEPRECORD_H_
+#define M2M_CEP_M2MCEPRECORD_H_
 
 
 #include "m2m/util/logging/M2MLogger.h"
@@ -237,4 +237,4 @@ unsigned int M2MCEPRecord_size (M2MCEPRecord *self);
 
 
 
-#endif /* M2MCEPRECORD_H_ */
+#endif /* M2M_CEP_M2MCEPRECORD_H_ */

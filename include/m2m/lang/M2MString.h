@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MSTRING_H_
-#define M2MSTRING_H_
+#ifndef M2M_LANG_M2MSTRING_H_
+#define M2M_LANG_M2MSTRING_H_
 
 
 #include "m2m/io/M2MHeap.h"
@@ -313,4 +313,4 @@ M2MString *M2MString_split (M2MString *string, const M2MString *delimiter, M2MSt
 
 
 
-#endif /* M2MSTRING_H_ */
+#endif /* M2M_LANG_M2MSTRING_H_ */

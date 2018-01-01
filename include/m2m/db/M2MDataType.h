@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MDATATYPE_H_
-#define M2MDATATYPE_H_
+#ifndef M2M_DB_M2MDATATYPE_H_
+#define M2M_DB_M2MDATATYPE_H_
 
 
 
@@ -92,4 +92,4 @@ M2MString *M2MDataType_toString (const M2MDataType self);
 
 
 
-#endif /* M2MDATATYPE_H_ */
+#endif /* M2M_DB_M2MDATATYPE_H_ */

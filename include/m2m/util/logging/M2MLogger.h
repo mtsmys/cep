@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MLOGGER_H_
-#define M2MLOGGER_H_
+#ifndef M2M_UTIL_LOGGING_M2MLOGGER_H_
+#define M2M_UTIL_LOGGING_M2MLOGGER_H_
 
 
 #include "m2m/io/M2MFile.h"
@@ -90,4 +90,4 @@ void M2MLogger_printErrorMessage (const M2MString *methodName, const unsigned in
 
 
 
-#endif /* M2MLOGGER_H_ */
+#endif /* M2M_UTIL_LOGGING_M2MLOGGER_H_ */

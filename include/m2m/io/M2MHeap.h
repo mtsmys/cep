@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MHEAP_H_
-#define M2MHEAP_H_
+#ifndef M2M_IO_M2MHEAP_H_
+#define M2M_IO_M2MHEAP_H_
 
 
 #include <stdlib.h>
@@ -86,4 +86,4 @@ void *M2MHeap_malloc (const size_t size);
 
 
 
-#endif /* M2MHEAP_H_ */
+#endif /* M2M_IO_M2MHEAP_H_ */

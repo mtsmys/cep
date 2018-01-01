@@ -90,6 +90,56 @@ void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 
 
 /**
+ * Set the synchronous mode of the SQLite 3 database.<br>
+ *
+ * @param[in] database		SQLite3 database object to be set synchronous mode
+ * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
+ */
+void M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
+	{
+	//========== Variable ==========
+	const M2MString *PRAGMA_SYNCHRONOUS_NORMAL_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
+	const M2MString *PRAGMA_SYNCHRONOUS_OFF_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous()";
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		//===== In the case of NORMAL mode =====
+		if (synchronous==true
+				&& M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL)==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Changed synchronous mode of SQLite 3 database to NORMAL");
+#endif // DEBUG
+			return;
+			}
+		//===== In the case of OFF mode =====
+		else if (synchronous==false
+				&& M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL)==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Changed synchronous mode of SQLite 3 database to OFF");
+#endif // DEBUG
+			return;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set SQLite3 database synchronous mode", NULL);
+			return;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
+		}
+	return;
+	}
+
+
+/**
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
@@ -134,43 +184,17 @@ static void M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
-	const M2MString *PRAGMA_SYNCHRONOUS_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
-	const M2MString *PRAGMA_NOT_SYNCHRONOUS_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setWAL()";
 
 	//===== Check argument =====
 	if (database!=NULL)
 		{
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set the journal mode of SQLite3 database");
-#endif // DEBUG
 		//===== データベースのジャーナルモードを設定 =====
 		if (M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL)==true)
 			{
-			//===== 同期モードの場合 =====
-			if (synchronous==true
-					&& M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_SQL)==true)
-				{
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Journal mode of SQLite 3 database set to WAL (synchronous mode)");
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Journal mode of SQLite 3 database set to WAL");
 #endif // DEBUG
-				return;
-				}
-			//===== 非同期モードの場合 =====
-			else if (synchronous==false
-					&& M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_SYNCHRONOUS_SQL)==true)
-				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Journal mode of SQLite 3 database set to WAL (asynchronous mode)");
-#endif // DEBUG
-				return;
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set SQLite3 database synchronization mode", NULL);
-				return;
-				}
 			}
 		//===== Error handling =====
 		else
@@ -186,7 +210,6 @@ static void M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 		}
 	return;
 	}
-
 
 
 

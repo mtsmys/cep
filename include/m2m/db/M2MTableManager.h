@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MTABLEMANAGER_H_
-#define M2MTABLEMANAGER_H_
+#ifndef M2M_DB_M2MTABLEMANAGER_H_
+#define M2M_DB_M2MTABLEMANAGER_H_
 
 
 #include "m2m/db/M2MSQLRunner.h"
@@ -138,4 +138,4 @@ M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const unsigne
 
 
 
-#endif /* M2MTABLEMANAGER_H_ */
+#endif /* M2M_DB_M2MTABLEMANAGER_H_ */

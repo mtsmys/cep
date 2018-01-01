@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MFILE_H_
-#define M2MFILE_H_
+#ifndef M2M_IO_M2MFILE_H_
+#define M2M_IO_M2MFILE_H_
 
 
 #include "m2m/io/M2MDirectory.h"
@@ -128,4 +128,4 @@ bool M2MFile_write (const FILE *file, const unsigned char *data, const size_t da
 
 
 
-#endif /* M2MFILE_H_ */
+#endif /* M2M_IO_M2MFILE_H_ */

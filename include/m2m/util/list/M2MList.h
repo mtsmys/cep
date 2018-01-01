@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MLIST_H_
-#define M2MLIST_H_
+#ifndef M2M_UTIL_LIST_M2MLIST_H_
+#define M2M_UTIL_LIST_M2MLIST_H_
 
 
 #include "m2m/io/M2MHeap.h"
@@ -222,4 +222,4 @@ M2MList *M2MList_set (M2MList *self, const void *value, const size_t valueLength
 
 
 
-#endif /* M2MLIST_H_ */
+#endif /* M2M_UTIL_LIST_M2MLIST_H_ */

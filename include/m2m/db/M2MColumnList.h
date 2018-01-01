@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MCOLUMNLIST_H_
-#define M2MCOLUMNLIST_H_
+#ifndef M2M_DB_M2MCOLUMNLIST_H_
+#define M2M_DB_M2MCOLUMNLIST_H_
 
 
 #include "m2m/lang/M2MString.h"
@@ -185,4 +185,4 @@ M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnNam
 
 
 
-#endif /* M2MCOLUMNLIST_H_ */
+#endif /* M2M_DB_M2MCOLUMNLIST_H_ */

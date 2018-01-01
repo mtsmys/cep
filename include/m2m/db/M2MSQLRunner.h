@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MSQLRUNNER_H_
-#define M2MSQLRUNNER_H_
+#ifndef M2M_DB_M2MSQLRUNNER_H_
+#define M2M_DB_M2MSQLRUNNER_H_
 
 
 
@@ -89,4 +89,4 @@ bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 
 
 
-#endif /* M2MSQLRUNNER_H_ */
+#endif /* M2M_DB_M2MSQLRUNNER_H_ */

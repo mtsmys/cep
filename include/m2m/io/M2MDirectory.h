@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MDIRECTORY_H_
-#define M2MDIRECTORY_H_
+#ifndef M2M_IO_M2MDIRECTORY_H_
+#define M2M_IO_M2MDIRECTORY_H_
 
 
 #include "m2m/lang/M2MString.h"
@@ -126,4 +126,4 @@ bool M2MDirectory_mkdirs (const M2MString *directoryPath, const M2MString *mode)
 
 
 
-#endif /* M2MDIRECTORY_H_ */
+#endif /* M2M_IO_M2MDIRECTORY_H_ */

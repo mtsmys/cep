@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MCOLUMN_H_
-#define M2MCOLUMN_H_
+#ifndef M2M_DB_M2MCOLUMN_H_
+#define M2M_DB_M2MCOLUMN_H_
 
 
 
@@ -207,4 +207,4 @@ M2MColumn *M2MColumn_setUnique (M2MColumn *self, const bool unique);
 
 
 
-#endif /* M2MCOLUMN_H_ */
+#endif /* M2M_DB_M2MCOLUMN_H_ */

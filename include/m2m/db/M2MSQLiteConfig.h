@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2MSQLITECONFIG_H_
-#define M2MSQLITECONFIG_H_
+#ifndef M2M_DB_M2MSQLITECONFIG_H_
+#define M2M_DB_M2MSQLITECONFIG_H_
 
 
 
@@ -61,14 +61,20 @@ void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
 
 
 /**
+ * Set the synchronous mode of the SQLite 3 database.<br>
+ *
+ * @param[in] database		SQLite3 database object to be set synchronous mode
+ * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
+ */
+void M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous);
+
+
+/**
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
  */
 void M2MSQLiteConfig_setUTF8 (sqlite3 *database);
-
-
-
 
 
 
@@ -78,4 +84,4 @@ void M2MSQLiteConfig_setUTF8 (sqlite3 *database);
 
 
 
-#endif /* M2MSQLITECONFIG_H_ */
+#endif /* M2M_DB_M2MSQLITECONFIG_H_ */
