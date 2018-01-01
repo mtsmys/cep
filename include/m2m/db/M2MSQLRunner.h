@@ -74,9 +74,9 @@ bool M2MSQLRunner_commitTransaction (sqlite3 *database);
  * This function needs many times, so don't use this for "INSERT" SQL or <br>
  * "UPDATE" SQL.<br>
  *
- * @param database	SQLite3 database manager object
- * @param sql		SQL string
- * @return			true: success，false: failuer
+ * @param[in] database	SQLite3 database manager object
+ * @param[in] sql		SQL string
+ * @return				true: success，false: failuer
  */
 bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 
