@@ -34,13 +34,12 @@
  * Declaration of private function
  ******************************************************************************/
 /**
- * 引数で指定されたSQLite3データベースファイル名を示す文字列から, データベース<br>
- * ファイルパスを示す文字列を作成し, 引数で指定されたバッファにコピーする。<br>
- * 処理に失敗した場合は戻り値として NULL を返す。<br>
+ * Create string indicating the database file path and copy it to the buffer. <br>
+ * If processing fails, NULL is returned as a return value.<br>
  *
- * @param[in] databaseName			SQLite3データベースファイル名を示す文字列
- * @param[out] databaseFilePath		SQLite3データベースファイルパスを示す文字列を格納するためのバッファ
- * @return							SQLite3データベースファイルパスを示す文字列のポインタ or NULL（エラーの場合）
+ * @param[in] databaseName			String indicating SQLite3 database file name
+ * @param[out] databaseFilePath		Pointer for storing string indicating the database file path
+ * @return							Pointer of string indicating database file path or NULL (in case of error)
  */
 static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MString **databaseFilePath);
 
@@ -71,7 +70,7 @@ static sqlite3 *this_getFileDatabase (M2MCEP *self);
  * @param[in] self	CEP実行オブジェクト
  * @return			CEPレコード情報オブジェクト
  */
-static M2MCEPRecord *this_getCEPRecord (const M2MCEP *self);
+static M2MDataFrame *this_getDataFrame (const M2MCEP *self);
 
 
 /**
@@ -139,7 +138,7 @@ static M2MTableManager *this_getTableManager (const M2MCEP *self);
  * @param[in] recordList	レコード情報オブジェクト
  * @return					挿入したレコード数 or -1（エラーの場合)
  */
-static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record, M2MTableManager *tableManager, M2MList *recordList);
+static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record, M2MTableManager *tableManager, M2MList *recordList);
 
 
 /**
@@ -202,14 +201,23 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトにファイル上のSQLite3データベース名をメンバ<br>
- * 変数に設定する。<br>
+ * Set SQLite3 database file name of member of the CEP structure object.<br>
  *
- * @param[in,out] self		CEP実行オブジェクト
- * @param[in] databaseName	ファイル上のSQLite3データベース名（ファイル名）
- * @return					メンバ変数が設定されたCEP実行オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		CEP structure object to be set SQLite3 database file name
+ * @param[in] databaseName	String indicating SQLite3 database file name
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName);
+
+
+/**
+ * Set indicated M2MDataFrame object into CEP structure object.<br>
+ *
+ * @param[in,out] self		CEP structure object to be set M2MDataFrame object
+ * @param[in] dataFrame		M2MDataFrame object
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
+ */
+static M2MCEP *this_setDataFrame (M2MCEP *self, M2MDataFrame *dataFrame);
 
 
 /**
@@ -218,7 +226,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] fileDatabase	SQLite3ファイルデータベース管理オブジェクト
- * @return					CEP実行オブジェクト or NULL（エラーの場合）
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase);
 
@@ -229,7 +237,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase);
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] fileDatabase	メモリー上のSQLite3データベース管理オブジェクト
- * @return					CEP実行オブジェクト or NULL（エラーの場合）
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase);
 
@@ -240,7 +248,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase);
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] tableManager	テーブル構築オブジェクト
- * @return					テーブル構築オブジェクトをセットしたCEP実行オブジェクト
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setTableManager (M2MCEP *self, const M2MTableManager *tableManager);
 
@@ -286,8 +294,8 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 	M2MString MESSAGE[256];
 #endif // DEBUG
 	const unsigned int MAX_RECORD = this_getMaxRecord(self);
-	const M2MCEPRecord *RECORD = M2MCEPRecord_begin(this_getCEPRecord(self));
-	const M2MList *OLD_RECORD_LIST = M2MList_begin(M2MCEPRecord_getOldRecordList(RECORD));
+	const M2MDataFrame *RECORD = M2MDataFrame_begin(this_getDataFrame(self));
+	const M2MList *OLD_RECORD_LIST = M2MList_begin(M2MDataFrame_getOldRecordList(RECORD));
 	const unsigned int OLD_RECORD_LIST_LENGTH = M2MList_length((M2MList *)OLD_RECORD_LIST);
 	const M2MString *DELETE_SQL = (M2MString *)"DELETE FROM %s WHERE rowid IN (SELECT rowid FROM %s ORDER BY rowid LIMIT %u) ";
 	const size_t TABLE_NAME_LENGTH = M2MString_length(tableName);
@@ -680,10 +688,9 @@ static M2MString *this_createInsertSQL (const M2MString *tableName, const M2MStr
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトが保有するデータベース名のメモリ領域を解放<br>
- * する。<br>
+ * Releases the heap memory of the database name possessed by the CEP object.<br>
  *
- * @param[in,out] self	CEP実行オブジェクト
+ * @param[in,out] self	CEP structure object
  */
 static void this_deleteDatabaseName (M2MCEP *self)
 	{
@@ -694,6 +701,9 @@ static void this_deleteDatabaseName (M2MCEP *self)
 	if (self!=NULL && this_getDatabaseName(self)!=NULL)
 		{
 		M2MHeap_free(self->databaseName);
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Deleted string indicating SQLite3 database file name");
+#endif // DEBUG
 		}
 	//===== Argument error =====
 	else if (self==NULL)
@@ -702,6 +712,9 @@ static void this_deleteDatabaseName (M2MCEP *self)
 		}
 	else
 		{
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3 database file name hasn't been set yet");
+#endif // DEBUG
 		}
 	return;
 	}
@@ -748,7 +761,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
 	M2MTableManager *tableManager = NULL;
-	M2MCEPRecord *record = NULL;
+	M2MDataFrame *dataFrame = NULL;
 	bool persistence = false;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_flushCEPRecord()";
 
@@ -757,7 +770,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 		{
 		//===== レコード管理オブジェクト（の先頭ノード）を取得 =====
 		if ((tableManager=this_getTableManager(self))!=NULL
-				&& (record=M2MCEPRecord_begin(this_getCEPRecord(self)))!=NULL)
+				&& (dataFrame=M2MDataFrame_begin(this_getDataFrame(self)))!=NULL)
 			{
 			//===== レコード永続化の場合 =====
 			if ((persistence=this_getPersistence(self))==true
@@ -769,15 +782,15 @@ static void this_flushCEPRecord (M2MCEP *self)
 				//===== トランザクション開始 =====
 				M2MSQLRunner_beginTransaction(fileDatabase);
 				//===== レコード管理オブジェクトが末端に辿り着くまで繰り返し =====
-				while (M2MCEPRecord_next(record)!=NULL)
+				while (M2MDataFrame_next(dataFrame)!=NULL)
 					{
 					//===== レコード管理オブジェクトの挿入／削除 =====
-					this_insertRecordList(fileDatabase, record, tableManager, M2MCEPRecord_getOldRecordList(record));
+					this_insertRecordList(fileDatabase, dataFrame, tableManager, M2MDataFrame_getOldRecordList(dataFrame));
 					//===== 次のレコード管理オブジェクトへ移動 =====
-					record = M2MCEPRecord_next(record);
+					dataFrame = M2MDataFrame_next(dataFrame);
 					}
 				//===== 末端のレコード管理オブジェクトの挿入／削除 =====
-				this_insertRecordList(fileDatabase, record, tableManager, M2MCEPRecord_getOldRecordList(record));
+				this_insertRecordList(fileDatabase, dataFrame, tableManager, M2MDataFrame_getOldRecordList(dataFrame));
 				//===== トランザクション終了 =====
 				M2MSQLRunner_commitTransaction(this_getFileDatabase(self));
 #ifdef DEBUG
@@ -819,15 +832,15 @@ static void this_flushCEPRecord (M2MCEP *self)
  * @param[in] self	CEP実行オブジェクト
  * @return			CEPレコード情報オブジェクト
  */
-static M2MCEPRecord *this_getCEPRecord (const M2MCEP *self)
+static M2MDataFrame *this_getDataFrame (const M2MCEP *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getCEPRecord()";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDataFrame()";
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		return self->record;
+		return self->dataFrame;
 		}
 	//===== Argument error =====
 	else
@@ -839,40 +852,41 @@ static M2MCEPRecord *this_getCEPRecord (const M2MCEP *self)
 
 
 /**
- * 引数で指定されたバッファにSQLite3データベースファイルを設置するディレクトリ<br>
- * （＝"/home/(ユーザ名)/.m2m/cep"）を示す文字列をコピーして返す．<br>
+ * Copy SQLite3 database working directory pathname (="~/.m2m/cep").<br>
+ * Because the heap memory allocation process is executed inside this function, <br>
+ * caller must release the memory to prevent memory leak.<br>
  *
- * @param[out] directoryPath	SQLite3データベースファイルを設置するディレクトリを示す文字列を格納するためのバッファ or NULL（エラーの場合）
- * @return						SQLite3データベースファイルを設置するディレクトリを示す文字列（引数の先頭ポインタ） or NULL（エラーの場合）
+ * @param[out] directoryPath	Pointer for storing string indicating the directory SQLite 3 database file is set
+ * @return						SQLite3 working directory pathname or NULL (in case of error)
  */
 static M2MString *this_getDatabaseDirectoryPath (M2MString **directoryPath)
 	{
 	//========== Variable ==========
-	M2MString *home = NULL;
-	size_t homeLength = 0;
-	const M2MString *SEPARATOR = (M2MString *)M2MDirectory_SEPARATOR;
-	const size_t CEP_DIRECTORY_LENGTH = M2MString_length((M2MString *)M2MCEP_DIRECTORY);
-	const size_t SEPARATOR_LENGTH = M2MString_length(SEPARATOR);
+#ifdef DEBUG
+	M2MString MESSAGE[512];
+#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseDirectoryPath()";
 
 	//===== Check argument =====
 	if (directoryPath!=NULL)
 		{
-		//===== バッファのヒープメモリを取得 =====
-		if ((home=M2MDirectory_getHomeDirectoryPath())!=NULL
-				&& (homeLength=M2MString_length(home))>0
-				&& ((*directoryPath)=(M2MString *)M2MHeap_malloc(homeLength+SEPARATOR_LENGTH+CEP_DIRECTORY_LENGTH+1))!=NULL)
+		//===== Get CEP working directory pathname =====
+		if (M2MString_append(directoryPath, M2MDirectory_getHomeDirectoryPath())!=NULL
+				&& M2MString_append(directoryPath, M2MDirectory_SEPARATOR)!=NULL
+				&& M2MString_append(directoryPath, M2MCEP_DIRECTORY)!=NULL)
 			{
-			//===== バッファへのパス文字列のコピー =====
-			memcpy(&((*directoryPath)[0]), home, homeLength);
-			memcpy(&((*directoryPath)[homeLength]), SEPARATOR, SEPARATOR_LENGTH);
-			memcpy(&((*directoryPath)[homeLength+SEPARATOR_LENGTH]), (M2MString *)M2MCEP_DIRECTORY, CEP_DIRECTORY_LENGTH);
+#ifdef DEBUG
+			memset(MESSAGE, 0, sizeof(MESSAGE));
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Get string indicating SQLite3 working directory pathname(=\"%s\")", (*directoryPath));
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
+#endif // DEBUG
 			return (*directoryPath);
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ホームディレクトリパスを示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
+			M2MHeap_free((*directoryPath))
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to copy the string indicating the home directory path", NULL);
 			return NULL;
 			}
 		}
@@ -886,67 +900,51 @@ static M2MString *this_getDatabaseDirectoryPath (M2MString **directoryPath)
 
 
 /**
- * 引数で指定されたSQLite3データベースファイル名を示す文字列から, データベース<br>
- * ファイルパスを示す文字列を作成し, 引数で指定されたバッファにコピーする。<br>
- * 処理に失敗した場合は戻り値として NULL を返す。<br>
+ * Create string indicating the database file path and copy it to the buffer. <br>
+ * If processing fails, NULL is returned as a return value.<br>
  *
- * @param[in] databaseName			SQLite3データベースファイル名を示す文字列
- * @param[out] databaseFilePath		SQLite3データベースファイルパスを示す文字列を格納するためのバッファ
- * @return							SQLite3データベースファイルパスを示す文字列のポインタ or NULL（エラーの場合）
+ * @param[in] databaseName			String indicating SQLite3 database file name
+ * @param[out] databaseFilePath		Pointer for storing string indicating the database file path
+ * @return							Pointer of string indicating database file path or NULL (in case of error)
  */
 static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MString **databaseFilePath)
 	{
 	//========== Variable ==========
 	M2MString *directoryPath = NULL;
-	size_t directoryPathLength = 0;
-	size_t databaseNameLength = 0;
-	const size_t SEPARATOR_LENGTH = M2MString_length((M2MString *)M2MDirectory_SEPARATOR);
+#ifdef DEBUG
+	M2MString MESSAGE[512];
+#endif // DEBUG
 	const M2MString *PERMISSION = (M2MString *)"0755";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseFilePath()";
 
 	//===== Check argument =====
-	if (databaseName!=NULL && (databaseNameLength=M2MString_length(databaseName))>0
+	if (databaseName!=NULL && M2MString_length(databaseName)>0
 			&& databaseFilePath!=NULL)
 		{
-		//===== データベースファイル設置ディレクトリパス文字列の取得 =====
+		//===== Copy database file installation directory pathname =====
 		if (this_getDatabaseDirectoryPath(&directoryPath)!=NULL
-				&& (directoryPathLength=M2MString_length(directoryPath))>0
-				&& this_makeDirectory(directoryPath, PERMISSION)!=NULL)
+				&& this_makeDirectory(directoryPath, PERMISSION)!=NULL
+				&& M2MString_append(databaseFilePath, directoryPath)!=NULL
+				&& M2MString_append(databaseFilePath, M2MDirectory_SEPARATOR)!=NULL
+				&& M2MString_append(databaseFilePath, databaseName)!=NULL)
 			{
-			//===== ヒープメモリ領域の獲得 =====
-			if ((*databaseFilePath=(M2MString *)M2MHeap_malloc(directoryPathLength+SEPARATOR_LENGTH+databaseNameLength+1))!=NULL)
-				{
-				//===== データベースファイルパス文字列のコピー =====
-				memcpy(&((*databaseFilePath)[0]), directoryPath, directoryPathLength);
-				memcpy(&((*databaseFilePath)[directoryPathLength]), (M2MString *)M2MDirectory_SEPARATOR, SEPARATOR_LENGTH);
-				memcpy(&((*databaseFilePath)[directoryPathLength+SEPARATOR_LENGTH]), databaseName, databaseNameLength);
-				//===== ディレクトリパス文字列のメモリ領域を解放 =====
-				M2MHeap_free(directoryPath);
-				//=====  =====
-				return (*databaseFilePath);
-				}
-			//===== Error handling =====
-			else
-				{
-				//===== ディレクトリパス文字列が存在する場合 =====
-				if (directoryPath!=NULL)
-					{
-					//===== ディレクトリパス文字列のメモリ領域を解放 =====
-					M2MHeap_free(directoryPath);
-					}
-				else
-					{
-					}
-				return NULL;
-				}
+			//===== Release heap memory of directory path string =====
+			M2MHeap_free(directoryPath);
+#ifdef DEBUG
+			memset(MESSAGE, 0, sizeof(MESSAGE));
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Get string indicating SQLite3 database file pathname(=\"%s\")", (*databaseFilePath));
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
+#endif // DEBUG
+			//=====  =====
+			return (*databaseFilePath);
 			}
 		//===== Error handling =====
 		else
 			{
-			//===== ディレクトリパス文字列が存在する場合 =====
+			//===== In the case of directory path string exists =====
 			if (directoryPath!=NULL)
 				{
-				//===== ディレクトリパス文字列のメモリ領域を解放 =====
+				//===== Release heap memory of directory path string =====
 				M2MHeap_free(directoryPath);
 				}
 			else
@@ -956,14 +954,14 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 			}
 		}
 	//===== Argument error =====
-	else if (databaseName==NULL || databaseNameLength<=0)
+	else if (databaseName==NULL || M2MString_length(databaseName)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"databaseName\"がNULL, または文字列数が0以下です", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"databaseFilePath\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseFilePath\" is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -1430,15 +1428,20 @@ static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2M
 	{
 	//========== Variable ==========
 	const unsigned int MAX_RECORD = 50;
+	const bool PERSISTENCE = true;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_init()";
 
 	//===== Check argument =====
-	if (self!=NULL && databaseName!=NULL && tableManager!=NULL)
+	if (self!=NULL
+			&& databaseName!=NULL && M2MString_length(databaseName)>0
+			&& tableManager!=NULL)
 		{
+		//===== Initialize CEP object =====
 		if (this_setDatabaseName(self, databaseName)!=NULL
 				&& M2MCEP_setMaxRecord(self, MAX_RECORD)!=NULL
-				&& (self->record=M2MCEPRecord_new())!=NULL
+				&& this_setDataFrame(self, M2MDataFrame_new())!=NULL
 				&& this_setTableManager(self, tableManager)!=NULL
-				&& M2MCEP_setPersistence(self, true)!=NULL)
+				&& M2MCEP_setPersistence(self, PERSISTENCE)!=NULL)
 			{
 			return self;
 			}
@@ -1446,12 +1449,24 @@ static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2M
 		else
 			{
 			M2MCEP_delete(&self);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize \"M2MCEP\" object", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		return NULL;
+		}
+	else if (databaseName==NULL || M2MString_length(databaseName)<=0)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant", NULL);
+		return NULL;
+		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" structure object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -1465,7 +1480,7 @@ static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2M
  * @param[in] persistence	永続化を実行するかどうかを示すフラグ
  * @return
  */
-static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *tableRecord, M2MTableManager *tableManager, const unsigned int maxRecord, const bool persistence)
+static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *tableRecord, M2MTableManager *tableManager, const unsigned int maxRecord, const bool persistence)
 	{
 	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
@@ -1491,8 +1506,8 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 
 	//===== Check argument =====
 	if (tableRecord!=NULL
-			&& (tableName=M2MCEPRecord_getTableName(tableRecord))!=NULL
-			&& (oldRecordList=M2MList_begin(M2MCEPRecord_getOldRecordList(tableRecord)))!=NULL
+			&& (tableName=M2MDataFrame_getTableName(tableRecord))!=NULL
+			&& (oldRecordList=M2MList_begin(M2MDataFrame_getOldRecordList(tableRecord)))!=NULL
 			&& (oldRecordListLength=M2MList_length(oldRecordList))>0)
 		{
 		//===== メモリ上のSQLite3データベース挿入済みレコード数が規定のレコード数最大値を超過している場合 =====
@@ -1502,7 +1517,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
 			if (persistence==true)
 				{
 				//===== ファイル上のSQLite3データベースへの過去レコード挿入準備 =====
-				if ((columnNameCSV=M2MCEPRecord_getColumnName(tableRecord))!=NULL
+				if ((columnNameCSV=M2MDataFrame_getColumnName(tableRecord))!=NULL
 						&& (columnList=M2MColumnList_begin(M2MTableManager_getColumnList(tableManager, tableName)))!=NULL
 						&& (dataTypeArrayLength=this_getDataTypeArray(columnList, columnNameCSV, DATA_TYPE_ARRAY, sizeof(DATA_TYPE_ARRAY)))>0
 						&& this_createInsertSQL(tableName, columnNameCSV, M2MColumnList_length(columnList), &insertSQL)!=NULL
@@ -1682,7 +1697,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MCEPRecord *table
  * @param[in] recordList	レコード情報オブジェクト
  * @return					挿入したレコード数 or -1（エラーの場合)
  */
-static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record, M2MTableManager *tableManager, M2MList *recordList)
+static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record, M2MTableManager *tableManager, M2MList *recordList)
 	{
 	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
@@ -1704,8 +1719,8 @@ static int this_insertRecordList (sqlite3 *database, const M2MCEPRecord *record,
 	if (database!=NULL && tableManager!=NULL && record!=NULL && (recordList=M2MList_begin(recordList))!=NULL)
 		{
 		//===== テーブル名, カラム名CSVと挿入対象の新規レコード情報オブジェクトの取得 =====
-		if ((tableName=M2MCEPRecord_getTableName(record))!=NULL
-				&& (columnNameCSV=M2MCEPRecord_getColumnName(record))!=NULL
+		if ((tableName=M2MDataFrame_getTableName(record))!=NULL
+				&& (columnNameCSV=M2MDataFrame_getColumnName(record))!=NULL
 				&& (columnList=M2MTableManager_getColumnList(tableManager, tableName))!=NULL
 				&& (columnList=M2MColumnList_begin(columnList))!=NULL
 				&& this_createInsertSQL(tableName, columnNameCSV, M2MColumnList_length(columnList), &insertSQL)!=NULL
@@ -1893,7 +1908,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 	{
 	//========== Variable ==========
 	M2MTableManager *tableManager = NULL;
-	M2MCEPRecord *tableRecord = NULL;
+	M2MDataFrame *tableRecord = NULL;
 	unsigned int maxRecord = 0;
 	bool persistence = false;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_insertRecordListToFileDatabase()";
@@ -1903,7 +1918,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 		{
 		//===== テーブルレコード管理オブジェクトを取得 =====
 		if ((tableManager=this_getTableManager(self))!=NULL
-				&& (tableRecord=M2MCEPRecord_begin(this_getCEPRecord(self)))!=NULL
+				&& (tableRecord=M2MDataFrame_begin(this_getDataFrame(self)))!=NULL
 				&& (maxRecord=this_getMaxRecord(self))>0)
 			{
 			//===== レコード永続化の場合 =====
@@ -1921,12 +1936,12 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 				// 何もしない
 				}
 			//===== レコード管理オブジェクトで繰り返し =====
-			while (M2MCEPRecord_next(tableRecord)!=NULL)
+			while (M2MDataFrame_next(tableRecord)!=NULL)
 				{
 				//===== レコード管理オブジェクトの保持する過去レコード処理を実行 =====
 				this_insertOldRecordList(this_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
 				//===== 次のテーブルレコード管理オブジェクトへ移動 =====
-				tableRecord = M2MCEPRecord_next(tableRecord);
+				tableRecord = M2MDataFrame_next(tableRecord);
 				}
 			//===== 最後のレコード管理オブジェクトの保持する過去レコード処理を実行 =====
 			this_insertOldRecordList(this_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
@@ -1986,7 +2001,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	M2MTableManager *tableManager = NULL;
-	M2MCEPRecord *record = NULL;
+	M2MDataFrame *record = NULL;
 	int numberOfRecord = 0;
 	int result = 0;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_insertRecordListToMemoryDatabase()";
@@ -1997,7 +2012,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 		//===== データベースとレコード管理オブジェクトの取得 =====
 		if ((memoryDatabase=this_getMemoryDatabase(self))!=NULL
 				&& (tableManager=this_getTableManager(self))!=NULL
-				&& (record=M2MCEPRecord_begin(this_getCEPRecord(self)))!=NULL)
+				&& (record=M2MDataFrame_begin(this_getDataFrame(self)))!=NULL)
 			{
 #ifdef DEBUG
 			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLiteデータベースへレコードを挿入する処理を開始します");
@@ -2005,13 +2020,13 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 			//===== トランザクション開始 =====
 			M2MSQLRunner_beginTransaction(memoryDatabase);
 			//===== レコード管理オブジェクトが末端に辿り着くまで繰り返し =====
-			while (M2MCEPRecord_next(record)!=NULL)
+			while (M2MDataFrame_next(record)!=NULL)
 				{
 				//===== 同一テーブルへのレコード一括挿入 =====
-				if ((result=this_insertRecordList(memoryDatabase, record, tableManager, M2MCEPRecord_getNewRecordList(record)))>0)
+				if ((result=this_insertRecordList(memoryDatabase, record, tableManager, M2MDataFrame_getNewRecordList(record)))>0)
 					{
 					//===== 挿入済みの新規レコードを過去レコードへ移動 =====
-					M2MCEPRecord_moveFromNewRecordListToOldRecordList(record);
+					M2MDataFrame_moveFromNewRecordListToOldRecordList(record);
 					//===== 挿入したレコード数をカウント =====
 					numberOfRecord += result;
 					}
@@ -2021,13 +2036,13 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLiteデータベースへのレコード挿入処理に失敗しました", NULL);
 					}
 				//===== 次のレコード情報オブジェクトへ進む =====
-				record = M2MCEPRecord_next(record);
+				record = M2MDataFrame_next(record);
 				}
 			//===== （最後の）テーブルへのレコード一括挿入 =====
-			if ((result=this_insertRecordList(memoryDatabase, record, tableManager, M2MCEPRecord_getNewRecordList(record)))>0)
+			if ((result=this_insertRecordList(memoryDatabase, record, tableManager, M2MDataFrame_getNewRecordList(record)))>0)
 				{
 				//===== 挿入済みの新規レコードを過去レコードへ移動 =====
-				M2MCEPRecord_moveFromNewRecordListToOldRecordList(record);
+				M2MDataFrame_moveFromNewRecordListToOldRecordList(record);
 				//===== 挿入したレコード数をカウント =====
 				numberOfRecord += result;
 				}
@@ -2255,74 +2270,62 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトにファイル上のSQLite3データベース名をメンバ<br>
- * 変数に設定する。<br>
+ * Set SQLite3 database file name of member of the CEP structure object.<br>
  *
- * @param[in,out] self		CEP実行オブジェクト
- * @param[in] databaseName	ファイル上のSQLite3データベース名（ファイル名）
- * @return					メンバ変数が設定されたCEP実行オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		CEP structure object to be set SQLite3 database file name
+ * @param[in] databaseName	String indicating SQLite3 database file name
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName)
 	{
 	//========== Variable ==========
-	size_t databaseNameLength = 0;
 #ifdef DEBUG
 	M2MString MESSAGE[256];
 #endif // DEBUG
-	const M2MString *FILE_EXTENSION = (M2MString *)".sqlite";
-	const size_t FILE_EXTENSION_LENGTH = M2MString_length(FILE_EXTENSION);
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_setDatabaseName()";
 
 	//===== Check argument =====
-	if (self!=NULL && databaseName!=NULL
-			&& (databaseNameLength=M2MString_length(databaseName))>0)
+	if (self!=NULL
+			&& databaseName!=NULL && M2MString_length(databaseName)>0)
 		{
-		//===== 初期化 =====
+		//===== Initialize SQLite3 fiel database name =====
 		this_deleteDatabaseName(self);
-		//===== 規程の拡張子が付与されているかどうか確認 =====
-		if (M2MString_lastIndexOf(databaseName, FILE_EXTENSION)!=NULL)
+		//===== Copy SQLite3 database file name =====
+		if (M2MString_append(&(self->databaseName), databaseName)!=NULL)
 			{
-			//===== ヒープメモリ領域の獲得 =====
-			if ((self->databaseName=(M2MString *)M2MHeap_malloc(databaseNameLength+1))!=NULL)
+			//===== In the case of extension isn't given in name =====
+			if (M2MString_lastIndexOf(databaseName, M2MSQLITECONFIG_FILE_EXTENSION)==NULL)
 				{
-				memcpy(self->databaseName, databaseName, databaseNameLength);
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"CEP実行オブジェクトにSQLiteデータベースファイル名(=\"%s\")をセットしました", self->databaseName);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
-				return self;
+				//===== Copy SQLite3 file extension =====
+				if (M2MString_append(&(self->databaseName), M2MSQLITECONFIG_FILE_EXTENSION)!=NULL)
+					{
+					// do nothing
+					}
+				//===== Error handling =====
+				else
+					{
+					this_deleteDatabaseName(self);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the SQLite3 database name in the CEP structure object", NULL);
+					return NULL;
+					}
 				}
-			//===== Error handling =====
+			//===== In the case of extension is given in name =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"データベース名をコピーするためのヒープメモリー領域の獲得に失敗しました", NULL);
-				return NULL;
+				// do nothing
 				}
+#ifdef DEBUG
+			memset(MESSAGE, 0, sizeof(MESSAGE));
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set the SQLite3 database name (=\"%s\") in the CEP structure object", this_getDatabaseName(self));
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
+#endif // DEBUG
+			return self;
 			}
-		//===== データベース名に拡張子が付与されていなかった場合 =====
+		//===== Error handling =====
 		else
 			{
-			//===== ヒープメモリ領域の獲得 =====
-			if ((self->databaseName=(M2MString *)M2MHeap_malloc(databaseNameLength+FILE_EXTENSION_LENGTH+1))!=NULL)
-				{
-				//===== データベース名をコピー =====
-				memcpy(&((self->databaseName)[0]), databaseName, databaseNameLength);
-				//===== 拡張子をコピー =====
-				memcpy(&((self->databaseName)[databaseNameLength]), FILE_EXTENSION, FILE_EXTENSION_LENGTH);
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"CEP実行オブジェクトにSQLiteデータベースファイル名(=\"%s\")をセットしました", self->databaseName);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
-				return self;
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"データベース名をコピーするためのヒープメモリー領域の獲得に失敗しました", NULL);
-				return NULL;
-				}
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying SQLite3 database name", NULL);
+			return NULL;
 			}
 		}
 	//===== Argument error =====
@@ -2333,12 +2336,47 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
 		}
 	else if (databaseName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"databaseName\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"databaseName\"文字列の長さが0以下です", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is vacant", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
+ * Set indicated M2MDataFrame object into CEP structure object.<br>
+ *
+ * @param[in,out] self		CEP structure object to be set M2MDataFrame object
+ * @param[in] dataFrame		M2MDataFrame object
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
+ */
+static M2MCEP *this_setDataFrame (M2MCEP *self, M2MDataFrame *dataFrame)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_setDataFrame()";
+
+	//===== Check argument =====
+	if (self!=NULL && dataFrame!=NULL)
+		{
+		self->dataFrame = dataFrame;
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set M2MDataFrame object into CEP object");
+#endif // DEBUG
+		return self;
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame\" structure object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -2350,7 +2388,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] fileDatabase	ファイル上のSQLite3データベース管理オブジェクト
- * @return					CEP実行オブジェクト or NULL（エラーの場合）
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
 	{
@@ -2386,7 +2424,7 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] fileDatabase	メモリー上のSQLite3データベース管理オブジェクト
- * @return					CEP実行オブジェクト or NULL（エラーの場合）
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
 	{
@@ -2422,7 +2460,7 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
  *
  * @param[in,out] self		CEP実行オブジェクト
  * @param[in] tableManager	テーブル構築オブジェクト
- * @return					テーブル構築オブジェクトをセットしたCEP実行オブジェクト
+ * @return					CEP structure object with member variable updated or NULL (in case of error)
  */
 static M2MCEP *this_setTableManager (M2MCEP *self, const M2MTableManager *tableManager)
 	{
@@ -2735,7 +2773,7 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 void M2MCEP_delete (M2MCEP **self)
 	{
 	//========== Variable ==========
-	M2MCEPRecord *record = NULL;
+	M2MDataFrame *record = NULL;
 #ifdef DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_delete()";
 #endif // DEBUG
@@ -2752,9 +2790,9 @@ void M2MCEP_delete (M2MCEP **self)
 		//===== ファイルデータベースを閉じる =====
 		this_closeFileDatabase((*self));
 		//===== CEPレコード情報オブジェクトのヒープメモリ領域を解放 =====
-		if ((record=this_getCEPRecord((*self)))!=NULL)
+		if ((record=this_getDataFrame((*self)))!=NULL)
 			{
-			M2MCEPRecord_delete(&record);
+			M2MDataFrame_delete(&record);
 			}
 		else
 			{
@@ -2786,7 +2824,7 @@ void M2MCEP_delete (M2MCEP **self)
  */
 M2MString *M2MCEP_getVersion ()
 	{
-	return CEP_VERSION;
+	return M2MCEP_VERSION;
 	}
 
 
@@ -2800,7 +2838,7 @@ M2MString *M2MCEP_getVersion ()
  *    and delete it in the oldest order if it exceeds the specified <br>
  *    maximum value. <br>
  * 4) Fetch the same data as the deleted record from the CEPRecord <br>
- *    structure object and insert it into the SQLite3 file database for <br>
+ *    structure object and insert it into the SQLite3 database file for <br>
  *    persistence. <br>
  * 5) Delete excess from record data of CEPRecord structure object. <br>
  *
@@ -2818,8 +2856,8 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && csv!=NULL)
 		{
-		//===== Set CSV string to M2MCEPRecord object =====
-		if (M2MCEPRecord_setCSV(this_getCEPRecord(self), tableName, csv)>0)
+		//===== Set CSV string to M2MDataFrame object =====
+		if (M2MDataFrame_setCSV(this_getDataFrame(self), tableName, csv)>0)
 			{
 			//===== Insert record into SQLite3 memory database =====
 			if ((numberOfRecord=this_insertRecordListToMemoryDatabase(self))>=0)
@@ -2828,7 +2866,7 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 				this_updateRecordCounter(self, numberOfRecord);
 				//===== Adjust the number of records in SQLite3 database in memory =====
 				this_adjustMemoryDatabaseRecord(self, tableName);
-				//===== Insert record into SQLite3 file database for persistence =====
+				//===== Insert record into SQLite3 database file for persistence =====
 				if (this_insertRecordListToFileDatabase(self)!=NULL)
 					{
 					//===== Execute vacuum processing to SQLite3 databases =====
@@ -2877,13 +2915,13 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 
 
 /**
- * CEP構造体オブジェクトを新規作成し, SQLite3データベース処理のための準備を行う．<br>
- * テーブルについては, メモリ上のSQLite3データベースは"M2MCEP"オブジェクトが作成<br>
- * される度に毎回構築する必要があるため, 必ず指定する事。<br>
+ * Create new CEP structure object and prepare for SQLite3 database processing. <br>
+ * For the table, be sure to specify the SQLite3 database on memory as it <br>
+ * needs to be built every time "M2MCEP" object is created. <br>
  *
- * @param[in] databaseName	SQLite3データベース名
- * @param[in] tableManager	SQLite3データベースのテーブルを構築するためのオブジェクト
- * @return					CEP実行オブジェクト or NULL（エラーの場合）
+ * @param[in] databaseName	String indicating SQLite3 database name
+ * @param[in] tableBuilder	Structure object for building SQLite3 database table
+ * @return					Created CEP structure object or NULL (in case of error)
  */
 M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableManager)
 	{
@@ -2935,7 +2973,7 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"tableManager\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}

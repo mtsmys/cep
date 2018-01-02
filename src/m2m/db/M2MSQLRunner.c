@@ -51,6 +51,9 @@ bool M2MSQLRunner_beginTransaction (sqlite3 *database)
 		//===== Execute SQL =====
 		if (M2MSQLRunner_executeUpdate(database, BEGIN_SQL)==true)
 			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to do \"BEGIN\" statement");
+#endif // DEBUG
 			return true;
 			}
 		//===== Error handling =====
@@ -87,6 +90,9 @@ bool M2MSQLRunner_commitTransaction (sqlite3 *database)
 		//===== Commit =====
 		if (M2MSQLRunner_executeUpdate(database, COMMIT_SQL)==true)
 			{
+#ifdef DEBUG
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to do \"COMMIT\" statement");
+#endif // DEBUG
 			return true;
 			}
 		//===== Error handling =====
@@ -136,6 +142,9 @@ bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 			//===== Check result status =====
 			if (sqlite3_finalize(statement)==SQLITE_OK)
 				{
+#ifdef DEBUG
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to do executeUpdate statement");
+#endif // DEBUG
 				return true;
 				}
 			//===== Error handling =====

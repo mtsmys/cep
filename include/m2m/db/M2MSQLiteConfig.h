@@ -50,6 +50,18 @@ extern "C"
 
 
 /*******************************************************************************
+ * Definition
+ ******************************************************************************/
+/**
+ * String indicating the SQLite3 database file extension.
+ */
+#ifndef M2MSQLITECONFIG_FILE_EXTENSION
+#define M2MSQLITECONFIG_FILE_EXTENSION (M2MString *)".sqlite"
+#endif /* M2MSQLITECONFIG_EXTENSION */
+
+
+
+/*******************************************************************************
  * Public function
  ******************************************************************************/
 /**

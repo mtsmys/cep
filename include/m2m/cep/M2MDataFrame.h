@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MCEPRecord.h
+ * M2MDataFrame.h
  *
- * Copyright (c) 2014, Akihisa Yasuda
+ * Copyright (c) 2018, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_CEP_M2MCEPRECORD_H_
-#define M2M_CEP_M2MCEPRECORD_H_
+#ifndef M2M_CEP_M2MDATAFRAME_H_
+#define M2M_CEP_M2MDATAFRAME_H_
 
 
 #include "m2m/lang/M2MString.h"
@@ -63,17 +63,17 @@ extern "C"
  * @param newRecordList 	新規に挿入したレコード情報（文字列）を示す構造体オブジェクト（＝[CSV1行 -> CSV1行 -> CSV1行・・・]）
  * @param newRecordList 	過去に挿入されたレコード情報（文字列）を示す構造体オブジェクト（＝[CSV1行 -> CSV1行 -> CSV1行・・・]）．過去データより昇順
  */
-#ifndef M2MCEPRecord
-typedef struct M2MCEPRecord
+#ifndef M2MDataFrame
+typedef struct M2MDataFrame
 	{
-	struct M2MCEPRecord *previous;
-	struct M2MCEPRecord *next;
+	struct M2MDataFrame *previous;
+	struct M2MDataFrame *next;
 	M2MString *tableName;
 	M2MString *columnName;
 	M2MList *newRecordList;
 	M2MList *oldRecordList;
-	} M2MCEPRecord;
-#endif /* M2MCEPRecord */
+	} M2MDataFrame;
+#endif /* M2MDataFrame */
 
 
 
@@ -89,7 +89,7 @@ typedef struct M2MCEPRecord
  * @param[in] self	レコード管理オブジェクト
  * @return			先頭のレコード管理オブジェクト
  */
-M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self);
+M2MDataFrame *M2MDataFrame_begin (M2MDataFrame *self);
 
 
 /**
@@ -97,7 +97,7 @@ M2MCEPRecord *M2MCEPRecord_begin (M2MCEPRecord *self);
  *
  * @param[in,out] self	メモリ領域解放対象のレコード管理オブジェクト
  */
-void M2MCEPRecord_delete (M2MCEPRecord **self);
+void M2MDataFrame_delete (M2MDataFrame **self);
 
 
 /**
@@ -107,7 +107,7 @@ void M2MCEPRecord_delete (M2MCEPRecord **self);
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持するカラム名を示すCSV形式の文字列 or NULL（エラーの場合）
  */
-M2MString *M2MCEPRecord_getColumnName (const M2MCEPRecord *self);
+M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self);
 
 
 /**
@@ -117,7 +117,7 @@ M2MString *M2MCEPRecord_getColumnName (const M2MCEPRecord *self);
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持する、新規に挿入された（未だメモリーDB未挿入の）レコードリスト
  */
-M2MList *M2MCEPRecord_getNewRecordList (const M2MCEPRecord *self);
+M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self);
 
 
 /**
@@ -127,7 +127,7 @@ M2MList *M2MCEPRecord_getNewRecordList (const M2MCEPRecord *self);
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持する、過去に挿入された（メモリーDB挿入済みの）レコードリスト
  */
-M2MList *M2MCEPRecord_getOldRecordList (const M2MCEPRecord *self);
+M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self);
 
 
 /**
@@ -137,7 +137,7 @@ M2MList *M2MCEPRecord_getOldRecordList (const M2MCEPRecord *self);
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持するテーブル名
  */
-M2MString *M2MCEPRecord_getTableName (const M2MCEPRecord *self);
+M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self);
 
 
 /**
@@ -149,7 +149,7 @@ M2MString *M2MCEPRecord_getTableName (const M2MCEPRecord *self);
  *
  * @param[in,out] self
  */
-void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self);
+void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self);
 
 
 /**
@@ -157,7 +157,7 @@ void M2MCEPRecord_moveFromNewRecordListToOldRecordList (M2MCEPRecord *self);
  *
  * @return	新規に生成したレコード管理オブジェクト
  */
-M2MCEPRecord *M2MCEPRecord_new ();
+M2MDataFrame *M2MDataFrame_new ();
 
 
 /**
@@ -167,7 +167,7 @@ M2MCEPRecord *M2MCEPRecord_new ();
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ後ろのレコード管理オブジェクト
  */
-M2MCEPRecord *M2MCEPRecord_next (const M2MCEPRecord *self);
+M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self);
 
 
 /**
@@ -177,7 +177,7 @@ M2MCEPRecord *M2MCEPRecord_next (const M2MCEPRecord *self);
  * @param[in] self		レコード管理オブジェクト
  * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ手前のレコード管理オブジェクト
  */
-M2MCEPRecord *M2MCEPRecord_previous (const M2MCEPRecord *self);
+M2MDataFrame *M2MDataFrame_previous (const M2MDataFrame *self);
 
 
 /**
@@ -187,7 +187,7 @@ M2MCEPRecord *M2MCEPRecord_previous (const M2MCEPRecord *self);
  * @param[in,out] self		レコード管理オブジェクト
  * @param[in] tableName		削除対象のレコード管理オブジェクトが保有するテーブル名を示す文字列
  */
-void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName);
+void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName);
 
 
 /**
@@ -199,7 +199,7 @@ void M2MCEPRecord_remove (M2MCEPRecord *self, const M2MString *tableName);
  * @param[in] csv			CSV形式の文字列データ（1行目にカラム名を示すヘッダ，2行目以降がデータとなる）
  * @return					オブジェクトに格納したレコード数[個] or -1（エラーの場合）
  */
-int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M2MString *csv);
+int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M2MString *csv);
 
 
 /**
@@ -209,7 +209,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
  * @param[in] self			レコード管理オブジェクト
  * @param[in] nextRecord	1つ後ろのレコード管理オブジェクト
  */
-void M2MCEPRecord_setNextRecord (M2MCEPRecord *self, M2MCEPRecord *nextRecord);
+void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord);
 
 
 /**
@@ -219,7 +219,7 @@ void M2MCEPRecord_setNextRecord (M2MCEPRecord *self, M2MCEPRecord *nextRecord);
  * @param[in,out] self			レコード管理オブジェクト
  * @param[in] previousRedord	1つ手前のレコード管理オブジェクト
  */
-void M2MCEPRecord_setPreviousRecord (M2MCEPRecord *self, M2MCEPRecord *previousRecord);
+void M2MDataFrame_setPreviousRecord (M2MDataFrame *self, M2MDataFrame *previousRecord);
 
 
 /**
@@ -228,7 +228,7 @@ void M2MCEPRecord_setPreviousRecord (M2MCEPRecord *self, M2MCEPRecord *previousR
  * @param[in] self	レコード管理オブジェクト
  * @return			要素数
  */
-unsigned int M2MCEPRecord_size (M2MCEPRecord *self);
+unsigned int M2MDataFrame_size (M2MDataFrame *self);
 
 
 
@@ -238,4 +238,4 @@ unsigned int M2MCEPRecord_size (M2MCEPRecord *self);
 
 
 
-#endif /* M2M_CEP_M2MCEPRECORD_H_ */
+#endif /* M2M_CEP_M2MDATAFRAME_H_ */

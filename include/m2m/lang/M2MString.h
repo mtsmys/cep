@@ -127,7 +127,7 @@ typedef unsigned char M2MString;
  *
  * @param[in,out] self	original string or NULL（"self" = "self + string")
  * @param[in] string	additional string
- * @return				pointer of connected string or NULL(means error)
+ * @return				Pointer of connected string or NULL (in case of error)
  */
 M2MString *M2MString_append (M2MString **self, const M2MString *string);
 

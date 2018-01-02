@@ -9,18 +9,18 @@ SRCS        := $(SRCDIR)m2m/io/M2MHeap.c \
                $(SRCDIR)m2m/io/M2MFile.c \
                $(SRCDIR)m2m/util/M2MBase64.c \
                $(SRCDIR)m2m/util/list/M2MList.c \
-               $(SRCDIR)m2m/util/logging/M2MLogger.c \
+               $(SRCDIR)m2m/log/M2MLogger.c \
                $(SRCDIR)m2m/db/M2MSQLRunner.c \
                $(SRCDIR)m2m/db/M2MSQLiteConfig.c \
                $(SRCDIR)m2m/db/M2MDataType.c \
                $(SRCDIR)m2m/db/M2MColumn.c \
                $(SRCDIR)m2m/db/M2MColumnList.c \
                $(SRCDIR)m2m/db/M2MTableManager.c \
-               $(SRCDIR)m2m/cep/M2MCEPRecord.c \
+               $(SRCDIR)m2m/cep/M2MDataFrame.c \
                $(SRCDIR)m2m/cep/M2MCEP.c 
 OBJS        := $(SRCS:%.c=%.o) 
 DEPS        := $(SRCS:%.c=%.d) 
-TARGET      := libcep.so.0.3.0 
+TARGET      := libcep.so.0.4.0 
 SONAME      := libcep.so.0 
 TARGETLINK  := libcep.so 
 LDFLAGS     := -shared -Wl,-soname=$(SONAME) 

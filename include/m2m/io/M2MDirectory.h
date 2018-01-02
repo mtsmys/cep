@@ -56,7 +56,7 @@ extern "C"
  * Directory name related to M2M processing(=".m2m")
  */
 #ifndef M2MDIRECTORY
-#define M2MDIRECTORY (unsigned char *)".m2m"
+#define M2MDIRECTORY (M2MString *)".m2m"
 #endif /* M2MDIRECTORY */
 
 
@@ -64,7 +64,7 @@ extern "C"
  * Pathname division character(＝"/")<br>
  */
 #ifndef M2MDirectory_SEPARATOR
-#define M2MDirectory_SEPARATOR (unsigned char *)"/"
+#define M2MDirectory_SEPARATOR (M2MString *)"/"
 #endif /* M2MDirectory_SEPARATOR */
 
 

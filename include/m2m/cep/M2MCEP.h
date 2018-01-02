@@ -33,7 +33,7 @@
 #define M2M_CEP_M2MCEP_H_
 
 
-#include "m2m/cep/M2MCEPRecord.h"
+#include "m2m/cep/M2MDataFrame.h"
 #include "m2m/db/M2MTableManager.h"
 #include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/db/M2MSQLRunner.h"
@@ -58,9 +58,9 @@ extern "C"
 /**
  * @version
  */
-#ifndef CEP_VERSION
-#define CEP_VERSION (M2MString *)"0.3.0"
-#endif /* CEP_VERSION */
+#ifndef M2MCEP_VERSION
+#define M2MCEP_VERSION (M2MString *)"0.4.0"
+#endif /* M2MCEP_VERSION */
 
 
 /**
@@ -78,7 +78,7 @@ extern "C"
  * @param tableManager		Database table manager structure object
  * @param memoryDatabase	SQLite3 database on memory
  * @param fileDatabase		SQLite3 database on file
- * @param record			Record information structure object
+ * @param dataFrame			DataFrame which is the core data for CEP
  * @param maxRecord			Maximum record number of table in memory
  * @param vacuumRecord		Number of records to execute database vacuum processing (auto vacuum setting in case of 0)
  * @param recordCounter		Record number counter for executing vacuum process of database
@@ -91,7 +91,7 @@ typedef struct
 	M2MTableManager *tableManager;
 	sqlite3 *memoryDatabase;
 	sqlite3 *fileDatabase;
-	M2MCEPRecord *record;
+	M2MDataFrame *dataFrame;
 	unsigned int maxRecord;
 	unsigned int vacuumRecord;
 	unsigned int recordCounter;
@@ -132,7 +132,7 @@ M2MString *M2MCEP_getVersion ();
  *    and delete it in the oldest order if it exceeds the specified <br>
  *    maximum value. <br>
  * 4) Fetch the same data as the deleted record from the CEPRecord <br>
- *    structure object and insert it into the SQLite3 file database for <br>
+ *    structure object and insert it into the SQLite3 database file for <br>
  *    persistence. <br>
  * 5) Delete excess from record data of CEPRecord structure object. <br>
  *
@@ -145,15 +145,15 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 
 
 /**
- * CEP構造体オブジェクトを新規作成し、SQLite3データベース処理のための準備を行う．<br>
- * テーブルについては、メモリ上のSQLite3データベースは"M2MCEP"オブジェクトが作成<br>
- * される度に毎回構築する必要があるため、必ず指定する事。<br>
+ * Create new CEP structure object and prepare for SQLite3 database processing. <br>
+ * For the table, be sure to specify the SQLite3 database on memory as it <br>
+ * needs to be built every time "M2MCEP" object is created. <br>
  *
- * @param[in] databaseName	SQLite3データベース名
- * @param[in] tableBuilder	SQLite3データベースのテーブルを構築するためのオブジェクト
- * @return					CEP構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] databaseName	String indicating SQLite3 database name
+ * @param[in] tableBuilder	Structure object for building SQLite3 database table
+ * @return					Created CEP structure object or NULL (in case of error)
  */
-M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableBuilder);
+M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableManager);
 
 
 /**

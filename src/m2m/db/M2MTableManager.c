@@ -1017,9 +1017,9 @@ unsigned char *M2MTableManager_getTableInfoSQL (const unsigned char *tableName, 
 
 
 /**
- * ヒープメモリ領域を獲得し, 新規にテーブル構築オブジェクトを作成する．<br>
+ * Get the heap memory and create a new M2MTableManager structure object.<br>
  *
- * @return		新規作成したテーブル構築オブジェクト
+ * @return		Newly created M2MTableManager structure object
  */
 M2MTableManager *M2MTableManager_new ()
 	{
