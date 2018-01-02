@@ -43,21 +43,44 @@
 bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
 	//========== Variable ==========
+	bool result = false;
 	const M2MString *PRAGMA_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 1 ";
 	const M2MString *PRAGMA_NOT_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 0 ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setAutoVacuum";
 
 	//===== When automatic vacuum is enabled =====
 	if (flag==true)
 		{
 		//===== Execute SQL statement to disable automatic vacuum =====
-		return M2MSQLRunner_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL);
+		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL))==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to enable auto vacuum mode");
+#endif // DEBUG
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to enable auto vacuum mode", NULL);
+			}
 		}
 	//===== When automatic vacuum is disabled =====
 	else
 		{
 		//===== Execute SQL statement to disable automatic vacuum =====
-		return M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL);
+		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL))==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to disable auto vacuum mode");
+#endif // DEBUG
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to disable auto vacuum mode", NULL);
+			}
 		}
+	return result;
 	}
 
 
@@ -71,19 +94,44 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
+	bool result = false;
 	const M2MString *PRAGMA_SYNCHRONOUS_NORMAL_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
 	const M2MString *PRAGMA_SYNCHRONOUS_OFF_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous";
 
 	//===== In the case of NORMAL mode =====
 	if (synchronous==true)
 		{
-		return M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL);
+		//===== Set NORMAL synchronous mode to SQLite3 database =====
+		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL))==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set the synchronous mode into \"NORMAL\"");
+#endif // DEBUG
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"NORMAL\"", NULL);
+			}
 		}
 	//===== In the case of OFF mode =====
 	else
 		{
-		return M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL);
+		//===== Set OFF synchronous mode to SQLite3 database =====
+		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL))==true)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set the synchronous mode into \"OFF\"");
+#endif // DEBUG
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"OFF\"", NULL);
+			}
 		}
+	return result;
 	}
 
 
@@ -96,10 +144,23 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	{
 	//========== Variable ==========
+	bool result = false;
 	const M2MString *PRAGMA_ENCODING_SQL = (M2MString *)"PRAGMA encoding = 'UTF-8'";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setUTF8";
 
 	//===== Set UTF-8 to SQLite3 database =====
-	return M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL);
+	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL))==true)
+		{
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set the encoding into \"UTF-8\"");
+#endif // DEBUG
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the encoding into \"UTF-8\"", NULL);
+		}
+	return result;
 	}
 
 
@@ -113,10 +174,23 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
+	bool result = false;
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setWAL";
 
 	//===== Set journal mode of SQLite3 database =====
-	return M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL);
+	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL))==true)
+		{
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to change the journal mode into \"WAL\"");
+#endif // DEBUG
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to change the journal mode into \"WAL\"", NULL);
+		}
+	return result;
 	}
 
 
@@ -129,10 +203,23 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	{
 	//========== Variable ==========
+	bool result = false;
 	const M2MString *SQL = "VACUUM ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_vacuum";
 
 	//===== Vacuum SQLite3 database =====
-	return M2MSQLRunner_executeUpdate(database, SQL);
+	if ((result=M2MSQLRunner_executeUpdate(database, SQL))==true)
+		{
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to execute vacuum process");
+#endif // DEBUG
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to execute vacuum process", NULL);
+		}
+	return result;
 	}
 
 

@@ -43,6 +43,7 @@ bool M2MSQLRunner_beginTransaction (sqlite3 *database)
 	{
 	//========== Variable ==========
 	const M2MString *BEGIN_SQL = (M2MString *)"BEGIN ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLRunner_beginTransaction";
 
 	//===== Check argument =====
 	if (database!=NULL)
@@ -55,12 +56,14 @@ bool M2MSQLRunner_beginTransaction (sqlite3 *database)
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to start transaction in indicated SQLite3 database", NULL);
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
 		return false;
 		}
 	}
@@ -76,6 +79,7 @@ bool M2MSQLRunner_commitTransaction (sqlite3 *database)
 	{
 	//========== Variable ==========
 	const M2MString *COMMIT_SQL = (M2MString *)"COMMIT ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLRunner_commitTransaction";
 
 	//===== Check argument =====
 	if (database!=NULL)
@@ -88,12 +92,14 @@ bool M2MSQLRunner_commitTransaction (sqlite3 *database)
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to commit transaction in indicated SQLite3 database", NULL);
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
 		return false;
 		}
 	}
@@ -114,9 +120,11 @@ bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 	{
 	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLRunner_executeUpdate";
 
 	//===== Check argument =====
-	if (database!=NULL && sql!=NULL)
+	if (database!=NULL
+			&& sql!=NULL && M2MString_length(sql)>0)
 		{
 		//===== Convert SQL statement to VDBE (internal execution format) =====
 		if (sqlite3_prepare(database, sql, -1, &statement, NULL)==SQLITE_OK)
@@ -125,6 +133,7 @@ bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 			while (sqlite3_step(statement)==SQLITE_BUSY)
 				{
 				}
+			//===== Check result status =====
 			if (sqlite3_finalize(statement)==SQLITE_OK)
 				{
 				return true;
@@ -132,22 +141,26 @@ bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql)
 			//===== Error handling =====
 			else
 				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
 				return false;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else if (database==NULL)
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
 		return false;
 		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL or vacant", NULL);
 		return false;
 		}
 	}

@@ -1074,6 +1074,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 	M2MString *lineEnd = NULL;
 	size_t lineLength = 0;
 	int numberOfRecord = -1;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEPRecord_setCSV()";
 
 	//===== Check argument =====
 	if (self!=NULL
@@ -1092,7 +1093,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから新規レコード情報リストが取得出来ません", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから新規レコード情報リストが取得出来ません", NULL);
 				return -1;
 				}
 			}
@@ -1119,7 +1120,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトセットするのに失敗しました", NULL);
+							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトセットするのに失敗しました", NULL);
 							//===== レコード管理オブジェクトのノードを初期化（テーブル名と新規レコード情報オブジェクトを削除) =====
 							this_init(self);
 							return -1;
@@ -1128,7 +1129,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列の1行目のヘッダ行取得に失敗しました", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列の1行目のヘッダ行取得に失敗しました", NULL);
 						//===== 生成したレコード管理オブジェクトを削除 =====
 						this_init(self);
 						return -1;
@@ -1137,7 +1138,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"新規レコード情報オブジェクトの作成に失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトの作成に失敗しました", NULL);
 					//===== 生成したレコード管理オブジェクトを削除 =====
 					this_init(self);
 					return -1;
@@ -1169,7 +1170,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"レコード管理オブジェクトへCSV形式のレコードをセットするのに失敗しました", NULL);
+							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトへCSV形式のレコードをセットするのに失敗しました", NULL);
 							//===== 生成したレコード管理オブジェクトを削除 =====
 							M2MCEPRecord_delete(&record);
 							return -1;
@@ -1178,7 +1179,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"レコード管理オブジェクトにカラム名をセットするのに失敗しました", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトにカラム名をセットするのに失敗しました", NULL);
 						//===== 生成したレコード管理オブジェクトを削除 =====
 						M2MCEPRecord_delete(&record);
 						return -1;
@@ -1187,7 +1188,7 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"新規レコード情報リストの作成処理に失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報リストの作成処理に失敗しました", NULL);
 					//===== 生成したレコード管理オブジェクトを削除 =====
 					M2MCEPRecord_delete(&record);
 					return -1;
@@ -1198,17 +1199,17 @@ int M2MCEPRecord_setCSV (M2MCEPRecord *self, const M2MString *tableName, const M
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
 		return -1;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたテーブル名を示す文字列がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたテーブル名を示す文字列がNULLです", NULL);
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MCEPRecord_setCSV()", __LINE__, (M2MString *)"引数で指定されたCSV形式のレコードを示す文字列がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式のレコードを示す文字列がNULLです", NULL);
 		return -1;
 		}
 	}
