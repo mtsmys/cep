@@ -35,7 +35,6 @@
 
 
 #include "m2m/lang/M2MString.h"
-#include "m2m/util/logging/M2MLogger.h"
 
 
 

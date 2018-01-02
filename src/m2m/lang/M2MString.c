@@ -198,13 +198,12 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	}
 
 
-
 /**
- * 引数で指定された2つの文字列を比較し, その結果を返す。<br>
+ * Compares the two strings specified by the argument and returns the result.<br>
  *
- * @param[in] self		比較対象の片方の文字列
- * @param[in] string	比較対象のもう一方の文字列
- * @return				0：2つが等しい場合, 負：辞書的にthis<stringの場合, 正：辞書的にthis>stringの場合
+ * @param[in] self		One string to be compared
+ * @param[in] string	Another string to be compared
+ * @return				0：two are equal, negative：In case of self < string, positive：In case of self > string
  */
 signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
@@ -220,6 +219,57 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	else
 		{
 		return -1;
+		}
+	}
+
+
+/**
+ * Convert double value into a string and copies it to the pointer. <br>
+ * Since buffering of arrays is executed inside this function, so call <br>
+ * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
+ * leak after using the string. <br>
+ *
+ * @param[in] number	Real number to be converted
+ * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
+ * @return				Copied string or NULL (in case of error)
+ */
+M2MString *M2MString_convertFromDoubleToString (const double number, M2MString **string)
+	{
+	//========== Variable ==========
+	M2MString tmpBuffer[128];
+	size_t stringLength = 0;
+
+	//===== Check argument =====
+	if (string!=NULL)
+		{
+		//===== Initialize array =====
+		memset(tmpBuffer, 0, sizeof(tmpBuffer));
+		//===== Convert from long to string =====
+		if (snprintf(tmpBuffer, sizeof(tmpBuffer), "%f", number)>=0
+				&& (stringLength=M2MString_length(tmpBuffer))>0)
+			{
+			//===== Get heap memory for copying =====
+			if (((*string)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
+				{
+				memcpy((*string), tmpBuffer, stringLength);
+				return (*string);
+				}
+			//===== Error handling =====
+			else
+				{
+				return NULL;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
 		}
 	}
 
@@ -314,16 +364,16 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 
 
 /**
- * 引数で指定された“double”値を文字列に変換し, 引数で指定されたポインタにコピー<br>
- * する。<br>
- * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
- * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
+ * Convert signed integer value into a string and copies it to the pointer. <br>
+ * Since buffering of arrays is executed inside this function, so call <br>
+ * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
+ * leak after using the string. <br>
  *
- * @param[in] number	文字列変換対象の実数
- * @param[out] string	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
- * @return				コピーした文字列 or NULL（エラーの場合）
+ * @param[in] number	signed integer number to be converted
+ * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
+ * @return				Copied string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromDoubleToString (const double number, M2MString **string)
+M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, M2MString **string)
 	{
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
@@ -332,63 +382,13 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 	//===== Check argument =====
 	if (string!=NULL)
 		{
-		//===== 配列の初期化 =====
-		memset(tmpBuffer, 0, sizeof(tmpBuffer));
-		//===== Convert from long to string =====
-		if (snprintf(tmpBuffer, sizeof(tmpBuffer), "%f", number)>=0
-				&& (stringLength=M2MString_length(tmpBuffer))>0)
-			{
-			//===== ヒープメモリ領域の獲得 =====
-			if (((*string)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
-				{
-				memcpy((*string), tmpBuffer, stringLength);
-				return (*string);
-				}
-			//===== Error handling =====
-			else
-				{
-				return NULL;
-				}
-			}
-		//===== Error handling =====
-		else
-			{
-			return NULL;
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		return NULL;
-		}
-	}
-
-
-/**
- * 引数で指定された“int”値を文字列に変換し, 引数で指定されたポインタにコピーする。<br>
- * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
- * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
- *
- * @param[in] number	文字列変換対象の整数
- * @param[out] string	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
- * @return				コピーした文字列 or NULL（エラーの場合）
- */
-M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MString **string)
-	{
-	//========== Variable ==========
-	M2MString tmpBuffer[128];
-	size_t stringLength = 0;
-
-	//===== Check argument =====
-	if (string!=NULL)
-		{
-		//===== 配列の初期化 =====
+		//===== Initialize array =====
 		memset(tmpBuffer, 0, sizeof(tmpBuffer));
 		//===== Convert from long to string =====
 		if (snprintf(tmpBuffer, sizeof(tmpBuffer), "%d", number)>=0
 				&& (stringLength=M2MString_length(tmpBuffer))>0)
 			{
-			//===== ヒープメモリ領域の獲得 =====
+			//===== Get heap memory for copying =====
 			if (((*string)=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
 				{
 				memcpy((*string), tmpBuffer, stringLength);
@@ -415,16 +415,16 @@ M2MString *M2MString_convertFromIntegerToString (const signed int number, M2MStr
 
 
 /**
- * 引数で指定された“long int”値を文字列に変換し, 引数で指定されたポインタにコピー<br>
- * する。<br>
- * 配列のバッファリングはこの関数内部で実行するため, 呼び出し側では文字列利用後, <br>
- * メモリーリークを防止するため, 必ず“M2MHeap_free()”関数を呼ぶ事。<br>
+ * Convert signed long value into a string and copies it to the pointer. <br>
+ * Since buffering of arrays is executed inside this function, so call <br>
+ * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
+ * leak after using the string. <br>
  *
- * @param[in]	文字列変換対象の整数
- * @param[out]	変換した文字列をコピーするためのポインタ（バッファリングは関数内部で実行する）
- * @return		コピーした文字列 or NULL（エラーの場合）
+ * @param[in] number	signed long number to be converted
+ * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
+ * @return				Copied string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromLongToString (const signed long number, M2MString **string)
+M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2MString **string)
 	{
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
@@ -433,13 +433,13 @@ M2MString *M2MString_convertFromLongToString (const signed long number, M2MStrin
 	//===== Check argument =====
 	if (string!=NULL)
 		{
-		//===== 配列の初期化 =====
+		//===== Initialize array =====
 		memset(tmpBuffer, 0, sizeof(tmpBuffer));
 		//===== Convert from long to string =====
 		if (snprintf(tmpBuffer, sizeof(tmpBuffer), "%ld", number)>=0
 				&& (stringLength=M2MString_length(tmpBuffer))>0)
 			{
-			//===== ヒープメモリ領域の獲得 =====
+			//===== Get heap memory for copying =====
 			if (((*string)=(unsigned char *)M2MHeap_malloc(stringLength+1))!=NULL)
 				{
 				memcpy((*string), tmpBuffer, stringLength);
@@ -495,12 +495,13 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
 
 
 /**
- * 引数で指定された文字列を整数に変換する。<br>
+ * 引数で指定された文字列をロング整数に変換する。<br>
  *
- * @param string	整数を示す文字列
- * @return			文字列から変換した整数
+ * @param string		ロング整数を示す文字列
+ * @param stringLength	ロング整数を示す文字列のサイズ[Byte]
+ * @return				文字列から変換したロング整数
  */
-int M2MString_convertFromStringToInteger (const M2MString *string, const size_t stringLength)
+long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
@@ -523,13 +524,13 @@ int M2MString_convertFromStringToInteger (const M2MString *string, const size_t 
 
 
 /**
- * 引数で指定された文字列をロング整数に変換する。<br>
+ * Convert the argument string to integer number.<br>
  *
- * @param string		ロング整数を示す文字列
- * @param stringLength	ロング整数を示す文字列のサイズ[Byte]
- * @return				文字列から変換したロング整数
+ * @param[in] string		String indicating signed integer
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Integer converted from string
  */
-long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength)
+signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
@@ -613,7 +614,7 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 			//===== 日時を文字列へ変換 =====
 			strftime(buffer, bufferLength-1, "%Y/%m/%d %H:%M:%S:", localCalendar);
 			//===== マイクロ秒構造体を文字列へ変換 =====
-			if (M2MString_convertFromLongToString((currentTime.tv_usec/1000), &miliSecond)!=NULL)
+			if (M2MString_convertFromSignedLongToString((currentTime.tv_usec/1000), &miliSecond)!=NULL)
 				{
 				//===== 変換した文字列の長さの確認 =====
 				if ((miliSecondLength=M2MString_length(miliSecond))>0

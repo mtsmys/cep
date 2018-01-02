@@ -38,6 +38,7 @@
 #include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MLogger.h"
 #include "m2m/util/M2MBase64.h"
 #include <signal.h>
 #include <sqlite3.h>
@@ -55,7 +56,15 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * CEP処理に関わるディレクトリ
+ * @version
+ */
+#ifndef CEP_VERSION
+#define CEP_VERSION (M2MString *)"0.3.0"
+#endif /* CEP_VERSION */
+
+
+/**
+ * CEP working directory
  */
 #ifndef M2MCEP_DIRECTORY
 #define M2MCEP_DIRECTORY (M2MString *)".m2m/cep"
@@ -106,22 +115,31 @@ void M2MCEP_delete (M2MCEP **self);
 
 
 /**
- * 引数で指定されたCSV形式の文字列データをCEP用SQLite3データベースのテーブルに<br>
- * 挿入する．<br>
- * 内部の処理手順は下記の通りである．<br>
- * <br>
- * 1) CSV形式の文字列をパースし，CEPRecord構造体オブジェクトに取り込む．<br>
- * 2) 引数で指定されたテーブルにデータを挿入する．
- * 3) テーブルの現在のレコード数を確認し，規定値を超過した場合は古いレコードから<br>
- *    削除する．<br>
- * 4) 削除したレコードと同じデータをCEPRecord構造体オブジェクトから取得し，<br>
- *    永続化のためにファイルに記録しているSQLite3データベースに挿入する．<br>
- * 5) CEPRecord構造体オブジェクトのレコードから超過分を削除する．<br>
+ * Return CEP library version number string defined in "M2MCEP.h" file.<br>
  *
- * @param[in,out] self	CEP構造体オブジェクト
- * @param[in] tableName	データ挿入対象のテーブル名
- * @param[in] csv		挿入データであるCSV形式の文字列（1行目はヘッダとしてカラム名を指定する事）
- * @return				CEP用SQLite3データベースに挿入したレコードの行数[行] or 0（エラーの場合）
+ * @return	CEP library version number string
+ */
+M2MString *M2MCEP_getVersion ();
+
+
+/**
+ * Insert string in CSV format into the table of SQLite 3 database for CEP. <br>
+ * The internal processing procedure is as follows.<br>
+ * <br>
+ * 1) Parse CSV string and import into a CEPRecord structure object. <br>
+ * 2) Insert record data into the table of SQLite3 memory database. <br>
+ * 3) Check the current record number of the table of SQLite3 memory database, <br>
+ *    and delete it in the oldest order if it exceeds the specified <br>
+ *    maximum value. <br>
+ * 4) Fetch the same data as the deleted record from the CEPRecord <br>
+ *    structure object and insert it into the SQLite3 file database for <br>
+ *    persistence. <br>
+ * 5) Delete excess from record data of CEPRecord structure object. <br>
+ *
+ * @param[in,out] self	CEP structure object
+ * @param[in] tableName	String indicating the table name to be inserted record
+ * @param[in] csv		String in CSV format as insert data (the first line specifies the column name as a header)
+ * @return				Number of inserted records[row] or -1 (in case of error)
  */
 int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString *csv);
 

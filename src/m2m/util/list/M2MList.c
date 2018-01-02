@@ -483,7 +483,7 @@ unsigned int M2MList_length (M2MList *self)
 			//===== When the value is not held =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
 			//===== Confirm existence of value =====
 			while (M2MList_next(self)!=NULL)

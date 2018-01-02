@@ -43,8 +43,8 @@ extern "C"
 
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
-#include "m2m/util/logging/M2MLogger.h"
 #include <sqlite3.h>
+#include <stdbool.h>
 
 
 
@@ -56,8 +56,9 @@ extern "C"
  *
  * @param[in] database	SQLite3 database object to set automatic vacuum
  * @param[in] flag		true: Enable automatic vacuum, false: Disable automatic vacuum
+ * @return				true: success，false: failure
  */
-void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
+bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
 
 
 /**
@@ -65,16 +66,27 @@ void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
  * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
+ * @return					true: success，false: failure
  */
-void M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous);
+bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous);
 
 
 /**
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
+ * @return				true: success，false: failure
  */
-void M2MSQLiteConfig_setUTF8 (sqlite3 *database);
+bool M2MSQLiteConfig_setUTF8 (sqlite3 *database);
+
+
+/**
+ * Execute the VACUUM process to the indicated SQLite3 database.<br>
+ *
+ * @param database	SQLite3 database object to be vacuum
+ * @return			true: success，false: failure
+ */
+bool M2MSQLiteConfig_vacuum (sqlite3 *database);
 
 
 

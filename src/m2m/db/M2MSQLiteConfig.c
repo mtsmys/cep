@@ -38,53 +38,25 @@
  *
  * @param[in] database	SQLite3 database object to set automatic vacuum
  * @param[in] flag		true: Enable automatic vacuum, false: Disable automatic vacuum
+ * @return				true: success，false: failure
  */
-void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
+bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
 	//========== Variable ==========
 	const M2MString *PRAGMA_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 1 ";
 	const M2MString *PRAGMA_NOT_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 0 ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setAutoVacuum()";
 
-	//===== Check argument =====
-	if (database!=NULL)
+	//===== When automatic vacuum is enabled =====
+	if (flag==true)
 		{
-		//===== When automatic vacuum is enabled =====
-		if (flag==true)
-			{
-			//===== Execute SQL statement to enable automatic vacuum =====
-			if (M2MSQLRunner_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL)==true)
-				{
-				return;
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to automatic vacuum setting of SQLite 3 database", NULL);
-				return;
-				}
-			}
-		//===== When automatic vacuum is disabled =====
-		else
-			{
-			//===== Execute SQL statement to disable automatic vacuum =====
-			if (M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL)==true)
-				{
-				return;
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to automatic vacuum off setting of SQLite 3 database", NULL);
-				return;
-				}
-			}
+		//===== Execute SQL statement to disable automatic vacuum =====
+		return M2MSQLRunner_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL);
 		}
-	//===== Argument error =====
+	//===== When automatic vacuum is disabled =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
-		return;
+		//===== Execute SQL statement to disable automatic vacuum =====
+		return M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL);
 		}
 	}
 
@@ -94,48 +66,24 @@ void M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
  * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
+ * @return					true: success，false: failure
  */
-void M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
+bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
 	const M2MString *PRAGMA_SYNCHRONOUS_NORMAL_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
 	const M2MString *PRAGMA_SYNCHRONOUS_OFF_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous()";
 
-	//===== Check argument =====
-	if (database!=NULL)
+	//===== In the case of NORMAL mode =====
+	if (synchronous==true)
 		{
-		//===== In the case of NORMAL mode =====
-		if (synchronous==true
-				&& M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL)==true)
-			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Changed synchronous mode of SQLite 3 database to NORMAL");
-#endif // DEBUG
-			return;
-			}
-		//===== In the case of OFF mode =====
-		else if (synchronous==false
-				&& M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL)==true)
-			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Changed synchronous mode of SQLite 3 database to OFF");
-#endif // DEBUG
-			return;
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set SQLite3 database synchronous mode", NULL);
-			return;
-			}
+		return M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL);
 		}
-	//===== Argument error =====
+	//===== In the case of OFF mode =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
+		return M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL);
 		}
-	return;
 	}
 
 
@@ -143,34 +91,15 @@ void M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
+ * @return				true: success，false: failure
  */
-void M2MSQLiteConfig_setUTF8 (sqlite3 *database)
+bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	{
 	//========== Variable ==========
 	const M2MString *PRAGMA_ENCODING_SQL = (M2MString *)"PRAGMA encoding = 'UTF-8'";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setUTF8()";
 
-	//===== Check argument =====
-	if (database!=NULL)
-		{
-		//===== Execute SQL statement =====
-		if (M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL)==true)
-			{
-			return;
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set UTF-8 character code of SQLite3 database", NULL);
-			return;
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
-		return;
-		}
+	//===== Set UTF-8 to SQLite3 database =====
+	return M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL);
 	}
 
 
@@ -179,36 +108,31 @@ void M2MSQLiteConfig_setUTF8 (sqlite3 *database)
  *
  * @param[in] database		SQLite3 database object to be set as WAL
  * @param[in] synchronous	true: Sync mode, false: Asynchronous mode
+ * @return					true: success，false: failure
  */
-static void M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
+bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setWAL()";
 
-	//===== Check argument =====
-	if (database!=NULL)
-		{
-		//===== データベースのジャーナルモードを設定 =====
-		if (M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL)==true)
-			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Journal mode of SQLite 3 database set to WAL");
-#endif // DEBUG
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set WAL journal mode of SQLite 3 database", NULL);
-			return;
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
-		}
-	return;
+	//===== Set journal mode of SQLite3 database =====
+	return M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL);
+	}
+
+
+/**
+ * Execute the VACUUM process to the indicated SQLite3 database.<br>
+ *
+ * @param database	SQLite3 database object to be vacuum
+ * @return			true: success，false: failure
+ */
+bool M2MSQLiteConfig_vacuum (sqlite3 *database)
+	{
+	//========== Variable ==========
+	const M2MString *SQL = "VACUUM ";
+
+	//===== Vacuum SQLite3 database =====
+	return M2MSQLRunner_executeUpdate(database, SQL);
 	}
 
 

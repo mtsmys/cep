@@ -34,8 +34,9 @@
 
 
 
-#include "m2m/util/logging/M2MLogger.h"
+#include "m2m/lang/M2MString.h"
 #include <sqlite3.h>
+#include <stdbool.h>
 
 
 

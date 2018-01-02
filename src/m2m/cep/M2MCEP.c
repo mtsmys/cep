@@ -264,14 +264,6 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 static void this_updateRecordCounter (M2MCEP *self, const unsigned int count);
 
 
-/**
- * SQLite3データベースのバキューム処理を実行する．<br>
- *
- * @param database	バキューム処理対象のSQLite3データベース管理オブジェクト
- */
-static void this_vacuum (sqlite3 *database);
-
-
 
 /*******************************************************************************
  * Private function
@@ -420,7 +412,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLite3データベースに対してバキューム処理を実行します");
 #endif // DEBUG
 				//===== メモリ上のSQLite3データベースをバキューム =====
-				this_vacuum(this_getMemoryDatabase(self));
+				M2MSQLiteConfig_vacuum(this_getMemoryDatabase(self));
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLite3データベースに対してバキューム処理を実行しました");
 #endif // DEBUG
@@ -431,7 +423,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベースに対してバキューム処理を実行します");
 #endif // DEBUG
 					//===== ファイル上のSQLite3データベースをバキューム =====
-					this_vacuum(this_getFileDatabase(self));
+					M2MSQLiteConfig_vacuum(this_getFileDatabase(self));
 #ifdef DEBUG
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベースに対してバキューム処理を実行しました");
 #endif // DEBUG
@@ -597,7 +589,7 @@ static M2MString *this_createInsertSQL (const M2MString *tableName, const M2MStr
 	const size_t QUESTION_MARK_LENGTH = M2MString_length((M2MString *)M2MString_QUESTION_MARK);
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
 	const size_t PARAMETER_LENGTH = columnListLength * (QUESTION_MARK_LENGTH + COMMA_LENGTH);
-	unsigned char PARAMETER[PARAMETER_LENGTH];
+	M2MString PARAMETER[PARAMETER_LENGTH];
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_createInsertSQL()";
 
 	//===== Check argument =====
@@ -1301,7 +1293,7 @@ static unsigned int this_getRecordCounter (const M2MCEP *self)
  * @param sql
  * @return
  */
-static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const unsigned char *sql)
+static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const M2MString *sql)
 	{
 	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
@@ -2570,7 +2562,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 		else if (dataType==M2M_DATA_TYPE_INTEGER)
 			{
 			//=====  =====
-			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToInteger(value, valueLength))==SQLITE_OK)
+			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToSignedInteger(value, valueLength))==SQLITE_OK)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"\"INTEGER\"型データをセットしました");
@@ -2730,47 +2722,6 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 	}
 
 
-/**
- * SQLite3データベースのバキューム処理を実行する．<br>
- *
- * @param database	バキューム処理対象のSQLite3データベース管理オブジェクト
- */
-static void this_vacuum (sqlite3 *database)
-	{
-	//========== Variable ==========
-	const M2MString *SQL = "VACUUM ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_vacuum()";
-
-	//===== Check argument =====
-	if (database!=NULL)
-		{
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3データベースのバキューム処理を実行します");
-#endif // DEBUG
-		//===== データベースのバキューム処理を実行 =====
-		if (M2MSQLRunner_executeUpdate(database, SQL)==true)
-			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3データベースのバキューム処理を実行しました");
-#endif // DEBUG
-			return;
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3データベースのバキューム処理に失敗しました", NULL);
-			return;
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL", NULL);
-		}
-	return;
-	}
-
-
 /*******************************************************************************
  * Public function
  ******************************************************************************/
@@ -2822,31 +2773,41 @@ void M2MCEP_delete (M2MCEP **self)
 		// do nothing
 		}
 #ifdef DEBUG
-	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** End of CEP process **********");
+	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** Shutdown CEP library **********");
 #endif // DEBUG
 	return;
 	}
 
 
 /**
- * 引数で指定されたCSV形式の文字列データをメモリー上のSQLite3データベースのテーブル<br>
- * に挿入する．<br>
- * 内部の処理手順は下記の通りである．<br>
- * <br>
- * 1)CSV形式の文字列をパースし, CEPレコード情報オブジェクトに取り込む．<br>
- * 2)メモリー上のSQLite3データベース内の（引数で指定された）テーブルに, CEPデータを挿入する．<br>
- * 3)メモリー上のSQLite3データベースのテーブルの現在のレコード数を確認し, 規定値を<br>
- *   超過した場合は古いレコードから削除する．<br>
- * 4)メモリー上のSQLite3データベースのテーブルから削除したレコードと同じデータを<br>
- *   CEPレコード情報オブジェクトから取得し, （永続化のために）ファイル上のSQLite3<br>
- *   データベースに挿入する．<br>
- * 5)CEPレコード情報オブジェクトのレコードデータから, ファイル上のSQLite3データベース<br>
- *   に挿入して永続化した超過分のレコードを削除する．<br>
+ * Return CEP library version number string defined in "M2MCEP.h" file.
  *
- * @param[in,out] self	CEP構造体オブジェクト
- * @param[in] tableName	データ挿入対象のテーブル名
- * @param[in] csv		挿入データであるCSV形式の文字列（1行目はヘッダとしてカラム名を指定する事）
- * @return				メモリー上のSQLite3データベースに挿入したレコードの行数[行] or -1（エラーの場合）
+ * @return	CEP library version number string
+ */
+M2MString *M2MCEP_getVersion ()
+	{
+	return CEP_VERSION;
+	}
+
+
+/**
+ * Insert string in CSV format into the table of SQLite 3 database for CEP. <br>
+ * The internal processing procedure is as follows.<br>
+ * <br>
+ * 1) Parse CSV string and import into a CEPRecord structure object. <br>
+ * 2) Insert record data into the table of SQLite3 memory database. <br>
+ * 3) Check the current record number of the table of SQLite3 memory database, <br>
+ *    and delete it in the oldest order if it exceeds the specified <br>
+ *    maximum value. <br>
+ * 4) Fetch the same data as the deleted record from the CEPRecord <br>
+ *    structure object and insert it into the SQLite3 file database for <br>
+ *    persistence. <br>
+ * 5) Delete excess from record data of CEPRecord structure object. <br>
+ *
+ * @param[in,out] self	CEP structure object
+ * @param[in] tableName	String indicating the table name to be inserted record
+ * @param[in] csv		String in CSV format as insert data (the first line specifies the column name as a header)
+ * @return				Number of inserted records[row] or -1 (in case of error)
  */
 int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString *csv)
 	{
@@ -2857,22 +2818,22 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && csv!=NULL)
 		{
-		//===== レコード管理オブジェクトへCSV形式の文字列をセット =====
+		//===== Set CSV string to M2MCEPRecord object =====
 		if (M2MCEPRecord_setCSV(this_getCEPRecord(self), tableName, csv)>0)
 			{
-			//===== メモリ上のSQLite3データベースへレコード挿入 =====
+			//===== Insert record into SQLite3 memory database =====
 			if ((numberOfRecord=this_insertRecordListToMemoryDatabase(self))>=0)
 				{
-				//===== バキューム処理用のレコードカウンターを更新 =====
+				//===== Update record counters for vacuum processing =====
 				this_updateRecordCounter(self, numberOfRecord);
-				//===== メモリ上のSQLite3データベースのレコード数を調整 =====
+				//===== Adjust the number of records in SQLite3 database in memory =====
 				this_adjustMemoryDatabaseRecord(self, tableName);
-				//===== ファイル上のSQLite3データベースへレコード挿入 =====
+				//===== Insert record into SQLite3 file database for persistence =====
 				if (this_insertRecordListToFileDatabase(self)!=NULL)
 					{
-					//===== バキューム処理の有無確認 =====
+					//===== Execute vacuum processing to SQLite3 databases =====
 					this_checkRecordCounterForVacuum(self);
-					//===== レコード数を返す =====
+					//===== Return number of records =====
 					return numberOfRecord;
 					}
 				//===== Error handling =====
@@ -2931,7 +2892,7 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_new()";
 
 #ifdef DEBUG
-	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** CEPライブラリ起動 **********");
+	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** Startup CEP library **********");
 #endif // DEBUG
 	//===== Check argument =====
 	if (databaseName!=NULL && tableManager!=NULL)
@@ -3094,7 +3055,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 					//===== SELECT結果データの列のデータ型で分岐 =====
 					if ((sqliteColumnType=sqlite3_column_type(statement, i))==SQLITE_INTEGER)
 						{
-						if (M2MString_convertFromIntegerToString(sqlite3_column_int(statement, i), &data)!=NULL)
+						if (M2MString_convertFromSignedIntegerToString(sqlite3_column_int(statement, i), &data)!=NULL)
 							{
 							//===== 整数データ文字列を付加 =====
 							M2MString_append(result, data);

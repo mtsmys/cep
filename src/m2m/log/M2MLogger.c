@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "m2m/util/logging/M2MLogger.h"
+#include "m2m/log/M2MLogger.h"
 
 
 /*******************************************************************************
@@ -155,7 +155,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 	//========== Variable ==========
 	M2MString time[128];
 	M2MString lineNumberString[16];
-	unsigned char buffer[256];
+	M2MString buffer[256];
 	size_t errorMessageLength = 0;
 	size_t timeLength = 0;
 	size_t methodNameLength = 0;
