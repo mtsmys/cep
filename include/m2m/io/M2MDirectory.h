@@ -55,9 +55,9 @@ extern "C"
 /**
  * Directory name related to M2M processing(=".m2m")
  */
-#ifndef M2MDIRECTORY
-#define M2MDIRECTORY (M2MString *)".m2m"
-#endif /* M2MDIRECTORY */
+#ifndef M2MDirectory_DIRECTORY_NAME
+#define M2MDirectory_DIRECTORY_NAME (M2MString *)".m2m"
+#endif /* M2MDirectory_DIRECTORY_NAME */
 
 
 /**

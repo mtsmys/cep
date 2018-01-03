@@ -86,7 +86,7 @@ size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLeng
 		if ((repeatNumber=(stringLength-chunkLength)/M2MBase64_FOUR_WORD)>0)
 			{
 			//===== Check existing of padding =====
-			switch (M2MString_length(M2MString_indexOf(string, (M2MString *)"=")))
+			switch (M2MString_length(M2MString_indexOf(string, M2MString_EQUAL)))
 				{
 				//===== There is no padding =====
 				case 0:
@@ -265,7 +265,7 @@ M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M
 			//===== Adding padding character ("=") =====
 			for (i=0; i<=(stringLength-index); i++)
 				{
-				memcpy(&((*string)[index]), (M2MString *)"=", 1);
+				memcpy(&((*string)[index]), M2MString_EQUAL, 1);
 				index++;
 				}
 			//===== Return encoded Base64 string =====

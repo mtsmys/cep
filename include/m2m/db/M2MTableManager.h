@@ -35,6 +35,11 @@
 
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/db/M2MColumnList.h"
+#include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MLogger.h"
+#include <sqlite3.h>
+#include <stdio.h>
+#include <string.h>
 
 
 
@@ -63,7 +68,7 @@ typedef struct M2MTableManager
 	{
 	struct M2MTableManager *previous;
 	struct M2MTableManager *next;
-	unsigned char *tableName;
+	M2MString *tableName;
 	M2MColumnList *columnList;
 	} M2MTableManager;
 #endif /* M2MTableManager */
@@ -97,18 +102,7 @@ void M2MTableManager_delete (M2MTableManager **self);
  * @param tableName	テーブル名を示す文字列
  * @return			テーブル名が一致したカラム構造体オブジェクト or NULL（エラーの場合)
  */
-M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const unsigned char *tableName);
-
-
-/**
- * 引数で指定されたテーブル名に対し、テーブル情報（フィールド名）を表示するための<br>
- * SQL文を構築し、引数で指定されたポインタにコピーする。<br>
- *
- * @param[in] tableName	テーブル名を示す文字列
- * @param[out] sql		SQL文をコピーするためのポインタ（バッファリングは関数内部で実行する）
- * @return				引数のポインタにコピーした文字列 or NULL（エラーの場合）
- */
-unsigned char *M2MTableManager_getTableInfoSQL (const unsigned char *tableName, unsigned char **sql);
+M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MString *tableName);
 
 
 /**
@@ -128,7 +122,7 @@ M2MTableManager *M2MTableManager_new ();
  * @param[in] columnList	カラム設定情報を格納したカラム構造体オブジェクト
  * @return					カラム設定情報を含むテーブル構築オブジェクト or NULL（エラーの場合)
  */
-M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const unsigned char *tableName, M2MColumnList *columnList);
+M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MString *tableName, M2MColumnList *columnList);
 
 
 

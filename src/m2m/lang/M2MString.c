@@ -291,17 +291,15 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 	const size_t CRLF_LENGTH = M2MString_length(M2MString_CRLF);
 
 	//===== Check argument =====
-	if (self!=NULL && string!=NULL)
+	if (self!=NULL && M2MString_length(self)>0
+			&& string!=NULL)
 		{
-		//===== 文字列中にCRLFが1つでも存在する（補正は実行しない)場合 =====
+		//===== When there is even one CRLF in the string (correction is not executed) =====
 		if ((lineEnd=M2MString_indexOf(self, M2MString_CRLF))!=NULL)
 			{
-			//===== 出力データのヒープメモリ領域を獲得 =====
-			if (((*string)=(M2MString *)M2MHeap_malloc(M2MString_length(self)))!=NULL)
+			//===== Copy original string as it is =====
+			if (M2MString_append(string, self)!=NULL)
 				{
-				//===== 入力データをそのままコピー =====
-				memcpy((*string), self, M2MString_length(self));
-				//===== 出力データを返す =====
 				return (*string);
 				}
 			//===== Error handling =====
@@ -318,7 +316,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 			//===== LFが無くなるまで探索を繰り返し =====
 			while ((lineEnd=M2MString_indexOf(lineStart, M2MString_LF))!=NULL)
 				{
-				//===== 文字列データが存在する場合 =====
+				//===== When string data exists in one line =====
 				if ((lineLength=M2MString_length(lineStart)-M2MString_length(lineEnd))>0)
 					{
 					//===== 文字列データをコピー =====
@@ -332,7 +330,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 					//===== CRLFを追加 =====
 					M2MString_append(string, M2MString_CRLF);
 					}
-				//===== ポインタを次の行の先頭へ移動 =====
+				//===== Move the pointer to the beginning of the next line =====
 				lineEnd += LF_LENGTH;
 				lineStart = lineEnd;
 				}
@@ -352,7 +350,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 			}
 		}
 	//===== Argument error =====
-	else if (self==NULL)
+	else if (self==NULL || M2MString_length(self)<=0)
 		{
 		return NULL;
 		}

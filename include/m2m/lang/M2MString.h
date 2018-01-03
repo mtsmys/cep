@@ -53,7 +53,7 @@ extern "C"
  * Class variable
  ******************************************************************************/
 /**
- * String type（＝unsigned char）
+ * String type (=unsigned char)
  */
 #ifndef M2MString
 typedef unsigned char M2MString;
@@ -61,58 +61,66 @@ typedef unsigned char M2MString;
 
 
 /**
- * COMMA（＝","）
+ * COMMA (=",")
  */
 #ifndef M2MString_COMMA
-#define M2MString_COMMA (unsigned char *)","
+#define M2MString_COMMA (M2MString *)","
 #endif /* M2MString_COMMA */
 
 
 /**
- * Line feed and carriage return（＝"\r\n"）
+ * Line feed and carriage return (="\r\n")
  */
 #ifndef M2MString_CRLF
-#define M2MString_CRLF (unsigned char *)"\r\n"
+#define M2MString_CRLF (M2MString *)"\r\n"
 #endif /* M2MString_CRLF */
 
 
 /**
- * Double quotation（＝"\"")
+ * Double quotation (="\"")
  */
 #ifndef M2MString_DOUBLE_QUOTATION
-#define M2MString_DOUBLE_QUOTATION (unsigned char *)"\""
+#define M2MString_DOUBLE_QUOTATION (M2MString *)"\""
 #endif /* M2MString_DOUBLE_QUOTATION */
 
 
 /**
- * Line feed（＝"\n"）
+ * Equal (="=")
+ */
+#ifndef M2MString_EQUAL
+#define M2MString_EQUAL (M2MString *)"="
+#endif /* M2MString_EQUAL */
+
+
+/**
+ * Line feed (="\n")
  */
 #ifndef M2MString_LF
-#define M2MString_LF (unsigned char *)"\n"
+#define M2MString_LF (M2MString *)"\n"
 #endif /* M2MString_LF */
 
 
 /**
- * Question mark（＝"?")
+ * Question mark (="?")
  */
 #ifndef M2MString_QUESTION_MARK
-#define M2MString_QUESTION_MARK (unsigned char *)"?"
+#define M2MString_QUESTION_MARK (M2MString *)"?"
 #endif /* M2MString_QUESTION_MARK */
 
 
 /**
- * Quotation（＝"'")
+ * Quotation (="'")
  */
 #ifndef M2MString_QUOTATION
-#define M2MString_QUOTATION (unsigned char *)"'"
+#define M2MString_QUOTATION (M2MString *)"'"
 #endif /* M2MString_QUOTATION */
 
 
 /**
- * White space（＝" "）
+ * White space (=" ")
  */
 #ifndef M2MString_SPACE
-#define M2MString_SPACE (unsigned char *)" "
+#define M2MString_SPACE (M2MString *)" "
 #endif /* M2MString_SPACE */
 
 
@@ -125,7 +133,7 @@ typedef unsigned char M2MString;
  * Memory allocation is executed in this function, so caller must release<br>
  * the memory of "self" string.<br>
  *
- * @param[in,out] self	The original string or NULL（"self" = "self + string")
+ * @param[in,out] self	The original string or NULL("self" = "self + string")
  * @param[in] string	additional string
  * @return				Pointer of connected string or NULL (in case of error)
  */
@@ -171,8 +179,8 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
  * 引数で指定された文字列に対し，改行コードをLFからCRLFに変換して返す．<br>
  *
  * @param[in] self		The original string to convert line feed code
- * @param[out] string	改行コードを補正したCSV形式の文字列を格納するポインタ（バッファリング自体は関数内部で実行)
- * @return				改行コードを補正したCSV形式の文字列ポインタ or NULL（エラーの場合)
+ * @param[out] string	改行コードを補正したCSV形式の文字列を格納するポインタ(バッファリング自体は関数内部で実行)
+ * @return				改行コードを補正したCSV形式の文字列ポインタ or NULL(エラーの場合)
  */
 M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **string);
 
@@ -264,7 +272,7 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
  *
  * @param[in] string	検索対象の文字列
  * @param[in] keyword	キーワード文字列
- * @return				検索対象の文字列のうち, キーワード開始位置を示すポインタ or NULL（エラーの場合）
+ * @return				検索対象の文字列のうち, キーワード開始位置を示すポインタ or NULL(エラーの場合)
  */
 M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword);
 
@@ -276,7 +284,7 @@ M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
  *
  * @param string	比較対象の文字列
  * @param fromIndex	検出用文字列
- * @return			検出された位置のポインタ or NULL（検出出来なかった場合）
+ * @return			検出された位置のポインタ or NULL(検出出来なかった場合)
  */
 M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *fromIndex);
 
@@ -284,14 +292,14 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *from
 /**
  * 引数で指定された文字列の長さを取得して返す。<br>
  *
- * @param[in] string	文字列（必ずヌル終端とする事）
- * @return				文字列の長さ or 0（エラーの場合）
+ * @param[in] string	文字列(必ずヌル終端とする事)
+ * @return				文字列の長さ or 0(エラーの場合)
  */
 size_t M2MString_length (const M2MString *string);
 
 
 /**
- * 引数で指定されたソース文字列（＝"string"）に対し, 分割用文字列（＝"delimiter"）<br>
+ * 引数で指定されたソース文字列 (="string")に対し, 分割用文字列 (="delimiter")<br>
  * で分割した結果を返す。<br>
  * 連続して取得する場合, 初回のみソース文字列を指定し, 次回以降はソース文字列に<br>
  * NULLを指定する。<br>
@@ -300,8 +308,8 @@ size_t M2MString_length (const M2MString *string);
  *
  * @param[in] string		分割処理対象のソース文字列
  * @param[in] delimiter		分割文字列
- * @param[in] savePointer	分割処理が施されたソース文字列のコピー用バッファ（毎回同じ変数を渡す事）
- * @return					分割されたソース文字列（の断片に該当する文字列）
+ * @param[in] savePointer	分割処理が施されたソース文字列のコピー用バッファ(毎回同じ変数を渡す事)
+ * @return					分割されたソース文字列 (の断片に該当する文字列)
  *
 M2MString *M2MString_split (M2MString *string, const M2MString *delimiter, M2MString **savePoint);
 */

@@ -34,11 +34,58 @@
  * Public function
  ******************************************************************************/
 /**
+ * Create SQL statement for displaying table information, and copy to the pointer.<br>
+ *
+ * @param[in] tableName	String indicating table name
+ * @param[out] sql		Pointer for copying the SQL statement (buffering is executed inside the function)
+ * @return				String copied to pointer or NULL (in case of error)
+ */
+M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MString **sql)
+	{
+	//========== Variable ==========
+	size_t tableNameLength = 0;
+	const M2MString *FORMAT = (M2MString *)"PRAGMA table_info(%s)";
+	const size_t FORMAT_LENGTH = M2MString_length(FORMAT);
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_getTableInfoSQL";
+
+	//===== Check argument =====
+	if (tableName!=NULL && (tableNameLength=M2MString_length(tableName))>0
+			&& sql!=NULL)
+		{
+		//===== Get heap memory for copying SQL string =====
+		if (((*sql)=(M2MString *)M2MHeap_malloc(FORMAT_LENGTH+tableNameLength+1))!=NULL)
+			{
+			//===== Copy SQL string =====
+			snprintf((*sql), FORMAT_LENGTH+tableNameLength, FORMAT, tableName);
+			return (*sql);
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying SQL string", NULL);
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (tableName==NULL || tableNameLength<=0)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
  * Set the auto-vacuum status in the SQLite3 database.<br>
  *
  * @param[in] database	SQLite3 database object to set automatic vacuum
  * @param[in] flag		true: Enable automatic vacuum, false: Disable automatic vacuum
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
@@ -89,7 +136,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
  * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
- * @return					true: success，false: failure
+ * @return					true: success, false: failure
  */
 bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	{
@@ -139,7 +186,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	{
@@ -169,7 +216,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
  *
  * @param[in] database		SQLite3 database object to be set as WAL
  * @param[in] synchronous	true: Sync mode, false: Asynchronous mode
- * @return					true: success，false: failure
+ * @return					true: success, false: failure
  */
 bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	{
@@ -198,7 +245,7 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
  * Execute the VACUUM process to the indicated SQLite3 database.<br>
  *
  * @param database	SQLite3 database object to be vacuum
- * @return			true: success，false: failure
+ * @return			true: success, false: failure
  */
 bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	{

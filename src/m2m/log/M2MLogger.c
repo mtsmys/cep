@@ -75,6 +75,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 	size_t methodNameLength = 0;
 	size_t lineNumberLength = 0;
 	size_t messageLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MLogger.this_createNewDebugMessage()";
 
 	//===== Check argument =====
 	if (methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
@@ -101,7 +102,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 			//===== Error handling ======
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"Failed to get heap memory for copying the debug message string", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying the debug message string", NULL);
 				return NULL;
 				}
 			}
@@ -118,7 +119,7 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 			//===== Error handling ======
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"Failed to get heap memory for copying the debug message string", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying the debug message string", NULL);
 				return NULL;
 				}
 			}
@@ -126,12 +127,12 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 	//===== Argument error =====
 	else if (methodName==NULL || methodNameLength<=0)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"Argument error! Indicated \"methodName\" is NULL", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"methodName\" is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MLogger.this_createNewDebugMessage()", __LINE__, (M2MString *)"Argument error! Indicated \"message\" is NULL", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"message\" is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -280,20 +281,19 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 	const M2MString *HOME_DIRECTORY = M2MDirectory_getHomeDirectoryPath();
 	const size_t HOME_DIRECTORY_LENGTH = M2MString_length(HOME_DIRECTORY);
 	const size_t SEPARATOR_LENGTH = M2MString_length(M2MDirectory_SEPARATOR);
-	const size_t DIRECTORY_NAME_LENGTH = M2MString_length(M2MDIRECTORY);
+	const size_t DIRECTORY_NAME_LENGTH = M2MString_length(M2MDirectory_DIRECTORY_NAME);
 	const size_t LOG_FILE_NAME_LENGTH = M2MString_length(logFileName);
 	M2MString LOG_FILE_DIRECTORY[HOME_DIRECTORY_LENGTH+SEPARATOR_LENGTH+DIRECTORY_NAME_LENGTH+2];
 	M2MString LOG_FILE_PATH[HOME_DIRECTORY_LENGTH+SEPARATOR_LENGTH+DIRECTORY_NAME_LENGTH+SEPARATOR_LENGTH+LOG_FILE_NAME_LENGTH+2];
-	const M2MString *PERMISSION = (M2MString *)"0755";
 
 	//===== Get log file directory pathname =====
 	memset(LOG_FILE_DIRECTORY, 0, sizeof(LOG_FILE_DIRECTORY));
-	snprintf(LOG_FILE_DIRECTORY, sizeof(LOG_FILE_DIRECTORY), (M2MString *)"%s/%s", HOME_DIRECTORY, M2MDIRECTORY);
+	snprintf(LOG_FILE_DIRECTORY, sizeof(LOG_FILE_DIRECTORY), (M2MString *)"%s/%s", HOME_DIRECTORY, M2MDirectory_DIRECTORY_NAME);
 	//===== Check the existence of directory =====
 	if (M2MDirectory_exists(LOG_FILE_DIRECTORY)==true)
 		{
 		memset(LOG_FILE_PATH, 0, sizeof(LOG_FILE_PATH));
-		snprintf(LOG_FILE_PATH, sizeof(LOG_FILE_PATH), (M2MString *)"%s/%s/%s", HOME_DIRECTORY, M2MDIRECTORY, logFileName);
+		snprintf(LOG_FILE_PATH, sizeof(LOG_FILE_PATH), (M2MString *)"%s/%s/%s", HOME_DIRECTORY, M2MDirectory_DIRECTORY_NAME, logFileName);
 		//===== Open log file =====
 		if ((file=M2MFile_open(LOG_FILE_PATH, true))!=NULL)
 			{
@@ -319,10 +319,10 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 	else
 		{
 		//===== Create new log file =====
-		if (M2MDirectory_mkdirs(LOG_FILE_DIRECTORY, PERMISSION)==true)
+		if (M2MDirectory_mkdirs(LOG_FILE_DIRECTORY, M2MLogger_LOG_FILE_PERMISSION)==true)
 			{
 			memset(LOG_FILE_PATH, 0, sizeof(LOG_FILE_PATH));
-			snprintf(LOG_FILE_PATH, sizeof(LOG_FILE_PATH), (M2MString *)"%s/%s/%s", HOME_DIRECTORY, M2MDIRECTORY, logFileName);
+			snprintf(LOG_FILE_PATH, sizeof(LOG_FILE_PATH), (M2MString *)"%s/%s/%s", HOME_DIRECTORY, M2MDirectory_DIRECTORY_NAME, logFileName);
 			//===== Open log file =====
 			if ((file=M2MFile_open(LOG_FILE_PATH, true))!=NULL)
 				{
@@ -354,13 +354,13 @@ static FILE *this_getLogFile (const M2MString *logFileName)
 
 
 /**
- * Return the log file name string(="m2m.log").<br>
+ * Return the default log file name string.<br>
  *
  * @return	Log file name string
  */
 static M2MString *this_getLogFileName ()
 	{
-	return (M2MString *)"m2m.log";
+	return M2MLogger_DEFAULT_LOG_FILE_NAME;
 	}
 
 

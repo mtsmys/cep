@@ -65,11 +65,21 @@ extern "C"
  * Public function
  ******************************************************************************/
 /**
+ * Create SQL statement for displaying table information, and copy to the pointer.<br>
+ *
+ * @param[in] tableName	String indicating table name
+ * @param[out] sql		Pointer for copying the SQL statement (buffering is executed inside the function)
+ * @return				String copied to pointer or NULL (in case of error)
+ */
+M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MString **sql);
+
+
+/**
  * Set the auto-vacuum status in the SQLite3 database.<br>
  *
  * @param[in] database	SQLite3 database object to set automatic vacuum
  * @param[in] flag		true: Enable automatic vacuum, false: Disable automatic vacuum
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
 
@@ -79,7 +89,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag);
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
  * @param[in] synchronous	true: Synchronous mode = NORMAL, false: Synchronous mode = OFF
- * @return					true: success，false: failure
+ * @return					true: success, false: failure
  */
 bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous);
 
@@ -88,7 +98,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous);
  * Set the character code of the database to UTF-8.<br>
  *
  * @param[in] database	SQLite3 database object to set character code to UTF-8
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLiteConfig_setUTF8 (sqlite3 *database);
 
@@ -97,7 +107,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database);
  * Execute the VACUUM process to the indicated SQLite3 database.<br>
  *
  * @param database	SQLite3 database object to be vacuum
- * @return			true: success，false: failure
+ * @return			true: success, false: failure
  */
 bool M2MSQLiteConfig_vacuum (sqlite3 *database);
 
