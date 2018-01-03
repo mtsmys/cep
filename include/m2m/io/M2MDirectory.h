@@ -35,10 +35,13 @@
 
 #include "m2m/lang/M2MString.h"
 #include <dirent.h>
+#include <fcntl.h>
 #include <fts.h>
-#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 
 
@@ -53,7 +56,7 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * Directory name related to M2M processing(=".m2m")
+ * Directory name related to M2M processing (=".m2m")
  */
 #ifndef M2MDirectory_DIRECTORY_NAME
 #define M2MDirectory_DIRECTORY_NAME (M2MString *)".m2m"
@@ -61,7 +64,7 @@ extern "C"
 
 
 /**
- * Pathname division character(＝"/")<br>
+ * Pathname division character (="/")
  */
 #ifndef M2MDirectory_SEPARATOR
 #define M2MDirectory_SEPARATOR (M2MString *)"/"
@@ -75,8 +78,8 @@ extern "C"
 /**
  * Tests whether the directory denoted by this abstract pathname exists.<br>
  *
- * @param directoryPath	Directory pathname string
- * @return				true: if the directory exists, false: otherwise
+ * @param[in] directoryPath	Directory pathname string
+ * @return					true: if the directory exists, false: otherwise
  */
 bool M2MDirectory_exists (const M2MString *directoryPath);
 
@@ -92,8 +95,8 @@ M2MString *M2MDirectory_getHomeDirectoryPath ();
 /**
  * Tests whether the pathname is directory.<br>
  *
- * @param directoryPath	String indicating the directory pathname
- * @return				true: if the pathname is directory, false: otherwise
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @return					true: if the pathname is directory, false: otherwise
  */
 bool M2MDirectory_isDirectory (const M2MString *directoryPath);
 

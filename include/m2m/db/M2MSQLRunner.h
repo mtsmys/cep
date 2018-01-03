@@ -52,10 +52,10 @@ extern "C"
  * Public method
  ******************************************************************************/
 /**
- * This function starts transaction with indicated SQLite3 database as an argument.<br>
+ * This function starts transaction with indicated SQLite3 database as argument.<br>
  *
  * @param[in] database	SQLite3 database manager object
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLRunner_beginTransaction (sqlite3 *database);
 
@@ -64,7 +64,7 @@ bool M2MSQLRunner_beginTransaction (sqlite3 *database);
  * Commit the transaction of the specified SQLite3 database object.<br>
  *
  * @param[in] database	SQLite3 database manager object
- * @return				true: success，false: failure
+ * @return				true: success, false: failure
  */
 bool M2MSQLRunner_commitTransaction (sqlite3 *database);
 
@@ -76,9 +76,9 @@ bool M2MSQLRunner_commitTransaction (sqlite3 *database);
  * This function needs many times, so don't use this for "INSERT" SQL or <br>
  * "UPDATE" SQL.<br>
  *
- * @param[in] database	SQLite3 database manager object
- * @param[in] sql		SQL string
- * @return				true: success，false: failuer
+ * @param database	SQLite3 database manager object
+ * @param sql		SQL string
+ * @return			true: success, false: failuer
  */
 bool M2MSQLRunner_executeUpdate (sqlite3 *database, const M2MString *sql);
 

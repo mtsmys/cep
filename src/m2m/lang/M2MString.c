@@ -31,14 +31,62 @@
 
 
 /*******************************************************************************
+ * Private function
+ ******************************************************************************/
+/**
+ * Print out error message to standard error output.<br>
+ *
+ * @param[in] methodName	String indicating function name
+ * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message		Message string indicating error content
+ */
+static void this_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	const size_t TIME_LENGTH = 128;
+	M2MString TIME[TIME_LENGTH];
+	const size_t ERROR_MESSAGE_LENGTH = 256;
+	M2MString errorMessage[ERROR_MESSAGE_LENGTH];
+
+	//===== Check argument =====
+	if (methodName!=NULL && M2MString_length(methodName)>0
+			&& message!=NULL && M2MString_length(message)>0)
+		{
+		//===== Initialize buffer =====
+		memset(TIME, 0, TIME_LENGTH);
+		memset(errorMessage, 0, ERROR_MESSAGE_LENGTH);
+		//===== Get local time string =====
+		if (M2MString_getLocalTime(TIME, TIME_LENGTH)>0)
+			{
+			fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s\n", TIME, methodName, lineNumber, message);
+			}
+		//===== Error handling =====
+		else
+			{
+			// do nothing
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		// do nothing
+		}
+	return;
+	}
+
+
+
+/*******************************************************************************
  * Public function
  ******************************************************************************/
 /**
- * Add the argument string after the self string.<br>
+ * This function adds "string" into after the "self" string.<br>
+ * Memory allocation is executed in this function, so caller must release<br>
+ * the memory of "self" string.<br>
  *
- * @param[in,out] self	Base string for adding (string after addition: self = self + string)
- * @param[in] string	Additional string
- * @return				Pointer of the buffer to which the string was added or NULL (means error)
+ * @param[in,out] self	The original string or NULL("self" = "self + string")
+ * @param[in] string	additional string
+ * @return				Pointer of connected string or NULL (in case of error)
  */
 M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	{
@@ -46,9 +94,11 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	M2MString *tmp = NULL;
 	size_t selfLength = 0;
 	size_t stringLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_append()";
 
 	//===== Check argument =====
-	if (self!=NULL && string!=NULL && (stringLength=M2MString_length(string))>0)
+	if (self!=NULL
+			&& string!=NULL && (stringLength=M2MString_length(string))>0)
 		{
 		//===== In the case of concatenation string existing =====
 		if ((*self)!=NULL)
@@ -76,12 +126,14 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 				else
 					{
 					M2MHeap_free(tmp);
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
 				return NULL;
 				}
 			}
@@ -99,6 +151,7 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
@@ -106,10 +159,12 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
 		return NULL;
 		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -129,6 +184,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	//========== Variable ==========
 	M2MString *tmp = NULL;
 	size_t thisLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_appendLength()";
 
 	//===== Check argument =====
 	if (self!=NULL && string!=NULL && 0<stringLength && stringLength<=M2MString_length(string))
@@ -159,12 +215,14 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 				else
 					{
 					M2MHeap_free(tmp);
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
 				return NULL;
 				}
 			}
@@ -182,6 +240,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
@@ -189,10 +248,12 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	//===== Argument error =====
 	else if (self==NULL)
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
 		return NULL;
 		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or \"stringLength\" is invalid");
 		return NULL;
 		}
 	}
@@ -201,23 +262,31 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 /**
  * Compares the two strings specified by the argument and returns the result.<br>
  *
- * @param[in] self		One string to be compared
+ * @param[in] self		The original string to be compared
  * @param[in] string	Another string to be compared
- * @return				0：two are equal, negative：In case of self < string, positive：In case of self > string
+ * @return				0: two are equal, negative: In case of self < string, positive: In case of self > string
  */
 signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
 	//========== Variable ==========
-	size_t thisLength = 0;
+	size_t selfLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_appendLength()";
 
 	//===== Check argument =====
-	if (self!=NULL && (thisLength=M2MString_length(self))>0 && string!=NULL)
+	if (self!=NULL && (selfLength=M2MString_length(self))>0
+			&& string!=NULL)
 		{
-		return memcmp(self, string, thisLength);
+		return memcmp(self, string, selfLength);
 		}
 	//===== Argument error =====
+	else if (self==NULL || selfLength<=0)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
+		return -1;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
 		return -1;
 		}
 	}
@@ -238,6 +307,7 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromDoubleToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -257,29 +327,32 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert double number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定された入力データに対し, 文字コードをCRLFに変換して返す．<br>
+ * Convert the line feed code from LF to CRLF for the argument string.<br>
  *
- * @param[in] self		入力ファイルから取得した文字列
- * @param[out] string	改行コードを補正したCSV形式の文字列を格納するポインタ（バッファリング自体は関数内部で実行)
- * @return				改行コードを補正したCSV形式の文字列ポインタ or NULL（エラーの場合)
+ * @param[in] self		The original string to convert line feed code
+ * @param[out] string	Pointer to store string corrected line feed code (buffering itself is executed inside the function)
+ * @return				Pointer of CSV string with corrected line feed code or NULL (in case of error)
  */
 M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **string)
 	{
@@ -289,6 +362,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 	size_t lineLength = 0;
 	const size_t LF_LENGTH = M2MString_length(M2MString_LF);
 	const size_t CRLF_LENGTH = M2MString_length(M2MString_CRLF);
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromLFToCRLF()";
 
 	//===== Check argument =====
 	if (self!=NULL && M2MString_length(self)>0
@@ -305,57 +379,60 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to append string");
 				return NULL;
 				}
 			}
-		//===== 文字列中にCRLFが1つも存在しない（補正を実行する)場合 =====
+		//===== When there is no CRLF in the string (to execute correction) =====
 		else
 			{
-			//===== 入力データの先頭位置を取得 =====
+			//===== Get the start position of input data =====
 			lineStart = (M2MString *)self;
-			//===== LFが無くなるまで探索を繰り返し =====
+			//===== Repeat search until LF disappears =====
 			while ((lineEnd=M2MString_indexOf(lineStart, M2MString_LF))!=NULL)
 				{
 				//===== When string data exists in one line =====
 				if ((lineLength=M2MString_length(lineStart)-M2MString_length(lineEnd))>0)
 					{
-					//===== 文字列データをコピー =====
+					//===== Copy string data =====
 					M2MString_appendLength(string, lineStart, lineLength);
-					//===== CRLFを追加 =====
+					//===== Add CRLF =====
 					M2MString_appendLength(string, M2MString_CRLF, CRLF_LENGTH);
 					}
-				//===== 文字列データが存在しない場合 =====
+				//===== When string data doesn't exist =====
 				else
 					{
-					//===== CRLFを追加 =====
+					//===== Add CRLF =====
 					M2MString_append(string, M2MString_CRLF);
 					}
 				//===== Move the pointer to the beginning of the next line =====
 				lineEnd += LF_LENGTH;
 				lineStart = lineEnd;
 				}
-			//===== 最後の行の文字列データが存在する場合 =====
+			//===== When string data of the last line exists =====
 			if ((lineLength=M2MString_length(lineStart))>0)
 				{
-				//===== 文字列データをコピー =====
+				//===== Copy string data =====
 				M2MString_appendLength(string, lineStart, lineLength);
 				}
-			//===== 最後の行の文字列データが存在しない場合 =====
+			//===== When string data of the last line doesn't exist =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== 出力データを返す =====
+			//===== Return output data =====
 			return (*string);
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL || M2MString_length(self)<=0)
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -367,7 +444,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
  * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
  * leak after using the string. <br>
  *
- * @param[in] number	signed integer number to be converted
+ * @param[in] number	Signed integer number to be converted
  * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
  * @return				Copied string or NULL (in case of error)
  */
@@ -376,6 +453,7 @@ M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, 
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromSignedIntegerToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -395,18 +473,21 @@ M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, 
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert integer number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -418,7 +499,7 @@ M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, 
  * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
  * leak after using the string. <br>
  *
- * @param[in] number	signed long number to be converted
+ * @param[in] number	Signed long number to be converted
  * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
  * @return				Copied string or NULL (in case of error)
  */
@@ -427,6 +508,7 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromSignedLongToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -446,76 +528,85 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert long integer number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定された文字列を実数に変換する。<br>
+ * Convert the argument string to double number.<br>
  *
- * @param string		実数を示す文字列
- * @param stringLength	実数を示す文字列のサイズ[Byte]
- * @return				文字列から変換した実数
+ * @param[in] string		String indicating double integer
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Double converted from string
  */
 double M2MString_convertFromStringToDouble (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
-	unsigned char STRING_ARRAY[stringLength+1];
+	M2MString STRING_ARRAY[stringLength+1];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToDouble()";
 
 	//===== Check argument =====
-	if (stringLength<=M2MString_length(string))
+	if (string!=NULL && stringLength<=M2MString_length(string))
 		{
-		//===== 変換バッファに文字列をコピー =====
+		//===== Initialize buffer =====
 		memset(STRING_ARRAY, 0, sizeof(STRING_ARRAY));
+		//===== Copy string to buffer =====
 		memcpy(STRING_ARRAY, string, stringLength);
-		//===== 文字列を実数に変換 =====
+		//===== Convert string to double number =====
 		return strtod(STRING_ARRAY, NULL);
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
 		return (double)-1;
 		}
 	}
 
 
 /**
- * 引数で指定された文字列をロング整数に変換する。<br>
+ * Convert the argument string to long integer number.<br>
  *
- * @param string		ロング整数を示す文字列
- * @param stringLength	ロング整数を示す文字列のサイズ[Byte]
- * @return				文字列から変換したロング整数
+ * @param[in] string		String indicating signed long integer
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Signed long integer converted from string
  */
 long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToLong()";
 
 	//===== Check argument =====
-	if (stringLength<=M2MString_length(string))
+	if (string!=NULL && stringLength<=M2MString_length(string))
 		{
-		//===== 変換バッファに文字列をコピー =====
+		//===== Initialize buffer =====
 		memset(STRING_ARRAY, 0, sizeof(STRING_ARRAY));
+		//===== Copy string to buffer =====
 		memcpy(STRING_ARRAY, string, stringLength);
-		//===== 文字列を整数に変換 =====
+		//===== Convert string to long number =====
 		return atoi(STRING_ARRAY);
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
 		return (int)-1;
 		}
 	}
@@ -526,71 +617,87 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
  *
  * @param[in] string		String indicating signed integer
  * @param[in] stringLength	Size of string[Byte]
- * @return					Integer converted from string
+ * @return					Signed integer converted from string
  */
 signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToSignedInteger()";
 
 	//===== Check argument =====
-	if (stringLength<=M2MString_length(string))
+	if (string!=NULL && stringLength<=M2MString_length(string))
 		{
-		//===== 変換バッファに文字列をコピー =====
+		//===== Initialize buffer =====
 		memset(STRING_ARRAY, 0, sizeof(STRING_ARRAY));
+		//===== Copy string to buffer =====
 		memcpy(STRING_ARRAY, string, stringLength);
-		//===== 文字列を整数に変換 =====
+		//===== Convert string to signed integer number =====
 		return atoi(STRING_ARRAY);
 		}
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
 		return (int)-1;
 		}
 	}
 
 
 /**
- * 2つの文字列を比較し, 同一であるかどうかを確認する。<br>
+ * Compare the two strings and return result.<br>
  *
- * @param[in] one		比較対象の文字列
- * @param[in] another	比較対象のもう一つの文字列
- * @param[in] length	比較対象の文字列の長さ[バイト]
- * @return				true : 同一の場合, false : 異なる場合
+ * @param[in] one		String to be compared
+ * @param[in] another	Another string to be compared
+ * @param[in] length	Length of string to be compared [byte]
+ * @return				true: When the same case, false: When they do not match
  */
 bool M2MString_equals (const M2MString *one, const M2MString *another, const size_t length)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_equals()";
+
 	//===== Check argument =====
 	if (one!=NULL && another!=NULL && length>0)
 		{
-		//===== 一致するかどうか検証 =====
+		//===== When the strings match =====
 		if (memcmp(one, another, length)==0)
 			{
 			return true;
 			}
-		//===== 一致しなかった場合 =====
+		//===== When the strings don't match =====
 		else
 			{
 			return false;
 			}
 		}
 	//===== Argument error =====
+	else if (one==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"one\" string is NULL");
+		return false;
+		}
+	else if (another==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"another\" string is NULL");
+		return false;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"length\" is invalid");
 		return false;
 		}
 	}
 
 
 /**
- * 引数で指定された”buffer”配列にローカルカレンダーの時間を示す文字列をコピー<br>
- * する。<br>
- * なお, この関数内部でバッファリングは行わないため, 呼び出し側でメモリ領域を<br>
- * 確保する事。<br>
+ * Copy string indicating the local calendar time to the "buffer" array. <br>
+ * Since buffering is not performed inside this function, so the memory <br>
+ * area must be reserved on the caller side. <br>
  *
- * @param[out] buffer		ローカルカレンダーの時間を示す文字列をコピーするためのバッファ
- * @param[in] bufferLength	引数で指定されたバッファの大きさを示す整数[バイト]
- * @return					バッファにコピーした, ローカル時間を示す文字列の大きさを示す整数[バイト]
+ * @param[out] buffer		A buffer for copying string indicating the time of the local calendar
+ * @param[in] bufferLength	Size of the buffer [byte]
+ * @return					Integer indicating the size of the local time character string copied to the buffer [bytes]
  */
 unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int bufferLength)
 	{
@@ -603,31 +710,31 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 	//===== Check argument =====
 	if (buffer!=NULL && bufferLength>0)
 		{
-		//===== 配列の初期化 =====
+		//===== Initialize array =====
 		memset(buffer, 0, bufferLength);
-		//===== ローカルカレンダの時刻を取得 =====
+		//===== Get local calendar time =====
 		if (gettimeofday(&currentTime, NULL)==0
 				&& (localCalendar=localtime(&(currentTime.tv_sec)))!=NULL)
 			{
-			//===== 日時を文字列へ変換 =====
+			//===== Convert date to string =====
 			strftime(buffer, bufferLength-1, "%Y/%m/%d %H:%M:%S:", localCalendar);
-			//===== マイクロ秒構造体を文字列へ変換 =====
+			//===== Convert microsecond structure to string =====
 			if (M2MString_convertFromSignedLongToString((currentTime.tv_usec/1000), &miliSecond)!=NULL)
 				{
-				//===== 変換した文字列の長さの確認 =====
+				//===== Confirm the length of the converted string =====
 				if ((miliSecondLength=M2MString_length(miliSecond))>0
 						&& miliSecondLength<(bufferLength-M2MString_length(buffer)-1))
 					{
-					//===== 変換した文字列をコピー =====
+					//===== Copy converted string into buffer =====
 					memcpy(&(buffer[M2MString_length(buffer)]), miliSecond, miliSecondLength);
-					//===== ヒープメモリ領域の解放 =====
+					//===== Release heap memory =====
 					M2MHeap_free(miliSecond);
 					return M2MString_length(buffer);
 					}
 				//===== Error handling =====
 				else
 					{
-					//===== ヒープメモリ領域の解放 =====
+					//===== Release heap memory =====
 					M2MHeap_free(miliSecond);
 					return 0;
 					}
@@ -657,73 +764,90 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 
 
 /**
- * 引数で指定された文字列の中からキーワードを検索し, 発見した場合は当該キーワード<br>
- * の開始位置を示すポインタを返す。<br>
- * 検索に失敗した場合は NULL を返す。<br>
+ * Returns the pointer that the "keyword" string first appears. <br>
+ * If "keyword" string isn't found, returns NULL.
  *
- * @param[in] string	検索対象の文字列
- * @param[in] keyword	キーワード文字列
- * @return				検索対象の文字列のうち, キーワード開始位置を示すポインタ or NULL（エラーの場合）
+ * @param[in] string	Search target string
+ * @param[in] keyword	Detection string
+ * @return				Pointer indicating keyword start position or NULL (in case of error)
  */
 M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_indexOf()";
+
 	//===== Check argument =====
 	if (string!=NULL && keyword!=NULL)
 		{
-		//===== キーワード検索結果を返す =====
+		//===== Return the result of search =====
 		return (M2MString *)strstr(string, keyword);
 		}
 	//===== Argument error =====
+	else if (string==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		return NULL;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"keyword\" string is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定された比較対象の文字列の中に, 検出用の文字列が最後に現れる場所を<br>
- * 返す。<br>
- * 検出用文字列が見つからなかった場合は NULL を返す。<br>
+ * Returns the pointer that the "keyword" string last appears. <br>
+ * If "keyword" string isn't found, returns NULL.
  *
- * @param string	比較対象の文字列
- * @param fromIndex	検出用文字列
- * @return			検出された位置のポインタ or NULL（検出出来なかった場合）
+ * @param[in] string	Search target string
+ * @param[in] keyword	Detection string
+ * @return				Pointer indicating keyword last position or NULL (in case of error)
  */
-M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *fromIndex)
+M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *keyword)
 	{
 	//========== Variable ==========
 	M2MString *lastIndex = NULL;
 	M2MString *index = (M2MString *)string;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_lastIndexOf()";
 
 	//===== Check argument =====
-	if (string!=NULL && fromIndex!=NULL)
+	if (string!=NULL && keyword!=NULL)
 		{
-		//=====  =====
-		while ((index=strstr(index, fromIndex))!=NULL)
+		//===== Repeat until arriving the last =====
+		while ((index=strstr(index, keyword))!=NULL)
 			{
 			lastIndex = index;
 			index++;
 			}
-		//=====  =====
+		//===== Return the last index =====
 		return lastIndex;
 		}
 	//===== Argument error =====
+	else if (string==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		return NULL;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"fromIndex\" string is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定された文字列の長さを取得して返す。<br>
+ * Get the length of the string. <br>
  *
- * @param[in] self		文字列（必ずヌル終端とする事）
- * @return				文字列の長さを示す整数 or 0（エラーの場合）
+ * @param[in] self	String (always be null terminated)
+ * @return			Length of string or 0 (in case of error)
  */
 size_t M2MString_length (const M2MString *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_length()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -732,6 +856,7 @@ size_t M2MString_length (const M2MString *self)
 	//===== Argument error =====
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL");
 		return 0;
 		}
 	}

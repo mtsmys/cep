@@ -39,10 +39,10 @@
  * function, so caller must call "M2MHeap_free ()" function to prevent <br>
  * memory leak after the relevant binary data is used.
  *
- * @param string		Target string for Base64 decoding
- * @param stringLength	Length of string[Byte]
- * @param buffer		Buffer for copying decoded data Base64(buffering is executed in this function)
- * @return				Length of decoded data[Byte]
+ * @param[in] string		Target string for Base64 decoding
+ * @param[in] stringLength	Length of string[Byte]
+ * @param[out] buffer		Buffer for copying decoded data Base64(buffering is executed in this function)
+ * @return					Length of decoded data[Byte]
  */
 size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLength, unsigned char **buffer)
 	{
@@ -176,13 +176,13 @@ size_t M2MBase64_decode (const M2MString *string, const unsigned long stringLeng
  * with a line feed code ("\r\m") every 76 characters, set "chunk" of <br>
  * the argument to true. <br>
  * If you want to put all the converted character strings on one line, <br>
- * set "chunk" to false.<br>
+ * set "chunk" to false. <br>
  *
- * @param src		Binary data to be converted to Base64 string
- * @param srcLength	Binary data size[Byte]
- * @param string	Pointer of converted Base64 string (buffering is executed within this function)
- * @param chunk		true: Insert a line feed code (="\r\n") every 76 characters, false: Don't insert a line feed code
- * @return			Pointer of converted Base64 string or NULL (in case of error)
+ * @param[in] src		Binary data to be converted to Base64 string
+ * @param[in] srcLength	Binary data size[Byte]
+ * @param[out] string	Pointer of converted Base64 string (buffering is executed within this function)
+ * @param[in] chunk		true: Insert a line feed code (="\r\n") every 76 characters, false: Don't insert a line feed code
+ * @return				Pointer of converted Base64 string or NULL (in case of error)
  */
 M2MString *M2MBase64_encode (const unsigned char *src, const size_t srcLength, M2MString **string, const bool chunk)
 	{

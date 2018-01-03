@@ -33,9 +33,9 @@
 #define M2M_IO_M2MHEAP_H_
 
 
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
 
 
 

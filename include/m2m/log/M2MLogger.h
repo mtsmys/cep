@@ -37,6 +37,9 @@
 #include "m2m/io/M2MDirectory.h"
 #include "m2m/io/M2MFile.h"
 #include "m2m/io/M2MHeap.h"
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 
 

@@ -200,8 +200,8 @@ static mode_t this_getPermission (const M2MString *mode)
 /**
  * Tests whether the directory denoted by this abstract pathname exists.<br>
  *
- * @param directoryPath	Directory pathname string
- * @return				true: if the directory exists, false: otherwise
+ * @param[in] directoryPath	Directory pathname string
+ * @return					true: if the directory exists, false: otherwise
  */
 bool M2MDirectory_exists (const M2MString *directoryPath)
 	{
@@ -256,8 +256,8 @@ M2MString *M2MDirectory_getHomeDirectoryPath ()
 /**
  * Tests whether the pathname is directory.<br>
  *
- * @param directoryPath	String indicating the directory pathname
- * @return				true: if the pathname is directory, false: otherwise
+ * @param[in] directoryPath	String indicating the directory pathname
+ * @return					true: if the pathname is directory, false: otherwise
  */
 bool M2MDirectory_isDirectory (const M2MString *directoryPath)
 	{

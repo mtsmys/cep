@@ -34,6 +34,13 @@
 
 
 #include "m2m/io/M2MDirectory.h"
+#include "m2m/io/M2MHeap.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 
 
