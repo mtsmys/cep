@@ -44,7 +44,7 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	{
 	//========== Variable ==========
 	M2MString *tmp = NULL;
-	size_t thisLength = 0;
+	size_t selfLength = 0;
 	size_t stringLength = 0;
 
 	//===== Check argument =====
@@ -54,19 +54,19 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 		if ((*self)!=NULL)
 			{
 			//===== Preparation for temporarily copying the original string =====
-			if( (thisLength=M2MString_length((*self)))>0
-				&& (tmp=(M2MString *)M2MHeap_malloc(thisLength+1))!=NULL)
+			if( (selfLength=M2MString_length((*self)))>0
+				&& (tmp=(M2MString *)M2MHeap_malloc(selfLength+1))!=NULL)
 				{
 				//===== Temporarily copy the source string =====
-				memcpy(tmp, (*self), thisLength);
+				memcpy(tmp, (*self), selfLength);
 				//===== Release heap memory of consolidation string =====
 				M2MHeap_free((*self));
 				//===== Acquire heap memory of concatenated string =====
-				if (((*self)=(M2MString *)M2MHeap_malloc(thisLength+stringLength+1))!=NULL)
+				if (((*self)=(M2MString *)M2MHeap_malloc(selfLength+stringLength+1))!=NULL)
 					{
 					//===== Concatenate strings =====
-					memcpy(&((*self)[0]), tmp, thisLength);
-					memcpy(&((*self)[thisLength]), string, stringLength);
+					memcpy(&((*self)[0]), tmp, selfLength);
+					memcpy(&((*self)[selfLength]), string, stringLength);
 					//===== Release temporary heap memory =====
 					M2MHeap_free(tmp);
 					//===== Return pointer of concatenated string =====

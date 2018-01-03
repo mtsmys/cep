@@ -399,7 +399,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
  * バキューム処理について, メモリ上のSQLite3データベースとファイル上のSQLite3<br>
  * データベース両者に対して実行する．<br>
  *
- * @param self	CEP実行オブジェクト
+ * @param self	CEP structure object
  */
 static void this_checkRecordCounterForVacuum (M2MCEP *self)
 	{
@@ -417,23 +417,23 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 			if (vacuumRecord<this_getRecordCounter(self))
 				{
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLite3データベースに対してバキューム処理を実行します");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database in memory");
 #endif // DEBUG
 				//===== メモリ上のSQLite3データベースをバキューム =====
 				M2MSQLiteConfig_vacuum(this_getMemoryDatabase(self));
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLite3データベースに対してバキューム処理を実行しました");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database in memory");
 #endif // DEBUG
 				//===== レコード永続化の場合 =====
 				if (this_getPersistence(self)==true)
 					{
 #ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベースに対してバキューム処理を実行します");
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database file");
 #endif // DEBUG
 					//===== ファイル上のSQLite3データベースをバキューム =====
 					M2MSQLiteConfig_vacuum(this_getFileDatabase(self));
 #ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベースに対してバキューム処理を実行しました");
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database file");
 #endif // DEBUG
 					}
 				//===== レコード非永続化の場合 =====
@@ -2294,10 +2294,10 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
 		if (M2MString_append(&(self->databaseName), databaseName)!=NULL)
 			{
 			//===== In the case of extension isn't given in name =====
-			if (M2MString_lastIndexOf(databaseName, M2MSQLITECONFIG_FILE_EXTENSION)==NULL)
+			if (M2MString_lastIndexOf(databaseName, M2MSQLiteConfig_FILE_EXTENSION)==NULL)
 				{
 				//===== Copy SQLite3 file extension =====
-				if (M2MString_append(&(self->databaseName), M2MSQLITECONFIG_FILE_EXTENSION)!=NULL)
+				if (M2MString_append(&(self->databaseName), M2MSQLiteConfig_FILE_EXTENSION)!=NULL)
 					{
 					// do nothing
 					}

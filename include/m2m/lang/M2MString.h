@@ -125,7 +125,7 @@ typedef unsigned char M2MString;
  * Memory allocation is executed in this function, so caller must release<br>
  * the memory of "self" string.<br>
  *
- * @param[in,out] self	original string or NULL（"self" = "self + string")
+ * @param[in,out] self	The original string or NULL（"self" = "self + string")
  * @param[in] string	additional string
  * @return				Pointer of connected string or NULL (in case of error)
  */
@@ -147,7 +147,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 /**
  * Compares the two strings specified by the argument and returns the result.<br>
  *
- * @param[in] self		One string to be compared
+ * @param[in] self		The original string to be compared
  * @param[in] string	Another string to be compared
  * @return				0：two are equal, negative：In case of self < string, positive：In case of self > string
  */
@@ -170,7 +170,7 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 /**
  * 引数で指定された文字列に対し，改行コードをLFからCRLFに変換して返す．<br>
  *
- * @param[in] self		改行コード変換対象の文字列
+ * @param[in] self		The original string to convert line feed code
  * @param[out] string	改行コードを補正したCSV形式の文字列を格納するポインタ（バッファリング自体は関数内部で実行)
  * @return				改行コードを補正したCSV形式の文字列ポインタ or NULL（エラーの場合)
  */
