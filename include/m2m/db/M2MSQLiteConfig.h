@@ -44,8 +44,9 @@ extern "C"
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
-#include <sqlite3.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <sqlite3.h>
 
 
 
@@ -65,6 +66,14 @@ extern "C"
  * Public function
  ******************************************************************************/
 /**
+ * Close the connection of indicated SQLite3 database.<br>
+ *
+ * @param database	SQLite3 database to be closed
+ */
+void M2MSQLiteConfig_closeDatabase (sqlite3 *database);
+
+
+/**
  * Create SQL statement for displaying table information, and copy to the pointer.<br>
  *
  * @param[in] tableName	String indicating table name
@@ -72,6 +81,17 @@ extern "C"
  * @return				String copied to pointer or NULL (in case of error)
  */
 M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MString **sql);
+
+
+/**
+ * Open the indicated SQLite3 database.<br>
+ * If caller uses a database in memory, should set ":memory:" as <br>
+ * "filename" argument.<br>
+ *
+ * @param filename	String indicating database name
+ * @return			Connection handler of opened SQLite3 database or NULL (in case of error)
+ */
+sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename);
 
 
 /**

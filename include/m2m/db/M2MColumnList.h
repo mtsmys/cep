@@ -33,8 +33,10 @@
 #define M2M_DB_M2MCOLUMNLIST_H_
 
 
-#include "m2m/lang/M2MString.h"
 #include "m2m/db/M2MColumn.h"
+#include "m2m/io/M2MHeap.h"
+#include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MLogger.h"
 
 
 

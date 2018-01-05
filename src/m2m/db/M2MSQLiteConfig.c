@@ -34,6 +34,75 @@
  * Public function
  ******************************************************************************/
 /**
+ * Close the connection of indicated SQLite3 database.<br>
+ *
+ * @param database	SQLite3 database to be closed
+ */
+void M2MSQLiteConfig_closeDatabase (sqlite3 *database)
+	{
+	//========== Variable ==========
+	sqlite3_stmt *statement = NULL;
+	sqlite3_stmt *next = NULL;
+	M2MString MESSAGE[256];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_closeDatabase()";
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		//===== Close SQLite3 database =====
+		if (sqlite3_close(database)==SQLITE_OK)
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 database");
+#endif // DEBUG
+			}
+		//===== In the case of failed to close the database =====
+		else
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to releasing heap memory for statements");
+#endif // DEBUG
+			//===== Get statement =====
+			statement = sqlite3_next_stmt(database, NULL);
+			//===== Repeat until existing statements =====
+			while (statement!=NULL)
+				{
+				//===== Get next statement =====
+				next = sqlite3_next_stmt(database, statement);
+				//===== Release heap memory for statement =====
+				sqlite3_finalize(statement);
+				//===== Move to next statement =====
+				statement = next;
+				}
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finished releasing heap memory for statements");
+#endif // DEBUG
+			//===== Close the SQLite3 database again =====
+			if (sqlite3_close(database)==SQLITE_OK)
+				{
+	#ifdef DEBUG
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 database");
+	#endif // DEBUG
+				}
+			//===== Error handling =====
+			else
+				{
+				memset(MESSAGE, 0, sizeof(MESSAGE));
+				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to close SQLite3 database because %s", (M2MString *)sqlite3_errmsg(database));
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
+				}
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		}
+	return;
+	}
+
+
+/**
  * Create SQL statement for displaying table information, and copy to the pointer.<br>
  *
  * @param[in] tableName	String indicating table name
@@ -46,7 +115,7 @@ M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MStrin
 	size_t tableNameLength = 0;
 	const M2MString *FORMAT = (M2MString *)"PRAGMA table_info(%s)";
 	const size_t FORMAT_LENGTH = M2MString_length(FORMAT);
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_getTableInfoSQL";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_getTableInfoSQL()";
 
 	//===== Check argument =====
 	if (tableName!=NULL && (tableNameLength=M2MString_length(tableName))>0
@@ -81,6 +150,45 @@ M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MStrin
 
 
 /**
+ * Open the indicated SQLite3 database.<br>
+ * If caller uses a database in memory, should set ":memory:" as <br>
+ * "filename" argument.<br>
+ *
+ * @param filename	String indicating database name
+ * @return			Connection handler of opened SQLite3 database or NULL (in case of error)
+ */
+sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
+	{
+	//========== Variable ==========
+	sqlite3 *database = NULL;
+	M2MString MESSAGE[256];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_openDatabase()";
+
+	//===== Open the SQLite3 database =====
+	if (sqlite3_open(filename, &database)==SQLITE_OK)
+		{
+#ifdef DEBUG
+		memset(MESSAGE, 0, sizeof(MESSAGE));
+		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Succeed to open a SQLite3 database(=\"%s\")", filename);
+		M2MLogger_printDebugMessage(MESSAGE, __LINE__, MESSAGE);
+#endif // DEBUG
+		//===== Return the connection handler =====
+		return database;
+		}
+	//===== Error handling =====
+	else
+		{
+		//===== Close the SQLite3 database =====
+		M2MSQLiteConfig_closeDatabase(database);
+		memset(MESSAGE, 0, sizeof(MESSAGE));
+		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to open a SQLite3 database(=\"%s\")", filename);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
+		return NULL;
+		}
+	}
+
+
+/**
  * Set the auto-vacuum status in the SQLite3 database.<br>
  *
  * @param[in] database	SQLite3 database object to set automatic vacuum
@@ -93,7 +201,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	bool result = false;
 	const M2MString *PRAGMA_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 1 ";
 	const M2MString *PRAGMA_NOT_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 0 ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setAutoVacuum";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setAutoVacuum()";
 
 	//===== When automatic vacuum is enabled =====
 	if (flag==true)
@@ -144,7 +252,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	bool result = false;
 	const M2MString *PRAGMA_SYNCHRONOUS_NORMAL_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
 	const M2MString *PRAGMA_SYNCHRONOUS_OFF_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous()";
 
 	//===== In the case of NORMAL mode =====
 	if (synchronous==true)
@@ -193,7 +301,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	//========== Variable ==========
 	bool result = false;
 	const M2MString *PRAGMA_ENCODING_SQL = (M2MString *)"PRAGMA encoding = 'UTF-8'";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setUTF8";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setUTF8()";
 
 	//===== Set UTF-8 to SQLite3 database =====
 	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL))==true)
@@ -223,7 +331,7 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	//========== Variable ==========
 	bool result = false;
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setWAL";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_setWAL()";
 
 	//===== Set journal mode of SQLite3 database =====
 	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL))==true)
@@ -252,7 +360,7 @@ bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	//========== Variable ==========
 	bool result = false;
 	const M2MString *SQL = "VACUUM ";
-	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_vacuum";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MSQLiteConfig_vacuum()";
 
 	//===== Vacuum SQLite3 database =====
 	if ((result=M2MSQLRunner_executeUpdate(database, SQL))==true)

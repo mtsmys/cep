@@ -475,47 +475,22 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 static void this_closeFileDatabase (M2MCEP *self)
 	{
 	//========== Variable ==========
-	sqlite3 *fileDatabase = NULL;
-	sqlite3_stmt *statement = NULL;
-	sqlite3_stmt *next = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_closeFileDatabase()";
 
 	//===== Check argument =====
-	if (self!=NULL && (fileDatabase=this_getFileDatabase(self))!=NULL)
+	if (self!=NULL)
 		{
-		//===== SQLite3メモリーデータベースを閉じる =====
-		if (sqlite3_close(fileDatabase)==SQLITE_OK)
-			{
-			return;
-			}
-		//===== SQLite3メモリーデータベースを閉じるのに失敗した場合 =====
-		else
-			{
-			//===== ステートメントの取得 =====
-			statement = sqlite3_next_stmt(fileDatabase, NULL);
-			//===== ステートメントが存在している場合 =====
-			while (statement!=NULL)
-				{
-				//===== 次のステートメントを取得 =====
-				next = sqlite3_next_stmt(fileDatabase, statement);
-				//===== ステートメントのメモリー領域を解放 =====
-				sqlite3_finalize(statement);
-				//===== 次のステートメントに移る =====
-				statement = next;
-				}
-			//===== （改めて）SQLite3メモリーデータベースを閉じる =====
-			sqlite3_close(fileDatabase);
-			return;
-			}
+		M2MSQLiteConfig_closeDatabase(this_getFileDatabase(self));
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 file database");
+#endif // DEBUG
 		}
 	//===== Argument error =====
-	else if (self==NULL)
-		{
-		return;
-		}
 	else
 		{
-		return;
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
 		}
+	return;
 	}
 
 
@@ -528,50 +503,22 @@ static void this_closeFileDatabase (M2MCEP *self)
 static void this_closeMemoryDatabase (M2MCEP *self)
 	{
 	//========== Variable ==========
-	sqlite3 *memoryDatabase = NULL;
-	sqlite3_stmt *statement = NULL;
-	sqlite3_stmt *next = NULL;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_closeMemoryDatabase()";
 
 	//===== Check argument =====
-	if (self!=NULL && (memoryDatabase=this_getMemoryDatabase(self))!=NULL)
+	if (self!=NULL)
 		{
-		//===== SQLite3メモリーデータベースを閉じる =====
-		if (sqlite3_close(memoryDatabase)==SQLITE_OK)
-			{
-			return;
-			}
-		//===== SQLite3メモリーデータベースを閉じるのに失敗した場合 =====
-		else
-			{
-			//===== ステートメントの取得 =====
-			statement = sqlite3_next_stmt(memoryDatabase, NULL);
-			//===== ステートメントが存在している場合 =====
-			while (statement!=NULL)
-				{
-				//===== 次のステートメントを取得 =====
-				next = sqlite3_next_stmt(memoryDatabase, statement);
-				//===== ステートメントのメモリー領域を解放 =====
-				sqlite3_finalize(statement);
-				//===== 次のステートメントに移る =====
-				statement = next;
-				}
-			//===== （改めて）SQLite3メモリーデータベースを閉じる =====
-			sqlite3_close(memoryDatabase);
-			return;
-			}
+		M2MSQLiteConfig_closeDatabase(this_getMemoryDatabase(self));
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 memory database");
+#endif // DEBUG
 		}
 	//===== Argument error =====
-	else if (self==NULL)
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
-		return;
-		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MCEP *\"から取得した\"fileDatabase\"がNULLです", NULL);
-		return;
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
 		}
+	return;
 	}
 
 
@@ -2133,7 +2080,7 @@ static sqlite3 *this_openFileDatabase (const M2MString *databaseName, const M2MT
 		if (this_getDatabaseFilePath(databaseName, &databaseFilePath)!=NULL)
 			{
 			//===== SQLite3データベースファイルを開く =====
-			if (sqlite3_open(databaseFilePath, &fileDatabase)==SQLITE_OK)
+			if ((fileDatabase=M2MSQLiteConfig_openDatabase(databaseFilePath))!=NULL)
 				{
 #ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
@@ -2176,8 +2123,7 @@ static sqlite3 *this_openFileDatabase (const M2MString *databaseName, const M2MT
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase), NULL);
-				sqlite3_close(fileDatabase);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to open SQLite3 file database", NULL);
 				//===== データベースファイルパス文字列のメモリ領域を解放 =====
 				M2MHeap_free(databaseFilePath);
 				return NULL;
@@ -2221,7 +2167,7 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_openMemoryDatabase()";
 
 	//===== SQLite3メモリデータベースを開く =====
-	if (sqlite3_open(MEMORY_DATABASE, &memoryDatabase)==SQLITE_OK)
+	if ((memoryDatabase=M2MSQLiteConfig_openDatabase(MEMORY_DATABASE))!=NULL)
 		{
 #ifdef DEBUG
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLiteデータベースを開きました");
@@ -2263,7 +2209,6 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 	else
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLiteデータベースのオープンに失敗しました", NULL);
-		sqlite3_close(memoryDatabase);
 		return NULL;
 		}
 	}

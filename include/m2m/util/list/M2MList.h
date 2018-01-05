@@ -34,6 +34,7 @@
 
 
 #include "m2m/io/M2MHeap.h"
+#include "m2m/lang/M2MString.h"
 #include <stdio.h>
 #include <stdbool.h>
 

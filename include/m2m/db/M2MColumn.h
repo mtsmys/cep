@@ -34,8 +34,11 @@
 
 
 
-#include "m2m/lang/M2MString.h"
 #include "m2m/db/M2MDataType.h"
+#include "m2m/io/M2MHeap.h"
+#include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MLogger.h"
+#include <stdbool.h>
 
 
 
@@ -70,6 +73,7 @@ typedef struct
 	bool unique;
 	} M2MColumn;
 #endif /* M2MColumn */
+
 
 
 /*******************************************************************************
@@ -172,7 +176,7 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType);
  * としてセットする。<br>
  *
  * @param[in,out] self	カラム情報オブジェクト
- * @param[in] name		カラム名を示す文字列
+ * @param[in] name		String indicating the column name
  * @return				カラム名をセットされたカラム情報オブジェクト or NULL（エラーの場合）
  */
 M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name);

@@ -1,7 +1,7 @@
 /*******************************************************************************
  * M2MDataFrame.c
  *
- * Copyright (c) 2014, Akihisa Yasuda
+ * Copyright (c) 2018, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
