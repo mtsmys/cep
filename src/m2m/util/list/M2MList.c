@@ -181,7 +181,7 @@ static M2MList *this_setPrevious (M2MList *self, M2MList *previous)
 	if (self!=NULL && previous!=NULL)
 		{
 		self->previous = previous;
-		return NULL;
+		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
@@ -650,16 +650,26 @@ M2MList *M2MList_new ()
 	if ((self=(M2MList *)M2MHeap_malloc(sizeof(M2MList)))!=NULL)
 		{
 		//===== Initialize created object =====
-		if (this_setPrevious(self, self)!=NULL
-				&& this_setNext(self, NULL)!=NULL)
+		if (this_setPrevious(self, self)!=NULL)
 			{
-			return self;
+			//===== Initialize created object =====
+			if (this_setNext(self, NULL)!=NULL)
+				{
+				return self;
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MList_delete(self);
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set next pointer of newly created M2MList object");
+				return NULL;
+				}
 			}
 		//===== Error handling =====
 		else
 			{
 			M2MList_delete(self);
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize a newly created M2MList object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set previous pointer of newly created M2MList object");
 			return NULL;
 			}
 		}

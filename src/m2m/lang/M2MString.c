@@ -270,7 +270,7 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
 	//========== Variable ==========
 	size_t selfLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_appendLength()";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_compareTo()";
 
 	//===== Check argument =====
 	if (self!=NULL && (selfLength=M2MString_length(self))>0
@@ -591,6 +591,7 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
+	M2MString MESSAGE[1024];
 	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToLong()";
 
 	//===== Check argument =====
@@ -604,9 +605,16 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 		return atoi(STRING_ARRAY);
 		}
 	//===== Argument error =====
+	else if (string==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		return (int)-1;
+		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
+		memset(MESSAGE, 0, sizeof(MESSAGE));
+		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument error! Length of indicated \"string\" string (=\"%s\") is shorter than stringLength(=\"%zu\")", string, stringLength);
+		this_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE);
 		return (int)-1;
 		}
 	}
