@@ -34,8 +34,11 @@
 
 
 #include "m2m/io/M2MHeap.h"
+#include <ctype.h>
 #include <errno.h>
+#include <iconv.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
@@ -164,6 +167,18 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string);
 
 
 /**
+ * This method converts character code with "iconv".<br>
+ *
+ * @param fromString			Conversion target string
+ * @param fromCharacterSetName	Character set name of original string
+ * @param toCharacterSetName	Convert character set name
+ * @param toString				Pointer for copying converted string(buffering is executed in this method)
+ * @return						Pointer of converted string or NULL(means error)
+ */
+M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2MString *fromCharacterSetName, const M2MString *toCharacterSetName, M2MString **toString);
+
+
+/**
  * Convert double value into a string and copies it to the pointer. <br>
  * Since buffering of arrays is executed inside this function, so call <br>
  * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
@@ -174,6 +189,16 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string);
  * @return				Copied string or NULL (in case of error)
  */
 M2MString *M2MString_convertFromDoubleToString (const double number, M2MString **string);
+
+
+/**
+ * M2MString converter from hexadecimal string into long number.<br>
+ *
+ * @param self			Hexadecimal string
+ * @param selfLength	Length of hexadecimal string[Byte]
+ * @return				Converted number from hexadecimal string
+ */
+uint32_t M2MString_convertFromHexadecimalStringToUnsignedLong (const M2MString *self, const size_t selfLength);
 
 
 /**
@@ -243,6 +268,17 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
 
 
 /**
+ * This method converts from unsigned long to string.<br>
+ * Generated string is allocated in this method, so caller must free it.<br>
+ *
+ * @param[in] number		Conversion target number
+ * @param[out] buffer		Array for copying integer string
+ * @param[in] bufferLength	Length of array[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
+
+
+/**
  * Compare the two strings and return result.<br>
  *
  * @param[in] one		String to be compared
@@ -251,6 +287,17 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
  * @return				true: When the same case, false: When they do not match
  */
 bool M2MString_equals (const M2MString *one, const M2MString *another, const size_t length);
+
+
+/**
+ * This method converts variables into string in the indicated format.<br>
+ *
+ * @param buffer		Buffer for copying translated strings
+ * @param bufferLength	Length of buffer[Byte]
+ * @param format		Format for translation into string
+ * @return				Length of converted strings[Byte] or -1(means error)
+ */
+int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MString *format, ...);
 
 
 /**

@@ -293,6 +293,91 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 
 
 /**
+ * This method converts character code with "iconv".<br>
+ *
+ * @param fromString			Conversion target string
+ * @param fromCharacterSetName	Character set name of original string
+ * @param toCharacterSetName	Convert character set name
+ * @param toString				Pointer for copying converted string(buffering is executed in this method)
+ * @return						Pointer of converted string or NULL(means error)
+ */
+M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2MString *fromCharacterSetName, const M2MString *toCharacterSetName, M2MString **toString)
+	{
+	//========== Variable ==========
+	iconv_t conversionDescryptor = NULL;
+	size_t srcLength = M2MString_length(fromString);
+	size_t bufferLength = srcLength * 2;
+	M2MString src[srcLength+1];
+	M2MString buffer[bufferLength+1];
+	M2MString *srcPointer = NULL;
+	M2MString *bufferPointer = NULL;
+
+	//===== Check argument =====
+	if (fromString!=NULL && srcLength>0 && fromCharacterSetName!=NULL && toCharacterSetName!=NULL && toString!=NULL)
+		{
+		//===== Initialize buffer =====
+		memset(src, 0, sizeof(src));
+		memcpy(src, fromString, srcLength);
+		memset(buffer, 0, sizeof(buffer));
+		//===== Get conversion descriptor =====
+		if ((conversionDescryptor=iconv_open(toCharacterSetName, fromCharacterSetName))>0)
+			{
+			//===== Get pointer for call "iconv" =====
+			srcPointer = src;
+			bufferPointer = buffer;
+			//===== Convert character code =====
+			if (iconv(conversionDescryptor, (char **)&srcPointer, &srcLength, (char **)&bufferPointer, &bufferLength)==0)
+				{
+				//===== Allocate new memory =====
+				if ((bufferLength=M2MString_length(buffer))>0
+						&& ((*toString)=(M2MString *)M2MHeap_malloc(bufferLength+1))!=NULL)
+					{
+					//===== Copy converted string =====
+					memcpy((*toString), buffer, bufferLength);
+					iconv_close(conversionDescryptor);
+					return (*toString);
+					}
+				//===== Error handling =====
+				else
+					{
+					iconv_close(conversionDescryptor);
+					return NULL;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				iconv_close(conversionDescryptor);
+				return NULL;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (fromString==NULL || srcLength<=0)
+		{
+		return NULL;
+		}
+	else if (fromCharacterSetName==NULL)
+		{
+		return NULL;
+		}
+	else if (toCharacterSetName==NULL)
+		{
+		return NULL;
+		}
+	else
+		{
+		return NULL;
+		}
+	}
+
+
+/**
  * Convert double value into a string and copies it to the pointer. <br>
  * Since buffering of arrays is executed inside this function, so call <br>
  * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
@@ -343,6 +428,54 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 		{
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
+		}
+	}
+
+
+/**
+ * M2MString converter from hexadecimal string into long number.<br>
+ *
+ * @param self			Hexadecimal string
+ * @param selfLength	Length of hexadecimal string[Byte]
+ * @return				Converted number from hexadecimal string
+ */
+uint32_t M2MString_convertFromHexadecimalStringToUnsignedLong (const M2MString *self, const size_t selfLength)
+	{
+	//========== Variable ==========
+	uint32_t decimal = 0;
+	uint32_t i = 0;
+	int16_t n = 0;
+	M2MString c;
+
+	//===== Check argument ======
+	if (self!=NULL && 0<selfLength && selfLength<=M2MString_length(self))
+		{
+		//=====  ======
+		for (i=0; i<selfLength; i++)
+			{
+			//=====  ======
+			if ('0'<=self[i] && self[i]<='9')
+				{
+				n = self[i] - '0';
+				}
+			//=====  ======
+			else if ('a'<=(c=tolower(self[i])) && c<='f')
+				{
+				n = c - 'a' + 10;
+				}
+			//=====  ======
+			else
+				{
+				}
+			//=====  ======
+			decimal = decimal *16 + n;
+			}
+		return decimal;
+		}
+	//===== Argument error ======
+	else
+		{
+		return 0;
 		}
 	}
 
@@ -653,6 +786,40 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
 
 
 /**
+ * This method converts from unsigned long to string.<br>
+ * Generated string is allocated in this method, so caller must free it.<br>
+ *
+ * @param[in] number		Conversion target number
+ * @param[out] buffer		Array for copying integer string
+ * @param[in] bufferLength	Length of array[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
+	{
+	//===== Check argument =====
+	if (bufferLength>0)
+		{
+		//===== Initialize temporary buffer =====
+		memset(buffer, 0, bufferLength);
+		//===== Convert from unsigned long to string =====
+		if (M2MString_format(buffer, bufferLength-1, "%du", number)>0)
+			{
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
+		}
+	}
+
+
+/**
  * Compare the two strings and return result.<br>
  *
  * @param[in] one		String to be compared
@@ -694,6 +861,36 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
 		{
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"length\" is invalid");
 		return false;
+		}
+	}
+
+
+/**
+ * This method converts variables into string in the indicated format.<br>
+ *
+ * @param buffer		Buffer for copying translated strings
+ * @param bufferLength	Length of buffer[Byte]
+ * @param format		Format for translation into string
+ * @return				Length of converted strings[Byte] or -1(means error)
+ */
+int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MString *format, ...)
+	{
+	//========== Variable ==========
+	va_list variableList;
+	int result = 0;
+
+	//===== Check argument =====
+	if (buffer!=NULL && bufferLength>0 && format!=NULL && M2MString_length(format)>0)
+		{
+		va_start(variableList, format);
+		result = vsnprintf(buffer, bufferLength, format, variableList);
+		va_end(variableList);
+		return result;
+		}
+	//===== Argument error =====
+	else
+		{
+		return -1;
 		}
 	}
 
