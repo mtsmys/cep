@@ -115,6 +115,36 @@ void M2MCEP_delete (M2MCEP **self);
 
 
 /**
+ * Return string indicating the database name possessed by the CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			String indicating database file name or NULL (in case of error)
+ */
+M2MString *M2MCEP_getDatabaseName (const M2MCEP *self);
+
+
+/**
+ * Get the SQLite3 database object on the file managed by the CEP object. <br>
+ * If the CEP object does not hold the SQLite 3 database object on the file <br>
+ * and the record persistence flag is set up, it will acquire and return <br>
+ * the SQLite 3 database object newly created.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			SQLite3 database object on file or NULL (in case of error)
+ */
+sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self);
+
+
+/**
+ * Return the SQLite 3 database object on the memory managed by the CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			SQLite3 database object on memory or NULL (in case of error)
+ */
+sqlite3 *M2MCEP_getMemoryDatabase (M2MCEP *self);
+
+
+/**
  * Return CEP library version number string defined in "M2MCEP.h" file.<br>
  *
  * @return	CEP library version number string

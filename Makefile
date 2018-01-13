@@ -5,14 +5,14 @@ CFLAGS      := $(INCLUDEPATH) -O3 -Wall -fPIC -Wno-pointer-sign -MMD -MP
 SRCDIR      := ./src/
 SRCS        := $(SRCDIR)m2m/io/M2MHeap.c \
                $(SRCDIR)m2m/lang/M2MString.c \
+               $(SRCDIR)m2m/util/M2MBase64.c \
                $(SRCDIR)m2m/io/M2MDirectory.c \
                $(SRCDIR)m2m/io/M2MFile.c \
-               $(SRCDIR)m2m/util/M2MBase64.c \
                $(SRCDIR)m2m/util/list/M2MList.c \
                $(SRCDIR)m2m/log/M2MLogger.c \
+               $(SRCDIR)m2m/db/M2MDataType.c \
                $(SRCDIR)m2m/db/M2MSQLRunner.c \
                $(SRCDIR)m2m/db/M2MSQLiteConfig.c \
-               $(SRCDIR)m2m/db/M2MDataType.c \
                $(SRCDIR)m2m/db/M2MColumn.c \
                $(SRCDIR)m2m/db/M2MColumnList.c \
                $(SRCDIR)m2m/db/M2MTableManager.c \

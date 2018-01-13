@@ -268,14 +268,25 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
 
 
 /**
+ * This method convert from string to 64bit integer number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Signed 64bit integer number converted from string
+ */
+int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, const size_t stringLength);
+
+
+/**
  * This method converts from unsigned long to string.<br>
  * Generated string is allocated in this method, so caller must free it.<br>
  *
  * @param[in] number		Conversion target number
  * @param[out] buffer		Array for copying integer string
  * @param[in] bufferLength	Length of array[Byte]
+ * @return					Converted hexadecimal number string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
+M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
 
 
 /**
@@ -309,7 +320,7 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
  * @param[in] bufferLength	Size of the buffer [byte]
  * @return					Integer indicating the size of the local time character string copied to the buffer [bytes]
  */
-unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int bufferLength);
+unsigned int M2MString_getLocalTime (M2MString *buffer, const size_t bufferLength);
 
 
 /**

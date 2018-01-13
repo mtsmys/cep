@@ -48,7 +48,7 @@ extern "C"
 
 
 /*******************************************************************************
- * クラス変数
+ * Definition
  ******************************************************************************/
 /**
  * データベースのテーブルのカラム情報を格納した構造体オブジェクト。<br>
@@ -57,7 +57,7 @@ extern "C"
  *
  * @param previous	A list structure object located before (indicating its own pointer in the case of the head)
  * @param next		A list structure object located behind (indicating NULL in the case of the end)
- * @param column	カラム情報オブジェクト（カラム1つのデータ型を内包する構造体）
+ * @param column	Column information object (containing one data type of a column)
  */
 #ifndef M2MColumnList
 typedef struct M2MColumnList
@@ -69,8 +69,9 @@ typedef struct M2MColumnList
 #endif /* M2MColumnList */
 
 
+
 /*******************************************************************************
- * 公開関数
+ * Public function
  ******************************************************************************/
 /**
  * カラム構造体オブジェクトのリンクに新規ノードを追加する。<br>

@@ -34,10 +34,9 @@
  * Private function
  ******************************************************************************/
 /**
- * 引数で指定されたカラム構造体オブジェクトがメンバ変数として保持しているカラム名<br>
- * を示す文字列のヒープメモリ領域を解放する。<br>
+ * Release heap memory of string indicating the column name.<br>
  *
- * @param[in,out] self	カラム構造体オブジェクト
+ * @param[in,out] self	Column information object
  */
 static void this_deleteName (M2MColumn *self)
 	{
@@ -48,35 +47,36 @@ static void this_deleteName (M2MColumn *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== カラム名の存在を確認 =====
+		//===== Check existence of column name =====
 		if ((name=M2MColumn_getName(self))!=NULL)
 			{
-			//===== ヒープメモリ領域を解放 =====
+			//===== Release the heap memory =====
 			M2MHeap_free(name);
 			}
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get column name string", NULL);
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		}
 	return;
 	}
+
 
 
 /*******************************************************************************
  * Public function
  ******************************************************************************/
 /**
- * デストラクタ。<br>
- * 引数で指定されたカラム情報オブジェクトのヒープメモリ領域を解放し, オブジェクト<br>
- * を削除する。<br>
+ * Destructor.<br>
+ * Release the heap memory of column information object.<br>
  *
- * @param[in,out] self	カラム情報オブジェクト
+ * @param[in,out] self	Column information object
  */
 void M2MColumn_delete (M2MColumn **self)
 	{
@@ -93,18 +93,17 @@ void M2MColumn_delete (M2MColumn **self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn **\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトがメンバ変数として保持しているカラム名<br>
- * を示す文字列を返す。<br>
+ * Return string indicating the column name held by column information object.<br>
  *
- * @param[in] self	カラム情報オブジェクト
- * @return			カラム名を示す文字列 or NULL（エラーの場合）
+ * @param[in] self	Column information object
+ * @return			String indicating the column name or NULL (in case of error)
  */
 unsigned char *M2MColumn_getName (const M2MColumn *self)
 	{
@@ -119,14 +118,16 @@ unsigned char *M2MColumn_getName (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param[in] self	カラム情報オブジェクト
+ * Return the data type held by column information object.<br>
+ *
+ * @param[in] self	Column information object
  */
 M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 	{
@@ -141,14 +142,16 @@ M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return M2M_DATA_TYPE_ERROR;
 		}
 	}
 
 
 /**
- * @param[in] self	カラム情報オブジェクト
+ * Return flag for primary key activation held by column information object.<br>
+ *
+ * @param[in] self	Column information object
  */
 bool M2MColumn_getPrimaryKey (const M2MColumn *self)
 	{
@@ -163,14 +166,16 @@ bool M2MColumn_getPrimaryKey (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * @param[in] self	カラム情報オブジェクト
+ * Return flag for auto increment enable held by column information object.<br>
+ *
+ * @param[in] self	Column information object
  */
 bool M2MColumn_getAutoIncrement (const M2MColumn *self)
 	{
@@ -185,14 +190,16 @@ bool M2MColumn_getAutoIncrement (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * @param[in] self	カラム情報オブジェクト
+ * Return flag for NULL activation held by column information object.<br>
+ *
+ * @param[in] self	Column information object
  */
 bool M2MColumn_getAllowNULL (const M2MColumn *self)
 	{
@@ -207,14 +214,16 @@ bool M2MColumn_getAllowNULL (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * @param[in] self	カラム情報オブジェクト
+ * Return flag of uniqueness validation held by column information object.<br>
+ *
+ * @param[in] self	Column information object
  */
 bool M2MColumn_getUnique (const M2MColumn *self)
 	{
@@ -229,17 +238,17 @@ bool M2MColumn_getUnique (const M2MColumn *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return false;
 		}
 	}
 
 
 /**
- * コンストラクタ。<br>
- * ヒープメモリ領域を獲得し, カラム情報オブジェクトを新規に作成する。<br>
+ * Constructor.<br>
+ * Get the heap memory and create a new column information object.
  *
- * @return	カラム情報オブジェクト
+ * @return	Created new column information object or NULL (in case of error)
  */
 M2MColumn *M2MColumn_new ()
 	{
@@ -277,12 +286,11 @@ M2MColumn *M2MColumn_new ()
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトにメンバ変数として, 自動インクリメントの<br>
- * 可否を示すフラグをセットする。<br>
+ * Set flag whether auto increment is enabled or not in column information object.<br>
  *
- * @param[in,out] self		カラム情報オブジェクト
- * @param[in] autoIncrement	自動インクリメントか否かを示すフラグ
- * @return					自動インクリメント情報をセットしたカラム情報オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		Column information object
+ * @param[in] autoIncrement	Flag indicating whether auto increment
+ * @return					Column information object with automatic increment information set or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement)
 	{
@@ -298,19 +306,18 @@ M2MColumn *M2MColumn_setAutoIncrement (M2MColumn *self, const bool autoIncrement
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として, レコードにNULLの可否<br>
- * を示すフラグをセットする。<br>
+ * Set a flag indicating whether NULL is allowed or not in the record.<br>
  *
- * @param[in,out] self	カラム情報オブジェクト
- * @param[in] allowNULL	レコードにNULLを許すか否かを示すフラグ
- * @return				NULLの可否を示すフラグをセットしたカラム情報オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self	Column information object
+ * @param[in] allowNULL	Flag indicating whether NULL is allowed for record
+ * @return				Column information object set with flag indicating NULL availability or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
 	{
@@ -326,19 +333,18 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として, データ型を示す列挙子<br>
- * をセットする。<br>
+ * Set an enumerator indicating the data type of the column information object.<br>
  *
- * @param[in,out] self	カラム情報オブジェクト
- * @param[in] dataType	データ型を示す列挙子
- * @return				データ型を示す列挙子をセットしたカラム情報オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self	Column information object
+ * @param[in] dataType	Enumerator for data type
+ * @return				Column information object with enumerator indicating data type or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
 	{
@@ -354,19 +360,18 @@ M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトに対し, カラム名を示す文字列をメンバ変数<br>
- * としてセットする。<br>
+ * Set string indicating a column name in column information object.<br>
  *
- * @param[in,out] self	カラム情報オブジェクト
+ * @param[in,out] self	Column information object
  * @param[in] name		String indicating the column name
- * @return				カラム名をセットされたカラム情報オブジェクト or NULL（エラーの場合）
+ * @return				Column information object with column name set or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
 	{
@@ -394,7 +399,7 @@ M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	else
@@ -406,12 +411,11 @@ M2MColumn *M2MColumn_setName (M2MColumn *self, const M2MString *name)
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として, 主キーか否かを示す<br>
- * フラグをセットする。<br>
+ * Set a flag indicating whether or not it is a primary key.<br>
  *
- * @param[in,out] self		カラム情報オブジェクト
- * @param[in] primaryKey	主キーか否かを示すフラグ
- * @return					フラグをセットしたカラム情報オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		Column information object
+ * @param[in] primaryKey	Flag indicating whether or not it is a primary key
+ * @return					Column information object with flag set or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
 	{
@@ -427,19 +431,18 @@ M2MColumn *M2MColumn_setPrimaryKey (M2MColumn *self, const bool primaryKey)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報オブジェクトのメンバ変数として, レコードのユニーク性<br>
- * を示すフラグをセットする。<br>
+ * Set a flag indicating the uniqueness of the record in column information object.<br>
  *
- * @param[in,out] self	カラム情報オブジェクト
- * @param[in] unique	レコードデータのユニーク性の可否を示すフラグ
- * @return				ユニーク性の可否を示すフラグがセットされたカラム情報オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self	Column information object
+ * @param[in] unique	Flag indicating whether or not the record data has uniqueness
+ * @return				Column information object or flag with flag indicating whether uniqueness is set or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setUnique (M2MColumn *self, const bool unique)
 	{
@@ -455,7 +458,7 @@ M2MColumn *M2MColumn_setUnique (M2MColumn *self, const bool unique)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumn\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
 		return NULL;
 		}
 	}

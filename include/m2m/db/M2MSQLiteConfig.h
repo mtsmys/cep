@@ -41,6 +41,7 @@ extern "C"
 
 
 
+#include "m2m/db/M2MDataType.h"
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
@@ -61,6 +62,14 @@ extern "C"
 #endif /* M2MSQLiteConfig_FILE_EXTENSION */
 
 
+/**
+ * String indicating SQLite3 database directory permission(="0755")
+ */
+#ifndef M2MSQLiteConfig_DATABASE_DIRECTORY_PERMISSION
+#define M2MSQLiteConfig_DATABASE_DIRECTORY_PERMISSION (M2MString *)"0755"
+#endif /* M2MSQLiteConfig_DATABASE_DIRECTORY_PERMISSION */
+
+
 
 /*******************************************************************************
  * Public function
@@ -68,9 +77,19 @@ extern "C"
 /**
  * Close the connection of indicated SQLite3 database.<br>
  *
- * @param database	SQLite3 database to be closed
+ * @param[in] database	SQLite3 database object to be closed
  */
 void M2MSQLiteConfig_closeDatabase (sqlite3 *database);
+
+
+/**
+ * Get a prepared statement object related with indicated SQL statement string.<br>
+ *
+ * @param[in] database	SQLite3 database object
+ * @param[in] sql		String indicating SQL statement
+ * @return				Prepared statement object or NULL (in case of error)
+ */
+sqlite3_stmt *M2MSQLiteConfig_getPreparedStatement (sqlite3 *database, const M2MString *sql);
 
 
 /**
@@ -84,14 +103,35 @@ M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MStrin
 
 
 /**
+ * Check the existence of indicated table and return the result.<br>
+ *
+ * @param[in] database	SQLite3 database object
+ * @param[in] tableName	String indicating the table name
+ * @return				true: In case of existing the table, false: In case of not existing the table
+ */
+bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableName);
+
+
+/**
  * Open the indicated SQLite3 database.<br>
  * If caller uses a database in memory, should set ":memory:" as <br>
  * "filename" argument.<br>
+ * Otherwise, caller should SQLite3 file pathname string as "filename" <br>
+ * argument.<br>
  *
- * @param filename	String indicating database name
- * @return			Connection handler of opened SQLite3 database or NULL (in case of error)
+ * @param[in] filename	String indicating database name
+ * @return				Connection handler of opened SQLite3 database or NULL (in case of error)
  */
 sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename);
+
+
+/**
+ * Execute SQL on the prepared statement object and return result code.<br>
+ *
+ * @param[in] statement	SQLite3 prepared statement object
+ * @return				Result code defined by SQLite3 API
+ */
+int M2MSQLiteConfig_next (sqlite3_stmt *statement);
 
 
 /**
@@ -124,10 +164,23 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database);
 
 
 /**
+ * Set the data in specified type into SQLite prepared statement.<br>
+ *
+ * @param[in] dataType		Data type of the SQLite3 database
+ * @param[in] index			Index number of the field (>=1)
+ * @param[in] value			String indicating the input data of the field
+ * @param[in] valueLength	Length of string indicating field input data[Byte]
+ * @param[in,out] statement	SQLite3 prepared statement object
+ * @return					true: Succeed to set, false: Failed to set
+ */
+bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement);
+
+
+/**
  * Execute the VACUUM process to the indicated SQLite3 database.<br>
  *
- * @param database	SQLite3 database object to be vacuum
- * @return			true: success, false: failure
+ * @param[in] database	SQLite3 database object to be vacuum
+ * @return				true: success, false: failure
  */
 bool M2MSQLiteConfig_vacuum (sqlite3 *database);
 

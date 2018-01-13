@@ -763,24 +763,61 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
-	M2MString STRING_ARRAY[stringLength+1];
+	M2MString buffer[stringLength+1];
 	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToSignedInteger()";
 
 	//===== Check argument =====
 	if (string!=NULL && stringLength<=M2MString_length(string))
 		{
 		//===== Initialize buffer =====
-		memset(STRING_ARRAY, 0, sizeof(STRING_ARRAY));
+		memset(buffer, 0, sizeof(buffer));
 		//===== Copy string to buffer =====
-		memcpy(STRING_ARRAY, string, stringLength);
+		memcpy(buffer, string, stringLength);
 		//===== Convert string to signed integer number =====
-		return atoi(STRING_ARRAY);
+		return atoi(buffer);
 		}
 	//===== Argument error =====
 	else
 		{
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
-		return (int)-1;
+		return (signed int)0;
+		}
+	}
+
+
+/**
+ * This method convert from string to 64bit integer number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string for convert[Byte]
+ * @return					Signed 64bit integer number converted from string
+ */
+int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, const size_t stringLength)
+	{
+	//========== Variable ==========
+	M2MString buffer[stringLength+1];
+	const uint32_t BASE = 10;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToSignedLongLong()";
+
+	//===== Check argument =====
+	if (string!=NULL && M2MString_length(string)>=stringLength)
+		{
+		//===== Copy string into buffer =====
+		memset(buffer, 0, sizeof(buffer));
+		memcpy(buffer, string, stringLength);
+		//===== Convert string into integer =====
+		return (int64_t)strtoll(buffer, NULL, BASE);
+		}
+	//===== Argument error =====
+	else if (string==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		return (int64_t)0L;
+		}
+	else
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"stringLength\" is bigger than length of \"string\"");
+		return (int64_t)0L;
 		}
 	}
 
@@ -792,28 +829,39 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
  * @param[in] number		Conversion target number
  * @param[out] buffer		Array for copying integer string
  * @param[in] bufferLength	Length of array[Byte]
+ * @return					Converted hexadecimal number string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
+M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromUnsignedLongToHexadecimalString()";
+
 	//===== Check argument =====
-	if (bufferLength>0)
+	if (buffer!=NULL && bufferLength>0)
 		{
 		//===== Initialize temporary buffer =====
 		memset(buffer, 0, bufferLength);
 		//===== Convert from unsigned long to string =====
-		if (M2MString_format(buffer, bufferLength-1, "%du", number)>0)
+		if (M2MString_format(buffer, bufferLength-1, "%lx", number)>0)
 			{
 			return buffer;
 			}
 		//===== Error handling =====
 		else
 			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert unsigned long to hexadecimal number");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (buffer==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
+		return NULL;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -878,9 +926,11 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
 	//========== Variable ==========
 	va_list variableList;
 	int result = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_format()";
 
 	//===== Check argument =====
-	if (buffer!=NULL && bufferLength>0 && format!=NULL && M2MString_length(format)>0)
+	if (buffer!=NULL && bufferLength>0
+			&& format!=NULL && M2MString_length(format)>0)
 		{
 		va_start(variableList, format);
 		result = vsnprintf(buffer, bufferLength, format, variableList);
@@ -888,8 +938,19 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
 		return result;
 		}
 	//===== Argument error =====
+	else if (buffer==NULL)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
+		return -1;
+		}
+	else if (bufferLength<=0)
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
+		return -1;
+		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"format\" string is NULL or vacant");
 		return -1;
 		}
 	}
@@ -904,13 +965,14 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
  * @param[in] bufferLength	Size of the buffer [byte]
  * @return					Integer indicating the size of the local time character string copied to the buffer [bytes]
  */
-unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int bufferLength)
+unsigned int M2MString_getLocalTime (M2MString *buffer, const size_t bufferLength)
 	{
 	//========== Variable ==========
 	struct timeval currentTime;
 	struct tm *localCalendar = NULL;
 	M2MString *miliSecond = NULL;
 	unsigned int miliSecondLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_getLocalTime()";
 
 	//===== Check argument =====
 	if (buffer!=NULL && bufferLength>0)
@@ -941,28 +1003,33 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const unsigned int buffe
 					{
 					//===== Release heap memory =====
 					M2MHeap_free(miliSecond);
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to copy milliseconds string because buffer size is short");
 					return 0;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert from milliseconds to string");
 				return 0;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get local calendar time");
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else if (buffer==NULL)
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\"is NULL");
 		return 0;
 		}
 	else
 		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
 		return 0;
 		}
 	}

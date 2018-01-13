@@ -45,25 +45,6 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトが保有するデータベース名を示す文字列を返す。<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			データベース名を示す文字列 or NULL（エラーの場合）
- */
-static M2MString *this_getDatabaseName (const M2MCEP *self);
-
-
-/**
- * 引数で指定されたCEP実行オブジェクトが管理しているSQLite3ファイルデータベース<br>
- * オブジェクトを取得して返す。<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			SQLite3ファイルデータベース or NULL（エラーの場合）
- */
-static sqlite3 *this_getFileDatabase (M2MCEP *self);
-
-
-/**
  * 引数で指定されたCEP実行オブジェクトが管理するCEPレコード情報オブジェクトを取得<br>
  * して返す。<br>
  *
@@ -98,16 +79,6 @@ static unsigned int this_getRecordCounter (const M2MCEP *self);
  * @return			SQLite3データベースがバキューム処理を実行するレコード数
  */
 static unsigned int this_getVacuumRecord (const M2MCEP *self);
-
-
-/**
- * 引数で指定されたCEP実行オブジェクトが管理しているSQLite3メモリーデータベース<br>
- * オブジェクトを取得して返す。<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			SQLite3メモリーデータベース or NULL（エラーの場合）
- */
-static sqlite3 *this_getMemoryDatabase (M2MCEP *self);
 
 
 /**
@@ -322,7 +293,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 					//===== DELETE文の作成 =====
 					snprintf(sql, DELETE_SQL_LENGTH, DELETE_SQL, tableName, tableName, excess);
 					//===== DELETE実行 =====
-					if (M2MSQLRunner_executeUpdate(this_getMemoryDatabase(self), sql)==true)
+					if (M2MSQLRunner_executeUpdate(M2MCEP_getMemoryDatabase(self), sql)==true)
 						{
 #ifdef DEBUG
 						memset(MESSAGE, 0, sizeof(MESSAGE));
@@ -420,7 +391,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database in memory");
 #endif // DEBUG
 				//===== メモリ上のSQLite3データベースをバキューム =====
-				M2MSQLiteConfig_vacuum(this_getMemoryDatabase(self));
+				M2MSQLiteConfig_vacuum(M2MCEP_getMemoryDatabase(self));
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database in memory");
 #endif // DEBUG
@@ -431,7 +402,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database file");
 #endif // DEBUG
 					//===== ファイル上のSQLite3データベースをバキューム =====
-					M2MSQLiteConfig_vacuum(this_getFileDatabase(self));
+					M2MSQLiteConfig_vacuum(M2MCEP_getFileDatabase(self));
 #ifdef DEBUG
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database file");
 #endif // DEBUG
@@ -480,7 +451,7 @@ static void this_closeFileDatabase (M2MCEP *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		M2MSQLiteConfig_closeDatabase(this_getFileDatabase(self));
+		M2MSQLiteConfig_closeDatabase(M2MCEP_getFileDatabase(self));
 #ifdef DEBUG
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 file database");
 #endif // DEBUG
@@ -508,7 +479,7 @@ static void this_closeMemoryDatabase (M2MCEP *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		M2MSQLiteConfig_closeDatabase(this_getMemoryDatabase(self));
+		M2MSQLiteConfig_closeDatabase(M2MCEP_getMemoryDatabase(self));
 #ifdef DEBUG
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 memory database");
 #endif // DEBUG
@@ -645,7 +616,7 @@ static void this_deleteDatabaseName (M2MCEP *self)
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_deleteDatabaseName()";
 
 	//===== Check argument =====
-	if (self!=NULL && this_getDatabaseName(self)!=NULL)
+	if (self!=NULL && M2MCEP_getDatabaseName(self)!=NULL)
 		{
 		M2MHeap_free(self->databaseName);
 #ifdef DEBUG
@@ -721,7 +692,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 			{
 			//===== レコード永続化の場合 =====
 			if ((persistence=this_getPersistence(self))==true
-					&& (fileDatabase=this_getFileDatabase(self))!=NULL)
+					&& (fileDatabase=M2MCEP_getFileDatabase(self))!=NULL)
 				{
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLiteデータベースへ未挿入レコード情報を一括挿入するトランザクション処理を開始します");
@@ -739,7 +710,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 				//===== 末端のレコード管理オブジェクトの挿入／削除 =====
 				this_insertRecordList(fileDatabase, dataFrame, tableManager, M2MDataFrame_getOldRecordList(dataFrame));
 				//===== トランザクション終了 =====
-				M2MSQLRunner_commitTransaction(this_getFileDatabase(self));
+				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLiteデータベースへ未挿入レコードを一括挿入するトランザクション処理を終了しました");
 #endif // DEBUG
@@ -861,7 +832,6 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 #ifdef DEBUG
 	M2MString MESSAGE[512];
 #endif // DEBUG
-	const M2MString *PERMISSION = (M2MString *)"0755";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseFilePath()";
 
 	//===== Check argument =====
@@ -870,7 +840,7 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 		{
 		//===== Copy database file installation directory pathname =====
 		if (this_getDatabaseDirectoryPath(&directoryPath)!=NULL
-				&& this_makeDirectory(directoryPath, PERMISSION)!=NULL
+				&& this_makeDirectory(directoryPath, M2MSQLiteConfig_DATABASE_DIRECTORY_PERMISSION)!=NULL
 				&& M2MString_append(databaseFilePath, directoryPath)!=NULL
 				&& M2MString_append(databaseFilePath, M2MDirectory_SEPARATOR)!=NULL
 				&& M2MString_append(databaseFilePath, databaseName)!=NULL)
@@ -909,31 +879,6 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 	else
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseFilePath\" is NULL", NULL);
-		return NULL;
-		}
-	}
-
-
-/**
- * 引数で指定されたCEP実行オブジェクトが保有するデータベース名を示す文字列を返す。<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			データベース名を示す文字列 or NULL（エラーの場合）
- */
-static M2MString *this_getDatabaseName (const M2MCEP *self)
-	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseName()";
-
-	//===== Check argument =====
-	if (self!=NULL)
-		{
-		return self->databaseName;
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -1010,87 +955,6 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 
 
 /**
- * 引数で指定されたCEP実行オブジェクトが管理しているファイル上のSQLite3データベース<br>
- * オブジェクトを取得して返す。<br>
- * もしCEP実行オブジェクトがファイル上のSQLite3データベース管理オブジェクトを<br>
- * 保持していなかった場合, 且つレコード永続化のフラグが立っている場合, 新規に<br>
- * ファイル上のSQLite3データベース管理オブジェクトを取得して返す．<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			ファイル上のSQLite3データベース管理オブジェクト or NULL（エラーの場合）
- */
-static sqlite3 *this_getFileDatabase (M2MCEP *self)
-	{
-	//========== Variable ==========
-	M2MString *databaseName = NULL;
-	M2MTableManager *tableManager = NULL;
-	sqlite3 *fileDatabase = NULL;
-	const bool SYNCHRONOUS_MODE = false;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getFileDatabase()";
-
-	//===== Check argument =====
-	if (self!=NULL)
-		{
-		//===== レコード永続化のフラグが立っている事を確認 =====
-		if (this_getPersistence(self)==true)
-			{
-			//===== ファイル上のSQLite3データベース管理オブジェクトの確認 =====
-			if (self->fileDatabase!=NULL)
-				{
-				return self->fileDatabase;
-				}
-			//===== ファイル上のSQLite3データベース管理オブジェクトを保持していない場合 =====
-			else
-				{
-				//===== ファイル上のSQLite3データベース管理オブジェクトの取得 =====
-				if ((databaseName=this_getDatabaseName(self))!=NULL
-						&& (tableManager=this_getTableManager(self))!=NULL
-						&& (fileDatabase=this_openFileDatabase(databaseName, tableManager, SYNCHRONOUS_MODE, this_getVacuumRecord(self)))!=NULL)
-					{
-					//===== ファイル上のSQLite3データベース管理オブジェクトをセット =====
-					this_setFileDatabase(self, fileDatabase);
-					//===== ファイル上のSQLite3データベース管理オブジェクトを返す =====
-					return fileDatabase;
-					}
-				//===== Error handling =====
-				else if (databaseName==NULL)
-					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なデータベースファイル名取得に失敗しました", NULL);
-					return NULL;
-					}
-				//===== Error handling =====
-				else if (tableManager==NULL)
-					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なテーブル構築オブジェクト取得に失敗しました", NULL);
-					return NULL;
-					}
-				//===== Error handling =====
-				else
-					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に失敗しました", NULL);
-					return NULL;
-					}
-				}
-			}
-		//===== レコード永続化のフラグが立っていない場合 =====
-		else
-			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード永続化は無効のため, ファイル上のSQLite3データベース管理オブジェクトを取得しません");
-#endif // DEBUG
-			return NULL;
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
-		return NULL;
-		}
-	}
-
-
-/**
  * SQLite3規程のテーブルに許される最大カラム数を返す．<br>
  *
  * @param database	SQLite3データベース管理オブジェクト
@@ -1139,55 +1003,6 @@ static unsigned int this_getMaxRecord (const M2MCEP *self)
 
 
 /**
- * CEP実行オブジェクトが管理しているメモリ上のSQLite3データベース管理オブジェクトを返す．<br>
- *
- * @param[in] self	CEP実行オブジェクト
- * @return			メモリ上のSQLite3データベース管理オブジェクト or NULL（エラーの場合）
- */
-static sqlite3 *this_getMemoryDatabase (M2MCEP *self)
-	{
-	//========== Variable ==========
-	sqlite3 *memoryDatabase = NULL;
-	const bool SYNCHRONOUS_MODE = false;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getMemoryDatabase()";
-
-	//===== Check argument =====
-	if (self!=NULL)
-		{
-		//===== メモリ上のSQLite3データベース管理オブジェクトの確認 =====
-		if (self->memoryDatabase!=NULL)
-			{
-			return self->memoryDatabase;
-			}
-		//===== メモリ上のSQLite3データベース管理オブジェクトが存在していない場合 =====
-		else
-			{
-			//===== メモリ上のSQLite3データベース管理オブジェクトの取得 =====
-			if ((memoryDatabase=this_openMemoryDatabase(this_getTableManager(self), SYNCHRONOUS_MODE, this_getVacuumRecord(self)))!=NULL)
-				{
-				//===== メモリ上のSQLite3データベース管理オブジェクトをセット =====
-				this_setMemoryDatabase(self, memoryDatabase);
-				//===== メモリ上のSQLite3データベース管理オブジェクトを返す =====
-				return memoryDatabase;
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"メモリ上のSQLite3データベース管理オブジェクト作成に失敗しました", NULL);
-				return NULL;
-				}
-			}
-		}
-	//===== 引数のエラー =====
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
-		return NULL;
-		}
-	}
-
-
-/**
  * 引数で指定されたCEP構造体オブジェクトから, 永続性の可否を示すフラグを取得する．<br>
  *
  * @param[in,out] self		CEP構造体オブジェクト
@@ -1229,48 +1044,6 @@ static unsigned int this_getRecordCounter (const M2MCEP *self)
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
 		return 0;
-		}
-	}
-
-
-/**
- * @param database
- * @param sql
- * @return
- */
-static sqlite3_stmt *this_getSQLitePreparedStatement (sqlite3 *database, const M2MString *sql)
-	{
-	//========== Variable ==========
-	sqlite3_stmt *statement = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getSQLitePreparedStatement()";
-
-	//===== Check argument =====
-	if (database!=NULL && sql!=NULL)
-		{
-		//===== プリペアドステートメントの獲得 =====
-		if (sqlite3_prepare(database, sql, -1, &statement, NULL)==SQLITE_OK)
-			{
-			//===== SQLのパラメータをリセット =====
-			sqlite3_clear_bindings(statement);
-			return statement;
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
-			return NULL;
-			}
-		}
-	//===== Argument error =====
-	else if (database==NULL)
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたSQLite3データベース管理オブジェクトがNULLです", NULL);
-		return NULL;
-		}
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたSQL文を示す文字列がNULLです", NULL);
-		return NULL;
 		}
 	}
 
@@ -1468,7 +1241,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 						&& (columnList=M2MColumnList_begin(M2MTableManager_getColumnList(tableManager, tableName)))!=NULL
 						&& (dataTypeArrayLength=this_getDataTypeArray(columnList, columnNameCSV, DATA_TYPE_ARRAY, sizeof(DATA_TYPE_ARRAY)))>0
 						&& this_createInsertSQL(tableName, columnNameCSV, M2MColumnList_length(columnList), &insertSQL)!=NULL
-						&& (statement=this_getSQLitePreparedStatement(fileDatabase, insertSQL))!=NULL)
+						&& (statement=M2MSQLiteConfig_getPreparedStatement(fileDatabase, insertSQL))!=NULL)
 					{
 #ifdef DEBUG
 					memset(MESSAGE, 0, sizeof(MESSAGE));
@@ -1875,7 +1648,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLiteデータベースへレコードを挿入するトランザクション処理を開始します");
 #endif // DEBUG
 				//===== トランザクション開始 =====
-				M2MSQLRunner_beginTransaction(this_getFileDatabase(self));
+				M2MSQLRunner_beginTransaction(M2MCEP_getFileDatabase(self));
 				}
 			//===== レコード非永続化の場合 =====
 			else
@@ -1886,17 +1659,17 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 			while (M2MDataFrame_next(tableRecord)!=NULL)
 				{
 				//===== レコード管理オブジェクトの保持する過去レコード処理を実行 =====
-				this_insertOldRecordList(this_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
+				this_insertOldRecordList(M2MCEP_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
 				//===== 次のテーブルレコード管理オブジェクトへ移動 =====
 				tableRecord = M2MDataFrame_next(tableRecord);
 				}
 			//===== 最後のレコード管理オブジェクトの保持する過去レコード処理を実行 =====
-			this_insertOldRecordList(this_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
+			this_insertOldRecordList(M2MCEP_getFileDatabase(self), tableRecord, tableManager, maxRecord, persistence);
 			//===== レコード永続化の場合 =====
 			if (this_getPersistence(self)==true)
 				{
 				//===== トランザクション終了 =====
-				M2MSQLRunner_commitTransaction(this_getFileDatabase(self));
+				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
 #ifdef DEBUG
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLiteデータベースへレコードを挿入するトランザクション処理を終了しました");
 #endif // DEBUG
@@ -1957,7 +1730,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 	if (self!=NULL)
 		{
 		//===== データベースとレコード管理オブジェクトの取得 =====
-		if ((memoryDatabase=this_getMemoryDatabase(self))!=NULL
+		if ((memoryDatabase=M2MCEP_getMemoryDatabase(self))!=NULL
 				&& (tableManager=this_getTableManager(self))!=NULL
 				&& (record=M2MDataFrame_begin(this_getDataFrame(self)))!=NULL)
 			{
@@ -2261,7 +2034,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
 				}
 #ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set the SQLite3 database name (=\"%s\") in the CEP structure object", this_getDatabaseName(self));
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set the SQLite3 database file name (=\"%s\") in the CEP structure object", M2MCEP_getDatabaseName(self));
 			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
 			return self;
@@ -2763,6 +2536,160 @@ void M2MCEP_delete (M2MCEP **self)
 
 
 /**
+ * Return string indicating the database name possessed by the CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			String indicating database file name or NULL (in case of error)
+ */
+M2MString *M2MCEP_getDatabaseName (const M2MCEP *self)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getDatabaseName()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		return self->databaseName;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
+ * Get the SQLite3 database object on the file managed by the CEP object. <br>
+ * If the CEP object does not hold the SQLite 3 database object on the file <br>
+ * and the record persistence flag is set up, it will acquire and return <br>
+ * the SQLite 3 database object newly created.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			SQLite3 database object on file or NULL (in case of error)
+ */
+sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self)
+	{
+	//========== Variable ==========
+	M2MString *databaseName = NULL;
+	M2MTableManager *tableManager = NULL;
+	sqlite3 *fileDatabase = NULL;
+	const bool SYNCHRONOUS_MODE = false;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getFileDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== Confirm the flag for record persistence =====
+		if (this_getPersistence(self)==true)
+			{
+			//===== ファイル上のSQLite3データベース管理オブジェクトの確認 =====
+			if (self->fileDatabase!=NULL)
+				{
+				return self->fileDatabase;
+				}
+			//===== ファイル上のSQLite3データベース管理オブジェクトを保持していない場合 =====
+			else
+				{
+				//===== ファイル上のSQLite3データベース管理オブジェクトの取得 =====
+				if ((databaseName=M2MCEP_getDatabaseName(self))!=NULL
+						&& (tableManager=this_getTableManager(self))!=NULL
+						&& (fileDatabase=this_openFileDatabase(databaseName, tableManager, SYNCHRONOUS_MODE, this_getVacuumRecord(self)))!=NULL)
+					{
+					//===== ファイル上のSQLite3データベース管理オブジェクトをセット =====
+					this_setFileDatabase(self, fileDatabase);
+					//===== ファイル上のSQLite3データベース管理オブジェクトを返す =====
+					return fileDatabase;
+					}
+				//===== Error handling =====
+				else if (databaseName==NULL)
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なデータベースファイル名取得に失敗しました", NULL);
+					return NULL;
+					}
+				//===== Error handling =====
+				else if (tableManager==NULL)
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に必要なテーブル構築オブジェクト取得に失敗しました", NULL);
+					return NULL;
+					}
+				//===== Error handling =====
+				else
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ファイル上のSQLite3データベース管理オブジェクト作成に失敗しました", NULL);
+					return NULL;
+					}
+				}
+			}
+		//===== When the record persistence flag is not set =====
+		else
+			{
+#ifdef DEBUG
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Because record persistence is invalid, we don't get the SQLite3 database object on the file");
+#endif // DEBUG
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
+ * Return the SQLite 3 database object on the memory managed by the CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			SQLite3 database object on memory or NULL (in case of error)
+ */
+sqlite3 *M2MCEP_getMemoryDatabase (M2MCEP *self)
+	{
+	//========== Variable ==========
+	sqlite3 *memoryDatabase = NULL;
+	const bool SYNCHRONOUS_MODE = false;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getMemoryDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== メモリ上のSQLite3データベース管理オブジェクトの確認 =====
+		if (self->memoryDatabase!=NULL)
+			{
+			return self->memoryDatabase;
+			}
+		//===== メモリ上のSQLite3データベース管理オブジェクトが存在していない場合 =====
+		else
+			{
+			//===== メモリ上のSQLite3データベース管理オブジェクトの取得 =====
+			if ((memoryDatabase=this_openMemoryDatabase(this_getTableManager(self), SYNCHRONOUS_MODE, this_getVacuumRecord(self)))!=NULL)
+				{
+				//===== メモリ上のSQLite3データベース管理オブジェクトをセット =====
+				this_setMemoryDatabase(self, memoryDatabase);
+				//===== メモリ上のSQLite3データベース管理オブジェクトを返す =====
+				return memoryDatabase;
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create SQLite3 database object in memory", NULL);
+				return NULL;
+				}
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
  * Return CEP library version number string defined in "M2MCEP.h" file.
  *
  * @return	CEP library version number string
@@ -2962,7 +2889,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 	if (self!=NULL && sql!=NULL && result!=NULL)
 		{
 		//===== SQL文をVDBE（内部実行形式）へ変換 =====
-		if ((memoryDatabase=this_getMemoryDatabase(self))!=NULL
+		if ((memoryDatabase=M2MCEP_getMemoryDatabase(self))!=NULL
 				&& sqlite3_prepare(memoryDatabase, sql, -1, &statement, NULL)==SQLITE_OK)
 			{
 			//===== SQL実行（結果行が末端に辿り着くまで繰り返し） =====

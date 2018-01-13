@@ -50,7 +50,7 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * Enumerated object indicating the data type of the database<br>
+ * Enumerated object indicating the data type of the SQLite3 database<br>
  */
 #ifndef M2MDataType
 typedef enum
