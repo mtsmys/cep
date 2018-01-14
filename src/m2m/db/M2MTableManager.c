@@ -106,7 +106,7 @@ static M2MTableManager *this_begin (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -140,7 +140,7 @@ static void this_deleteColumnList (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		}
 	return;
 	}
@@ -174,7 +174,7 @@ static void this_deleteTableName (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		}
 	return;
 	}
@@ -306,7 +306,7 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -388,12 +388,12 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"sql\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" pointer is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -418,89 +418,8 @@ static M2MString *this_getTableName (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
-		}
-	}
-
-
-/**
- * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するテーブル名を<br>
- * 示す文字列に対し, 同一名のテーブルがデータベースに存在するかどうかを確認する。<br>
- *
- * @param[in] self		テーブル構築オブジェクト
- * @param[in] database	テーブル名確認対象のSQLite3データベース
- * @return				true : 同一テーブル名のテーブルが存在, false : 同一テーブル名のテーブルは存在しない
- */
-static bool this_isExistingTable (const M2MTableManager *self, sqlite3 *database)
-	{
-	//========== Variable ==========
-	sqlite3_stmt *statement = NULL;
-	M2MString sql[256];
-	M2MString *tableName = NULL;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif /* DEBUG */
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager.this_isExistingTable()";
-
-	//===== Check argument =====
-	if (self!=NULL && database!=NULL)
-		{
-		//===== 配列の初期化 =====
-		memset(sql, 0, sizeof(sql));
-		//===== SQL文を配列へコピー =====
-		snprintf(sql, sizeof(sql)-1, (M2MString *)"SELECT COUNT(DISTINCT name) AS result FROM sqlite_master WHERE type='table' AND name='%s'", tableName=this_getTableName(self));
-		//===== SQLをセット =====
-		if (sqlite3_prepare(database, sql, -1, &statement, NULL)==SQLITE_OK)
-			{
-			//===== SQL実行 =====
-			while (sqlite3_step(statement)==SQLITE_ROW)
-				{
-				//===== 同一テーブル名が見つかった場合 =====
-				if (sqlite3_column_int(statement, 0)==1)
-					{
-					sqlite3_finalize(statement);
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"SQLiteデータベース上に\"%s\"テーブルは既に存在しています", tableName);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif /* DEBUG */
-					return true;
-					}
-				//===== 同一テーブル名が見つからなかった場合 =====
-				else
-					{
-					sqlite3_finalize(statement);
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"SQLiteデータベース上に\"%s\"テーブルは未だ存在していません", tableName);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif /* DEBUG */
-					return false;
-					}
-				}
-			//===== Error handling =====
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, sqlite3_errmsg(database), NULL);
-			return false;
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, sqlite3_errmsg(database), NULL);
-			sqlite3_finalize(statement);
-			return false;
-			}
-		}
-	//===== Argument error =====
-	else if (self==NULL)
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
-		return false;
-		}
-	else
-		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
-		return false;
 		}
 	}
 
@@ -524,7 +443,7 @@ static M2MTableManager *this_next (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -549,7 +468,7 @@ static M2MTableManager *this_previous (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -577,12 +496,12 @@ static M2MTableManager *this_setColumnList (M2MTableManager *self, M2MColumnList
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -610,7 +529,7 @@ static M2MTableManager *this_setNext (M2MTableManager *self, M2MTableManager *ne
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -638,12 +557,12 @@ static M2MTableManager *this_setPrevious (M2MTableManager *self, M2MTableManager
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"previous\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"previous\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -694,12 +613,12 @@ static M2MTableManager *this_setTableName (M2MTableManager *self, const M2MStrin
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"tableName\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -710,10 +629,10 @@ static M2MTableManager *this_setTableName (M2MTableManager *self, const M2MStrin
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたSQLite3データベースに対し, テーブルを作成する。<br>
+ * Create a table for the SQLite3 database.<br>
  *
- * @param[in] self		（テーブル情報挿入済みの）テーブル構築オブジェクト
- * @param[in] database	テーブル作成対象のSQLite3データベース
+ * @param[in] self		Table construction object (column information inserted)
+ * @param[in] database	SQLite3 database to create table
  */
 void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 	{
@@ -734,7 +653,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 			while ((next=this_next(self))!=NULL)
 				{
 				//===== 同一名のテーブルが存在する場合 =====
-				if (this_isExistingTable(self, database)==true)
+				if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
 					{
 					// 何もしない
 					}
@@ -787,7 +706,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				self = next;
 				}
 			//===== 同一名のテーブルが存在する場合 =====
-			if (this_isExistingTable(self, database)==true)
+			if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
 				{
 				// 何もしない
 				}
@@ -863,22 +782,23 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"sqlite3 *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"database\" object is NULL", NULL);
 		return;
 		}
 	}
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトのメモリ領域を解放する．<br>
- * この関数を呼び出した後は当該変数にアクセス出来なくなる事に留意する．<br>
+ * Releases heap memory of the table construction object. <br>
+ * Be aware that after calling this function you can no longer access <br>
+ * that variable.<br>
  *
- * @param[in,out] self	（ヒープ）メモリ領域解放対象のテーブル構築オブジェクト
+ * @param[in,out] self	Table construction object to be freed heap memory
  */
 void M2MTableManager_delete (M2MTableManager **self)
 	{
@@ -928,51 +848,54 @@ void M2MTableManager_delete (M2MTableManager **self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCEPテーブル構築オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトからテーブル名に一致するカラム構造体オブジェクトを取得する．
+ * Get column list object matching the table name from table construction object.<br>
  *
- * @param self		テーブル構築オブジェクト
- * @param tableName	テーブル名を示す文字列
- * @return			テーブル名が一致したカラム構造体オブジェクト or NULL（エラーの場合)
+ * @param[in] self		Table construction object
+ * @param[in] tableName	String indicating table name
+ * @return				Column structure object with matching table name or NULL (in case of error)
  */
 M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MString *tableName)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_getColumnList()";
+
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=this_begin(self))!=NULL)
 			{
-			//===== 末端に辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (this_next(self)!=NULL)
 				{
-				//===== テーブル名が一致した場合 =====
+				//===== When the table names match =====
 				if (M2MString_compareTo(this_getTableName(self), tableName)==0)
 					{
-					//===== カラム構造体オブジェクトを返す =====
+					//===== Return column list object =====
 					return this_getColumnList(self);
 					}
-				//===== テーブル名が一致しない場合 =====
+				//===== When table names don't match =====
 				else
 					{
-					// そのまま繰り返し
+					// do nothing
 					}
-				//===== 次のノードへ移動 =====
+				//===== Move to next node =====
 				self = (M2MTableManager *)this_next(self);
 				}
-			//===== 末端ノードのテーブル名が一致した場合 =====
+			//===== When the table name of the end node matches =====
 			if (M2MString_compareTo(this_getTableName(self), tableName)==0)
 				{
-				//===== カラム構造体オブジェクトを返す =====
+				//===== Return column list object =====
 				return this_getColumnList(self);
 				}
-			//===== 末端ノードのテーブル名が一致しない場合 =====
+			//===== When the table name of the end node doesn't match =====
 			else
 				{
 				return NULL;
@@ -981,21 +904,28 @@ M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MSt
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get begin node from indicated \"M2MTableManager\" object", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		return NULL;
+		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * Get the heap memory and create a new M2MTableManager structure object.<br>
+ * Get heap memory and create a new table construction object.<br>
  *
- * @return		Newly created M2MTableManager structure object
+ * @return	Created new table construction object
  */
 M2MTableManager *M2MTableManager_new ()
 	{
@@ -1003,34 +933,33 @@ M2MTableManager *M2MTableManager_new ()
 	M2MTableManager *self = NULL;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_new()";
 
-	//===== ヒープメモリ領域の獲得 =====
+	//===== Get heap memory =====
 	if ((self=(M2MTableManager *)M2MHeap_malloc(sizeof(M2MTableManager)))!=NULL)
 		{
-		//===== 初期化 =====
+		//===== Set member variables =====
 		this_setPrevious(self, self);
 		this_setNext(self, NULL);
 #ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築オブジェクトを新規作成しました");
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Created new table construction object");
 #endif // DEBUG
 		return self;
 		}
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"ヒープメモリ領域の獲得に失敗しました", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for creating \"M2MTableManager\" object", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム情報を, 同じく引数で指定されたテーブル構築オブジェクトに<br>
- * 格納する。<br>
+ * Store the column information in the table construction object.<br>
  *
- * @param[in,out] self		テーブル作成のためのカラム設定情報を格納したテーブル構築オブジェクト
- * @param[in] tableName		テーブル名を示す文字列
- * @param[in] columnList	カラム設定情報を格納したカラム構造体オブジェクト
- * @return					カラム設定情報を含むテーブル構築オブジェクト or NULL（エラーの場合)
+ * @param[in,out] self		Table construction object
+ * @param[in] tableName		String indicating table name
+ * @param[in] columnList	Column structure object storing column setting information
+ * @return					Table construction object containing column setting information or NULL (in case of error)
  */
 M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MString *tableName, M2MColumnList *columnList)
 	{
@@ -1040,7 +969,7 @@ M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MStri
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && columnList!=NULL)
 		{
-		//===== メンバ変数へセット =====
+		//===== Set member variables =====
 		if (this_setTableName(self, tableName)!=NULL
 				&& this_setColumnList(self, columnList)!=NULL)
 			{
@@ -1049,24 +978,24 @@ M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MStri
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"にテーブル名, もしくはカラム構造体オブジェクトをセットするのに失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set table name or column structure object in \"M2MTableManager\" object", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"tableName\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}

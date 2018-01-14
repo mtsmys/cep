@@ -35,12 +35,13 @@
  ******************************************************************************/
 /**
  *
- * @param[in] self
+ * @param[in] self	Column information list object
  */
 static void this_deleteColumn (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	M2MColumn *column = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_deleteColumn()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -60,37 +61,48 @@ static void this_deleteColumn (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		// do nothing
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * @param[in,out] self
- * @param[in] columnName
- * @return
+ * Search and detect a list object matching column name from the column list.<br>
+ *
+ * @param[in,out] self			Column information list object
+ * @param[in] columnName		String indicating column name
+ * @param[in] columnNameLength	Length of column name string[Byte]
+ * @return						Column information list object matching the column name
  */
-static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnName)
+static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnName, const size_t columnNameLength)
 	{
 	//========== Variable ==========
-	size_t columnNameLength = 0;
 	M2MColumn *column = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_detect()";
 
 	//===== Check argument =====
-	if (self!=NULL && columnName!=NULL && (columnNameLength=M2MString_length(columnName))>0)
+	if (self!=NULL
+			&& columnName!=NULL
+			&& columnNameLength<=M2MString_length(columnName))
 		{
-		//===== Get the first node =====
-		if ((self=M2MColumnList_begin(self))!=NULL)
+		//===== Get begin node =====
+		if ((self=(M2MColumnList_begin(self)))!=NULL)
 			{
-			//===== Repeat until reaching the end node =====
+			//===== Loop until getting at the end node =====
 			while (M2MColumnList_next(self)!=NULL)
 				{
-				//===== When there is a node matching the column name =====
+				//===== Check the name of column =====
 				if ((column=M2MColumnList_getColumn(self))!=NULL
 						&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
 					{
 					return self;
+					}
+				//===== Error handling =====
+				else if (column==NULL)
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The medium node of \"M2MColumnList\" object is NULL", NULL);
+					return NULL;
 					}
 				//===== Move to next node =====
 				else
@@ -98,13 +110,19 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 					self = M2MColumnList_next(self);
 					}
 				}
-			//===== When there is a node matching the column name =====
+			//===== Check the name of column =====
 			if ((column=M2MColumnList_getColumn(self))!=NULL
 					&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
 				{
 				return self;
 				}
-			//===== If there is no node matching the column name =====
+			//===== Error handling =====
+			else if (column==NULL)
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The end node of \"M2MColumnList\" object is NULL", NULL);
+				return NULL;
+				}
+			//===== In case of not existing a node matching the name =====
 			else
 				{
 				return NULL;
@@ -113,12 +131,24 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The begin node of \"M2MColumnList\" object is NULL", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
+		return NULL;
+		}
+	else if (columnName==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL", NULL);
+		return NULL;
+		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string", NULL);
 		return NULL;
 		}
 	}
@@ -126,12 +156,15 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 
 /**
  *
- * @param[in,out] self
+ * @param[in,out] self	Column information list object
  * @param[in] column
  * @return
  */
 static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setColumn()";
+
 	//===== Check argument =====
 	if (self!=NULL && column!=NULL)
 		{
@@ -142,18 +175,22 @@ static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param[in,out] self
+ * @param[in,out] self	Column information list object
  * @param[in] next
  * @return
  */
 static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setNext()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -163,18 +200,22 @@ static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param[in,out] self
+ * @param[in,out] self	Column information list object
  * @param[in] previous
  * @return
  */
 static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *previous)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setPrevious()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -184,6 +225,7 @@ static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *prev
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -193,16 +235,16 @@ static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *prev
  * Public function
  ******************************************************************************/
 /**
- * カラム構造体オブジェクトのリンクに新規ノードを追加する。<br>
+ * Add a new node to the link of the column information list object.<br>
  *
- * @param[in,out] self		カラム構造体オブジェクト
- * @param[in] columnName	カラム名
- * @param[in] dataType		カラムのデータ型
- * @param[in] primaryKey	主キー有効化のフラグ
- * @param[in] autoIncrement	自動インクリメント有効化のフラグ
- * @param[in] allowNULL		NULL有効化のフラグ
- * @param[in] unique		ユニーク性有効化のフラグ
- * @return					新規追加されたカラム構造体オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		Column information list object
+ * @param[in] columnName	String indicating column name
+ * @param[in] dataType		Data type of the column
+ * @param[in] primaryKey	Flag for primary key activation
+ * @param[in] autoIncrement	Flag for auto increment enable
+ * @param[in] allowNULL		Flag for NULL activation
+ * @param[in] unique		Flag of uniqueness validation
+ * @return					Newly added information list object or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnName, const M2MDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique)
 	{
@@ -210,16 +252,17 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 	M2MColumnList *detectedNode = NULL;
 	M2MColumnList *newNode = NULL;
 	M2MColumn *column = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_add()";
 
 	//===== Check argument =====
-	if (self!=NULL && columnName!=NULL)
+	if (self!=NULL && columnName!=NULL && M2MString_length(columnName)>0)
 		{
-		//=====  =====
-		if ((detectedNode=this_detect(self, columnName))!=NULL)
+		//===== In case of same column is existing =====
+		if ((detectedNode=this_detect(self, columnName, M2MString_length(columnName)))!=NULL)
 			{
 			return detectedNode;
 			}
-		//=====  =====
+		//===== In case of adding a newly column node =====
 		else
 			{
 			//=====  =====
@@ -242,7 +285,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"引数で指定されたカラム情報をカラム情報オブジェクトにセットする処理でエラーが発生しました", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object", NULL);
 						M2MColumn_delete(&column);
 						return NULL;
 						}
@@ -250,10 +293,9 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object", NULL);
 					return NULL;
 					}
-
 				}
 			//=====  =====
 			else
@@ -279,7 +321,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"引数で指定されたカラム情報をカラム情報オブジェクトにセットする処理でエラーが発生しました", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object", NULL);
 						M2MColumn_delete(&column);
 						M2MColumnList_delete(newNode);
 						return NULL;
@@ -288,17 +330,17 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 				//===== Error handling =====
 				else if (self==NULL)
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"オブジェクトから末端ノードを取得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get end node from \"M2 MColumnList\" object specified by argument", NULL);
 					return NULL;
 					}
 				else if (newNode==NULL)
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"カラム構造体オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column list object", NULL);
 					return NULL;
 					}
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"カラム情報オブジェクトを新規作成するため, ヒープメモリ領域を獲得するのに失敗しました", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object", NULL);
 					M2MColumnList_delete(newNode);
 					return NULL;
 					}
@@ -308,25 +350,28 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_add()", __LINE__, (M2MString *)"引数で指定された\"columnName\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL or vacant", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの1つ先に位置するノードを取得する。<br>
+ * Get the node located one column ahead of the link of the column list object.<br>
  *
- * @param[in] self	カラム構造体オブジェクト
- * @return			カラム構造体オブジェクトのリンクの先頭ノード or NULL（エラーの場合）
+ * @param[in] self	Column information list object
+ * @return			Column information list object which is first node of link or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_begin()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -339,65 +384,66 @@ M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_length()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの全ノードのメモリ領域を解放する。<br>
+ * Release the memory of all nodes of the link of the column list object.<br>
  *
- * @param[in,out] self	カラム構造体オブジェクト
+ * @param[in,out] self	Column information list object
  */
 void M2MColumnList_delete (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	M2MColumnList *next = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MColumnList_begin(self))!=NULL)
 			{
-			//===== 末端のノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (M2MColumnList_next(self)!=NULL)
 				{
-				//===== 1つ後ろのノードのポインタを一時的に取得 =====
+				//===== Temporarily get the pointer of the node behind =====
 				next = M2MColumnList_next(self);
-				//===== 削除対象のノードをリンクから切り離し =====
+				//===== Detach node to be deleted from link =====
 				this_setNext(self, NULL);
 				this_setPrevious(next, next);
-				//===== カラム構造体オブジェクトのヒープメモリ領域を解放 =====
+				//===== Release heap memory of column structure object =====
 				this_deleteColumn(self);
 				M2MHeap_free(self);
-				//===== 次のノードに移動 =====
+				//===== Move to next node =====
 				self = next;
 				}
-			//===== （末端の）カラム構造体オブジェクトの有無を確認 =====
+			//===== Confirm existence of end node =====
 			if (self!=NULL)
 				{
-				//===== （末端の）カラム構造体オブジェクトのヒープメモリ領域を解放 =====
+				//===== Release heap memory of column structure object =====
 				this_deleteColumn(self);
 				M2MHeap_free(self);
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_delete()", __LINE__, (M2MString *)"カラム構造体オブジェクトのリンクの末端ノードがNULLです", NULL);
+				M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_delete()", __LINE__, (M2MString *)"End node of column list object link is NULL", NULL);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_delete()", __LINE__, (M2MString *)"カラム構造体オブジェクトの先頭ノードの取得に失敗しました", NULL);
+			M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_delete()", __LINE__, (M2MString *)"Failed to get first node of the column list object", NULL);
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_delete()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		}
 	return;
 	}
@@ -406,11 +452,14 @@ void M2MColumnList_delete (M2MColumnList *self)
 /**
  * 引数で指定されたカラム構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
  *
- * @param[in,out] self	カラム構造体オブジェクト
+ * @param[in,out] self	Column information list object
  * @return				カラム構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
  */
 M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_end()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -423,7 +472,7 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_end()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -433,11 +482,14 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self)
  * 引数で指定されたカラム構造体オブジェクトからカラム情報オブジェクトを取得して<br>
  * 返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			カラム情報オブジェクト
  */
 M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_getColumn()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -446,7 +498,7 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_getColumn()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -456,7 +508,7 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
  * 引数で指定されたカラム構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
  * する。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			true : 値が1つも存在しない, false : 値を1つ以上保有している
  */
 bool M2MColumnList_isEmpty (M2MColumnList *self)
@@ -477,13 +529,14 @@ bool M2MColumnList_isEmpty (M2MColumnList *self)
 /**
  * カラム構造体オブジェクトのノード数を示す整数を返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			リンクされているカラム構造体オブジェクトのノード数を示す整数
  */
 unsigned int M2MColumnList_length (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	unsigned int length = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_length()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -519,7 +572,7 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_length()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return 0;
 		}
 	}
@@ -529,11 +582,14 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
  * 引数で指定されたカラム構造体オブジェクトの1つ後ろに位置するカラム構造体<br>
  * オブジェクトを返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return next 	1つ後ろに位置するカラム構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
  */
 M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_next()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -542,48 +598,62 @@ M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_next()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * ヒープ領域のメモリを獲得し, M2MColumnList構造体オブジェクトを新規作成する。<br>
+ * Get heap memory and create a new M2MColumnList structure object.<br>
  *
- * @return	新規作成したM2MColumnList構造体オブジェクト
+ * @return	Created new column information list object
  */
 M2MColumnList *M2MColumnList_new ()
 	{
 	//========== Variable ==========
 	M2MColumnList *self = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_new()";
 
-	//===== ヒープメモリ領域の獲得 =====
+	//===== Get heap memory for creating new object =====
 	if ((self=(M2MColumnList *)M2MHeap_malloc(sizeof(M2MColumnList)))!=NULL)
 		{
-		this_setPrevious(self, self);
-		this_setNext(self, NULL);
-		return self;
+		//===== Initialize column information list object =====
+		if (this_setPrevious(self, self)!=NULL
+				&& this_setNext(self, NULL)!=NULL)
+			{
+			return self;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MColumnList_delete(self);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize \"M2MColumnList\" object", NULL);
+			return NULL;
+			}
 		}
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_new()", __LINE__, (M2MString *)"\"M2MColumnList\"オブジェクトを生成すためのヒープメモリ領域獲得に失敗しました", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for creating a new \"M2MColumnList\" object", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトの1つ手前に存在するカラム構造体<br>
- * オブジェクトを取得して返す。<br>
- * 引数で指定されたカラム構造体オブジェクトが先頭ノードの場合, 同じポインタを示す。<br>
+ * Get and return the column object existing one before the argument. <br>
+ * If the column structure object is the first node, it indicates the <br>
+ * same pointer.<br>
  *
- * @param[in] self	カラム構造体オブジェクト
- * @return			1つ手前に存在するカラム構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] self	Column information list object
+ * @return			Column structure object which exists one before or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_previous (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_previous()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -592,67 +662,36 @@ M2MColumnList *M2MColumnList_previous (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MColumnList_previous()", __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param self
- * @param columnName
- * @param columnNameLength
- * @return
+ * Search and detect an object matching column name from the column list.<br>
+ *
+ * @param[in] self				Column information list object
+ * @param[in] columnName		String indicating column name
+ * @param[in] columnNameLength	Length of column name string[Byte]
+ * @return						Column information object matching the column name
  */
 M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnName, const size_t columnNameLength)
 	{
 	//========== Variable ==========
-	M2MColumn *column = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList_search()";
 
 	//===== Check argument =====
-	if (self!=NULL && columnName!=NULL && columnNameLength<=M2MString_length(columnName))
+	if (self!=NULL
+			&& columnName!=NULL
+			&& columnNameLength<=M2MString_length(columnName))
 		{
-		//=====  =====
-		if ((self=(M2MColumnList_begin(self)))!=NULL)
+		//===== Detected a matching node =====
+		if ((self=this_detect(self, columnName, columnNameLength))!=NULL)
 			{
-			//=====  =====
-			while (M2MColumnList_next(self)!=NULL)
-				{
-				//=====  =====
-				if ((column=M2MColumnList_getColumn(self))!=NULL
-						&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
-					{
-					return column;
-					}
-				//=====  =====
-				else if (column==NULL)
-					{
-					return NULL;
-					}
-				//=====  =====
-				else
-					{
-					self = M2MColumnList_next(self);
-					}
-				}
-			//=====  =====
-			if ((column=M2MColumnList_getColumn(self))!=NULL
-					&& M2MString_equals(M2MColumn_getName(column), columnName, columnNameLength)==true)
-				{
-				return column;
-				}
-			//=====  =====
-			else if (column==NULL)
-				{
-				return NULL;
-				}
-			//=====  =====
-			else
-				{
-				return NULL;
-				}
+			return M2MColumnList_getColumn(self);
 			}
-		//=====  =====
+		//===== Failed to detect =====
 		else
 			{
 			return NULL;
@@ -661,14 +700,17 @@ M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnNam
 	//===== Argument error =====
 	else if (self==NULL)
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
 		return NULL;
 		}
 	else if (columnName==NULL)
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string", NULL);
 		return NULL;
 		}
 	}

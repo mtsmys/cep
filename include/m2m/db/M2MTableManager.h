@@ -34,6 +34,7 @@
 
 
 #include "m2m/db/M2MSQLRunner.h"
+#include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/db/M2MColumnList.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
@@ -78,49 +79,49 @@ typedef struct M2MTableManager
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたSQLite3データベースに対し、テーブルを作成する。<br>
+ * Create a table for the SQLite3 database.<br>
  *
- * @param[in] self		（カラム情報挿入済みの）テーブル構築オブジェクト
- * @param[in] database	テーブル作成対象のSQLite3データベース
+ * @param[in] self		Table construction object (column information inserted)
+ * @param[in] database	SQLite3 database to create table
  */
 void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database);
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトのメモリ領域を解放する．<br>
- * この関数を呼び出した後は当該変数にアクセス出来なくなる事に留意する．<br>
+ * Releases heap memory of the table construction object. <br>
+ * Be aware that after calling this function you can no longer access <br>
+ * that variable.<br>
  *
- * @param[in,out] self	（ヒープ）メモリ領域解放対象のテーブル構築オブジェクト
+ * @param[in,out] self	Table construction object to be freed heap memory
  */
 void M2MTableManager_delete (M2MTableManager **self);
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトからテーブル名に一致するカラム構造体オブジェクトを取得する．
+ * Get column list object matching the table name from table construction object.<br>
  *
- * @param self		テーブル構築オブジェクト
- * @param tableName	テーブル名を示す文字列
- * @return			テーブル名が一致したカラム構造体オブジェクト or NULL（エラーの場合)
+ * @param[in] self		Table construction object
+ * @param[in] tableName	String indicating table name
+ * @return				Column structure object with matching table name or NULL (in case of error)
  */
 M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MString *tableName);
 
 
 /**
- * ヒープメモリ領域を獲得し，新規にテーブル構築オブジェクトを作成する．<br>
+ * Get heap memory and create a new table construction object.<br>
  *
- * @return		新規作成したテーブル構築オブジェクト
+ * @return	Created new table construction object
  */
 M2MTableManager *M2MTableManager_new ();
 
 
 /**
- * 引数で指定されたカラム情報を、同じく引数で指定されたテーブル構築オブジェクトに<br>
- * 格納する。<br>
+ * Store the column information in the table construction object.<br>
  *
- * @param[in,out] self		テーブル作成のためのカラム設定情報を格納したテーブル構築オブジェクト
- * @param[in] tableName		テーブル名を示す文字列
- * @param[in] columnList	カラム設定情報を格納したカラム構造体オブジェクト
- * @return					カラム設定情報を含むテーブル構築オブジェクト or NULL（エラーの場合)
+ * @param[in,out] self		Table construction object
+ * @param[in] tableName		String indicating table name
+ * @param[in] columnList	Column structure object storing column setting information
+ * @return					Table construction object containing column setting information or NULL (in case of error)
  */
 M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MString *tableName, M2MColumnList *columnList);
 

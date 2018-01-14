@@ -42,7 +42,7 @@
 M2MString *M2MDataType_toString (const M2MDataType self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataType_toString";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataType_toString()";
 
 	if (self==M2M_DATA_TYPE_BLOB)
 		{

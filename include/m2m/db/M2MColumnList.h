@@ -74,33 +74,33 @@ typedef struct M2MColumnList
  * Public function
  ******************************************************************************/
 /**
- * カラム構造体オブジェクトのリンクに新規ノードを追加する。<br>
+ * Add a new node to the link of the column information list object.<br>
  *
- * @param[in,out] self		カラム構造体オブジェクト
- * @param[in] columnName	カラム名
- * @param[in] dataType		カラムのデータ型
- * @param[in] primaryKey	主キー有効化のフラグ
- * @param[in] autoIncrement	自動インクリメント有効化のフラグ
- * @param[in] allowNULL		NULL有効化のフラグ
- * @param[in] unique		ユニーク性有効化のフラグ
- * @return					新規追加されたカラム構造体オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		Column information list object
+ * @param[in] columnName	String indicating column name
+ * @param[in] dataType		Data type of the column
+ * @param[in] primaryKey	Flag for primary key activation
+ * @param[in] autoIncrement	Flag for auto increment enable
+ * @param[in] allowNULL		Flag for NULL activation
+ * @param[in] unique		Flag of uniqueness validation
+ * @return					Newly added information list object or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnName, const M2MDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの1つ先に位置するノードを取得する。<br>
+ * Get the node located one column ahead of the link of the column list object.<br>
  *
- * @param[in] self	カラム構造体オブジェクト
- * @return			カラム構造体オブジェクトのリンクの先頭ノード or NULL（エラーの場合）
+ * @param[in] self	Column information list object
+ * @return			Column information list object which is first node of link or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_begin (M2MColumnList *self);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの全ノードのメモリ領域を解放する。<br>
+ * Release the memory of all nodes of the link of the column list object.<br>
  *
- * @param[in,out] self	カラム構造体オブジェクト
+ * @param[in,out] self	Column information list object
  */
 void M2MColumnList_delete (M2MColumnList *self);
 
@@ -108,7 +108,7 @@ void M2MColumnList_delete (M2MColumnList *self);
 /**
  * 引数で指定されたカラム構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
  *
- * @param[in,out] self	カラム構造体オブジェクト
+ * @param[in,out] self	Column information list object
  * @return				カラム構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
  */
 M2MColumnList *M2MColumnList_end (M2MColumnList *self);
@@ -118,7 +118,7 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self);
  * 引数で指定されたカラム構造体オブジェクトからカラム情報オブジェクトを取得して<br>
  * 返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			カラム情報オブジェクト
  */
 M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self);
@@ -128,7 +128,7 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self);
  * 引数で指定されたカラム構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
  * する。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			true : 値が1つも存在しない、false : 値を1つ以上保有している
  */
 bool M2MColumnList_isEmpty (M2MColumnList *self);
@@ -137,7 +137,7 @@ bool M2MColumnList_isEmpty (M2MColumnList *self);
 /**
  * カラム構造体オブジェクトのノード数を示す整数を返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return			リンクされているカラム構造体オブジェクトのノード数を示す整数
  */
 unsigned int M2MColumnList_length (M2MColumnList *self);
@@ -147,36 +147,38 @@ unsigned int M2MColumnList_length (M2MColumnList *self);
  * 引数で指定されたカラム構造体オブジェクトの1つ後ろに位置するカラム構造体<br>
  * オブジェクトを返す。<br>
  *
- * @param[in] self	カラム構造体オブジェクト
+ * @param[in] self	Column information list object
  * @return next 	1つ後ろに位置するカラム構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
  */
 M2MColumnList *M2MColumnList_next (const M2MColumnList *self);
 
 
 /**
- * ヒープ領域のメモリを獲得し、M2MColumnList構造体オブジェクトを新規作成する。<br>
+ * Get heap memory and create a new M2MColumnList structure object.<br>
  *
- * @return	新規作成したM2MColumnList構造体オブジェクト
+ * @return	Created new column information list object
  */
 M2MColumnList *M2MColumnList_new ();
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトの1つ手前に存在するカラム構造体<br>
- * オブジェクトを取得して返す。<br>
- * 引数で指定されたカラム構造体オブジェクトが先頭ノードの場合、同じポインタを示す。<br>
+ * Get and return the column object existing one before the argument. <br>
+ * If the column structure object is the first node, it indicates the <br>
+ * same pointer.<br>
  *
- * @param[in] self	カラム構造体オブジェクト
- * @return			1つ手前に存在するカラム構造体オブジェクト or NULL（エラーの場合）
+ * @param[in] self	Column information list object
+ * @return			Column structure object which exists one before or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_previous (const M2MColumnList *self);
 
 
 /**
- * @param self
- * @param columnName
- * @param columnNameLength
- * @return
+ * Search and detect an object matching column name from the column list.<br>
+ *
+ * @param[in] self				Column information list object
+ * @param[in] columnName		String indicating column name
+ * @param[in] columnNameLength	Length of column name string[Byte]
+ * @return						Column information object matching the column name
  */
 M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnName, const size_t columnNameLength);
 
