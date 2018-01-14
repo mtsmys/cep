@@ -450,10 +450,10 @@ void M2MColumnList_delete (M2MColumnList *self)
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
+ * Get the node located at the end of the link of the column list object.<br>
  *
  * @param[in,out] self	Column information list object
- * @return				カラム構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
+ * @return				End node of link of column list object or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 	{
@@ -479,11 +479,10 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトからカラム情報オブジェクトを取得して<br>
- * 返す。<br>
+ * Get column information object possessed by column list object.<br>
  *
  * @param[in] self	Column information list object
- * @return			カラム情報オブジェクト
+ * @return			Column information object
  */
 M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 	{
@@ -505,20 +504,19 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
- * する。<br>
+ * Check whether or not the column structure object has one or more values.<br>
  *
  * @param[in] self	Column information list object
- * @return			true : 値が1つも存在しない, false : 値を1つ以上保有している
+ * @return			true: There is no value, false: Have one or more values
  */
 bool M2MColumnList_isEmpty (M2MColumnList *self)
 	{
-	//===== カラム名を設定しているノードが1つでも存在する場合 =====
+	//===== Check the length of list =====
 	if (M2MColumnList_length(self)>0)
 		{
 		return false;
 		}
-	//===== カラム名を設定しているノードが1つも存在しない場合 =====
+	//===== In case of no nodes in list =====
 	else
 		{
 		return true;
@@ -527,10 +525,10 @@ bool M2MColumnList_isEmpty (M2MColumnList *self)
 
 
 /**
- * カラム構造体オブジェクトのノード数を示す整数を返す。<br>
+ * Get the number of nodes in the column structure list object.<br>
  *
  * @param[in] self	Column information list object
- * @return			リンクされているカラム構造体オブジェクトのノード数を示す整数
+ * @return			The number of nodes of linked column list object
  */
 unsigned int M2MColumnList_length (M2MColumnList *self)
 	{
@@ -541,23 +539,23 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MColumnList_begin(self))!=NULL
 				&& M2MColumnList_getColumn(self)!=NULL)
 			{
 			length++;
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (M2MColumnList_next(self)!=NULL)
 				{
-				//===== カラム名の確認 =====
+				//===== Get column name =====
 				if (M2MColumnList_getColumn(self)!=NULL)
 					{
 					length++;
 					}
-				//===== カラム名が未設定の場合 =====
+				//===== When column name is not set yet =====
 				else
 					{
-					// 何しない
+					// do nothing
 					}
 				self = M2MColumnList_next(self);
 				}
@@ -579,11 +577,10 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトの1つ後ろに位置するカラム構造体<br>
- * オブジェクトを返す。<br>
+ * Get a column structure object positioned after the argument object.<br>
  *
  * @param[in] self	Column information list object
- * @return next 	1つ後ろに位置するカラム構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
+ * @return next 	Column structure object located one behind or NULL (in case of the argument node is end)
  */
 M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 	{

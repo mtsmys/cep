@@ -56,10 +56,9 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * @version
  */
 #ifndef M2MCEP_VERSION
-#define M2MCEP_VERSION (M2MString *)"0.4.0"
+#define M2MCEP_VERSION (M2MString *)"0.4.1"
 #endif /* M2MCEP_VERSION */
 
 

@@ -51,9 +51,9 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * データベースのテーブルのカラム情報を格納した構造体オブジェクト。<br>
- * リスト構造になっており、複数のカラム情報オブジェクトがリンクで繋がれた構造と<br>
- * なっている。<br>
+ * A structure object that stores column information of a database table. <br>
+ * It has a list structure, and has a structure in which a plurality of <br>
+ * column information objects are linked by a link.<br>
  *
  * @param previous	A list structure object located before (indicating its own pointer in the case of the head)
  * @param next		A list structure object located behind (indicating NULL in the case of the end)
@@ -106,49 +106,46 @@ void M2MColumnList_delete (M2MColumnList *self);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトのリンクの末端に位置するノードを取得する。<br>
+ * Get the node located at the end of the link of the column list object.<br>
  *
  * @param[in,out] self	Column information list object
- * @return				カラム構造体オブジェクトのリンクの末端ノード or NULL（エラーの場合）
+ * @return				End node of link of column list object or NULL (in case of error)
  */
 M2MColumnList *M2MColumnList_end (M2MColumnList *self);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトからカラム情報オブジェクトを取得して<br>
- * 返す。<br>
+ * Get column information object possessed by column list object.<br>
  *
  * @param[in] self	Column information list object
- * @return			カラム情報オブジェクト
+ * @return			Column information object
  */
 M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトが1つ以上の値を持っているかどうかを判定<br>
- * する。<br>
+ * Check whether or not the column structure object has one or more values.<br>
  *
  * @param[in] self	Column information list object
- * @return			true : 値が1つも存在しない、false : 値を1つ以上保有している
+ * @return			true: There is no value, false: Have one or more values
  */
 bool M2MColumnList_isEmpty (M2MColumnList *self);
 
 
 /**
- * カラム構造体オブジェクトのノード数を示す整数を返す。<br>
+ * Get the number of nodes in the column structure list object.<br>
  *
  * @param[in] self	Column information list object
- * @return			リンクされているカラム構造体オブジェクトのノード数を示す整数
+ * @return			The number of nodes of linked column list object
  */
 unsigned int M2MColumnList_length (M2MColumnList *self);
 
 
 /**
- * 引数で指定されたカラム構造体オブジェクトの1つ後ろに位置するカラム構造体<br>
- * オブジェクトを返す。<br>
+ * Get a column structure object positioned after the argument object.<br>
  *
  * @param[in] self	Column information list object
- * @return next 	1つ後ろに位置するカラム構造体オブジェクト（引数ノードが末端の場合はNULLを返す）
+ * @return next 	Column structure object located one behind or NULL (in case of the argument node is end)
  */
 M2MColumnList *M2MColumnList_next (const M2MColumnList *self);
 
