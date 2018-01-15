@@ -174,6 +174,7 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 
 
 /**
+ * Constructor.<br>
  * Create new CEP structure object and prepare for SQLite3 database processing. <br>
  * For the table, be sure to specify the SQLite3 database on memory as it <br>
  * needs to be built every time "M2MCEP" object is created. <br>

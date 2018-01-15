@@ -923,7 +923,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 			//===== Error handling =====
 			else
 				{
-				dataTypeArray[dataTypeIndex] = M2M_DATA_TYPE_ERROR;
+				dataTypeArray[dataTypeIndex] = M2MDataType_ERROR;
 				}
 			dataTypeIndex++;
 			//===== カンマ分だけポインタを移動 =====
@@ -943,7 +943,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 		//===== Error handling =====
 		else
 			{
-			dataTypeArray[dataTypeIndex] = M2M_DATA_TYPE_ERROR;
+			dataTypeArray[dataTypeIndex] = M2MDataType_ERROR;
 			}
 		return dataTypeIndex;
 		}
@@ -2227,7 +2227,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 	if (index>0 && statement!=NULL)
 		{
 		//===== BLOB型データの場合 =====
-		if (dataType==M2M_DATA_TYPE_BLOB)
+		if (dataType==M2MDataType_BLOB)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -2243,11 +2243,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== BOOL型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_BOOL)
+		else if (dataType==M2MDataType_BOOL)
 			{
 			}
 		//===== CHAR型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_CHAR)
+		else if (dataType==M2MDataType_CHAR)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -2263,7 +2263,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== DATETIME型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_DATETIME)
+		else if (dataType==M2MDataType_DATETIME)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToLong(value, valueLength))==SQLITE_OK)
@@ -2279,7 +2279,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== DOUBLE型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_DOUBLE)
+		else if (dataType==M2MDataType_DOUBLE)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -2295,11 +2295,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== ERROR型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_ERROR)
+		else if (dataType==M2MDataType_ERROR)
 			{
 			}
 		//===== FLOAT型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_FLOAT)
+		else if (dataType==M2MDataType_FLOAT)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -2315,7 +2315,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== INTEGER型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_INTEGER)
+		else if (dataType==M2MDataType_INTEGER)
 			{
 			//=====  =====
 			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToSignedInteger(value, valueLength))==SQLITE_OK)
@@ -2331,7 +2331,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== NULL型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_NULL)
+		else if (dataType==M2MDataType_NULL)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_null(statement, index)==SQLITE_OK)
@@ -2347,11 +2347,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== NUMERIC型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_NUMERIC)
+		else if (dataType==M2MDataType_NUMERIC)
 			{
 			}
 		//===== REAL型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_REAL)
+		else if (dataType==M2MDataType_REAL)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -2367,7 +2367,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== TEXT型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_TEXT)
+		else if (dataType==M2MDataType_TEXT)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -2383,7 +2383,7 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 				}
 			}
 		//===== VARCHAR型データの場合 =====
-		else if (dataType==M2M_DATA_TYPE_VARCHAR)
+		else if (dataType==M2MDataType_VARCHAR)
 			{
 			//===== 値をセット =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -2492,20 +2492,18 @@ void M2MCEP_delete (M2MCEP **self)
 	{
 	//========== Variable ==========
 	M2MDataFrame *record = NULL;
-#ifdef DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_delete()";
-#endif // DEBUG
 
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
-		//===== データベース名文字列のヒープメモリ領域を解放 =====
+		//===== Release heap memory for database name string =====
 		this_deleteDatabaseName((*self));
-		//===== メモリデータベースを閉じる =====
+		//===== Close memory database =====
 		this_closeMemoryDatabase((*self));
 		//===== CEPレコード情報オブジェクト（未挿入）をファイルデータベースに挿入 =====
 		this_flushCEPRecord((*self));
-		//===== ファイルデータベースを閉じる =====
+		//===== Close file database =====
 		this_closeFileDatabase((*self));
 		//===== CEPレコード情報オブジェクトのヒープメモリ領域を解放 =====
 		if ((record=this_getDataFrame((*self)))!=NULL)
@@ -2526,7 +2524,7 @@ void M2MCEP_delete (M2MCEP **self)
 	//===== Argument error =====
 	else
 		{
-		// do nothing
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
 		}
 #ifdef DEBUG
 	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** Shutdown CEP library **********");

@@ -226,7 +226,7 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
 		if ((statement=M2MSQLiteConfig_getPreparedStatement(database, SQL))!=NULL)
 			{
 			//===== In case of existing the table =====
-			if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2M_DATA_TYPE_TEXT, 1, tableName, tableNameLength, statement)==true
+			if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, tableName, tableNameLength, statement)==true
 					&& ((result=M2MSQLiteConfig_next(statement)==SQLITE_ROW) || result==SQLITE_DONE)
 					&& (numberOfTable=sqlite3_column_int(statement, 0))==1)
 				{
@@ -484,7 +484,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 	if (index>=1 && statement!=NULL)
 		{
 		//===== In case of BLOB type =====
-		if (dataType==M2M_DATA_TYPE_BLOB)
+		if (dataType==M2MDataType_BLOB)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -499,12 +499,12 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of BOOL type =====
-		else if (dataType==M2M_DATA_TYPE_BOOL)
+		else if (dataType==M2MDataType_BOOL)
 			{
 			return false;
 			}
 		//===== In case of CHAR type =====
-		else if (dataType==M2M_DATA_TYPE_CHAR)
+		else if (dataType==M2MDataType_CHAR)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_text(statement, index, value, -1, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -519,7 +519,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of DATETIME type =====
-		else if (dataType==M2M_DATA_TYPE_DATETIME)
+		else if (dataType==M2MDataType_DATETIME)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToSignedLongLong(value, valueLength))==SQLITE_OK)
@@ -534,7 +534,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of DOUBLE type =====
-		else if (dataType==M2M_DATA_TYPE_DOUBLE)
+		else if (dataType==M2MDataType_DOUBLE)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -549,12 +549,12 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of ERROR type =====
-		else if (dataType==M2M_DATA_TYPE_ERROR)
+		else if (dataType==M2MDataType_ERROR)
 			{
 			return false;
 			}
 		//===== In case of FLOAT type =====
-		else if (dataType==M2M_DATA_TYPE_FLOAT)
+		else if (dataType==M2MDataType_FLOAT)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -569,7 +569,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of INTEGER type =====
-		else if (dataType==M2M_DATA_TYPE_INTEGER)
+		else if (dataType==M2MDataType_INTEGER)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToSignedInteger(value, valueLength))==SQLITE_OK)
@@ -584,7 +584,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of NULL type =====
-		else if (dataType==M2M_DATA_TYPE_NULL)
+		else if (dataType==M2MDataType_NULL)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_null(statement, index)==SQLITE_OK)
@@ -599,12 +599,12 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of NUMERIC type =====
-		else if (dataType==M2M_DATA_TYPE_NUMERIC)
+		else if (dataType==M2MDataType_NUMERIC)
 			{
 			return false;
 			}
 		//===== In case of REAL type =====
-		else if (dataType==M2M_DATA_TYPE_REAL)
+		else if (dataType==M2MDataType_REAL)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
@@ -619,7 +619,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of TEXT type =====
-		else if (dataType==M2M_DATA_TYPE_TEXT)
+		else if (dataType==M2MDataType_TEXT)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_text(statement, index, value, -1, SQLITE_TRANSIENT)==SQLITE_OK)
@@ -634,7 +634,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				}
 			}
 		//===== In case of VARCHAR type =====
-		else if (dataType==M2M_DATA_TYPE_VARCHAR)
+		else if (dataType==M2MDataType_VARCHAR)
 			{
 			//===== Set value =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)

@@ -44,51 +44,51 @@ M2MString *M2MDataType_toString (const M2MDataType self)
 	//========== Variable ==========
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataType_toString()";
 
-	if (self==M2M_DATA_TYPE_BLOB)
+	if (self==M2MDataType_BLOB)
 		{
 		return (M2MString *)"BLOB";
 		}
-	else if (self==M2M_DATA_TYPE_BOOL)
+	else if (self==M2MDataType_BOOL)
 		{
 		return (M2MString *)"BOOL";
 		}
-	else if (self==M2M_DATA_TYPE_CHAR)
+	else if (self==M2MDataType_CHAR)
 		{
 		return (M2MString *)"CHAR";
 		}
-	else if (self==M2M_DATA_TYPE_DATETIME)
+	else if (self==M2MDataType_DATETIME)
 		{
 		return (M2MString *)"DATETIME";
 		}
-	else if (self==M2M_DATA_TYPE_DOUBLE)
+	else if (self==M2MDataType_DOUBLE)
 		{
 		return (M2MString *)"DOUBLE";
 		}
-	else if (self==M2M_DATA_TYPE_ERROR)
+	else if (self==M2MDataType_ERROR)
 		{
 		return NULL;
 		}
-	else if (self==M2M_DATA_TYPE_FLOAT)
+	else if (self==M2MDataType_FLOAT)
 		{
 		return (M2MString *)"FLOAT";
 		}
-	else if (self==M2M_DATA_TYPE_INTEGER)
+	else if (self==M2MDataType_INTEGER)
 		{
 		return (M2MString *)"INTEGER";
 		}
-	else if (self==M2M_DATA_TYPE_NUMERIC)
+	else if (self==M2MDataType_NUMERIC)
 		{
 		return (M2MString *)"NUMERIC";
 		}
-	else if (self==M2M_DATA_TYPE_REAL)
+	else if (self==M2MDataType_REAL)
 		{
 		return (M2MString *)"REAL";
 		}
-	else if (self==M2M_DATA_TYPE_TEXT)
+	else if (self==M2MDataType_TEXT)
 		{
 		return (M2MString *)"TEXT";
 		}
-	else if (self==M2M_DATA_TYPE_VARCHAR)
+	else if (self==M2MDataType_VARCHAR)
 		{
 		return (M2MString *)"VARCHAR";
 		}

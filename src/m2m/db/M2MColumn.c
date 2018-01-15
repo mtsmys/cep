@@ -143,7 +143,7 @@ M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 	else
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL", NULL);
-		return M2M_DATA_TYPE_ERROR;
+		return M2MDataType_ERROR;
 		}
 	}
 
@@ -262,7 +262,7 @@ M2MColumn *M2MColumn_new ()
 		//===== Initialize column information object =====
 		if (M2MColumn_setAllowNULL(self, false)!=NULL
 				&& M2MColumn_setAutoIncrement(self, false)!=NULL
-				&& M2MColumn_setDataType(self, M2M_DATA_TYPE_ERROR)!=NULL
+				&& M2MColumn_setDataType(self, M2MDataType_ERROR)!=NULL
 				&& M2MColumn_setPrimaryKey(self, false)!=NULL
 				&& M2MColumn_setUnique(self, false)!=NULL)
 			{

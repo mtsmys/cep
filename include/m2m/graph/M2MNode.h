@@ -108,13 +108,35 @@ extern "C"
  * Public function
  ******************************************************************************/
 /**
+ * Connect nodes specified by arguments with an edge.<br>
+ * Actually maintain relationships in a "Nested Sets Model" in the table <br>
+ * of SQLite 3 database.<br>
+ *
+ * @param[in] database		SQLite3 database object
+ * @param[in] oneNodeID		Node ID of the connection source to be connected at edge
+ * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
+ * @return					Edge ID connecting nodes
+ */
+uint32_t M2MNode_connect (sqlite3 *database, const uint32_t oneNodeID, const uint32_t anotherNodeID);
+
+
+/**
  * Destructor.<br>
  * Delete a record indicated with ID in the "m2m_node" table.
  *
  * @param[in] database	SQLite3 database object
- * @param[in] id		Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
  */
-void M2MNode_delete (sqlite3 *database, const uint32_t id);
+void M2MNode_delete (sqlite3 *database, const uint32_t nodeID);
+
+
+/**
+ * @param[in] database	SQLite3 database object
+ * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
+ * @return				String indicating node name or NULL (in case of error)
+ */
+M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString **name);
 
 
 /**
@@ -122,25 +144,16 @@ void M2MNode_delete (sqlite3 *database, const uint32_t id);
  * @param[in] name		String indicating node name
  * @return				Number indicating node ID which is unique in "m2m_node" table
  */
-uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name);
+uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name);
 
 
 /**
  * @param[in] database	SQLite3 database object
- * @param[in] id		Number indicating node ID which is unique in "m2m_node" table
- * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
- * @return				String indicating node name or NULL (in case of error)
- */
-M2MString *M2MNode_getName (sqlite3 *database, const uint32_t id, M2MString **name);
-
-
-/**
- * @param[in] database	SQLite3 database object
- * @param[in] id		Number indicating node ID which is unique inside "m2m_node" table
+ * @param[in] nodeID	Number indicating node ID which is unique inside "m2m_node" table
  * @param[out] property	Pointer to copying property belonging to the node
  * @return				String indicating node name or NULL (in case of error)
  */
-M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t id, M2MString **property);
+M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MString **property);
 
 
 /**

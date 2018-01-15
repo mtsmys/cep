@@ -34,15 +34,6 @@
  * Definition of private function
  ******************************************************************************/
 /**
- * 引数で指定されたテーブル構築オブジェクトの先頭ノードを取得する。<br>
- *
- * @param[in] self	テーブル構築オブジェクト
- * @return			先頭に位置するテーブル構築オブジェクト
- */
-static M2MTableManager *this_begin (M2MTableManager *self);
-
-
-/**
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
  * オブジェクトを返す。<br>
  *
@@ -59,15 +50,6 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self);
  * @return			テーブル名を示す文字列
  */
 static unsigned char *this_getTableName (const M2MTableManager *self);
-
-
-/**
- * 引数で指定されたテーブル構築オブジェクトの1つ次のノードを返す．<br>
- *
- * @param[in] tableBuilder	テーブル構築オブジェクト
- * @return					引数で指定されたテーブル構築オブジェクトの1つ次のノード or NULL（エラーの場合）
- */
-static M2MTableManager *this_next (const M2MTableManager *self);
 
 
 /**
@@ -224,7 +206,7 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 				//===== 主キーをセット =====
 				M2MString_append(columnDefinition, (M2MString *)"PRIMARY KEY ");
 				//===== 更にデータ型が整数で自動インクリメント設定の場合 =====
-				if (dataType==M2M_DATA_TYPE_INTEGER
+				if (dataType==M2MDataType_INTEGER
 						&& M2MColumn_getAutoIncrement(column)==true)
 					{
 					//===== 自動インクリメントをセット =====
