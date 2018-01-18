@@ -69,6 +69,19 @@ typedef struct
  * Public function
  ******************************************************************************/
 /**
+ * Connect nodes specified by arguments with an edge.<br>
+ * Actually maintain relationships in a "Nested Sets Model" in the table <br>
+ * of SQLite 3 database.<br>
+ *
+ * @param[in] self			M2MGraph structure object
+ * @param[in] nodeID		Node ID of the connection source to be connected at edge
+ * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
+ * @return					M2MGraph structure object relationships updated or NULL (in case of error)
+ */
+M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const uint32_t anotherNodeID);
+
+
+/**
  * Destructor.<br>
  *
  * @param[in,out] self	M2MGraph structure object to be freed of memory area
@@ -83,6 +96,13 @@ void M2MGraph_delete (M2MGraph **self);
  * @return			String indicating database file name or NULL (in case of error)
  */
 M2MString *M2MGraph_getDatabaseName (const M2MGraph *self);
+
+
+/**
+ * @param[in] self		M2MGraph structure object
+ * @return				SQLite3 database object
+ */
+sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self);
 
 
 /**

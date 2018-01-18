@@ -41,6 +41,8 @@
 #include <inttypes.h>
 #include <sqlite3.h>
 #include <stdint.h>
+#include <stdlib.h>
+
 
 
 #ifdef __cplusplus
@@ -54,7 +56,7 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- *
+ * Table name of managing properties of node relationships.<br>
  */
 #ifndef M2MNode_TABLE_NAME
 #define M2MNode_TABLE_NAME (M2MString *)"m2m_node"
@@ -72,7 +74,7 @@ extern "C"
 
 
 /**
- *
+ * Column name of the name of node which is unique in "m2m_node" table.<br>
  */
 #ifndef M2MNode_COLUMN_NAME
 #define M2MNode_COLUMN_NAME (M2MString *)"name"
@@ -80,7 +82,7 @@ extern "C"
 
 
 /**
- *
+ * Column name of the property information of node in "m2m_node" table.<br>
  */
 #ifndef M2MNode_COLUMN_PROPERTY
 #define M2MNode_COLUMN_PROPERTY (M2MString *)"property"
@@ -88,7 +90,7 @@ extern "C"
 
 
 /**
- *
+ * Column name of the Nested Set Model information of node in "m2m_node" table.<br>
  */
 #ifndef M2MNode_COLUMN_LEFT
 #define M2MNode_COLUMN_LEFT (M2MString *)"left"
@@ -96,7 +98,7 @@ extern "C"
 
 
 /**
- *
+ * Column name of the Nested Set Model information of node in "m2m_node" table.<br>
  */
 #ifndef M2MNode_COLUMN_RIGHT
 #define M2MNode_COLUMN_RIGHT (M2MString *)"right"
@@ -107,19 +109,6 @@ extern "C"
 /*******************************************************************************
  * Public function
  ******************************************************************************/
-/**
- * Connect nodes specified by arguments with an edge.<br>
- * Actually maintain relationships in a "Nested Sets Model" in the table <br>
- * of SQLite 3 database.<br>
- *
- * @param[in] database		SQLite3 database object
- * @param[in] oneNodeID		Node ID of the connection source to be connected at edge
- * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
- * @return					Edge ID connecting nodes
- */
-uint32_t M2MNode_connect (sqlite3 *database, const uint32_t oneNodeID, const uint32_t anotherNodeID);
-
-
 /**
  * Destructor.<br>
  * Delete a record indicated with ID in the "m2m_node" table.
@@ -132,19 +121,19 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID);
 
 /**
  * @param[in] database	SQLite3 database object
+ * @param[in] name		String indicating node name
+ * @return				Number indicating node ID which is unique in "m2m_node" table
+ */
+uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name);
+
+
+/**
+ * @param[in] database	SQLite3 database object
  * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
  * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
  * @return				String indicating node name or NULL (in case of error)
  */
 M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString **name);
-
-
-/**
- * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating node name
- * @return				Number indicating node ID which is unique in "m2m_node" table
- */
-uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name);
 
 
 /**
@@ -166,6 +155,19 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
  * @return				Number indicating node ID which is unique in "m2m_node" table
  */
 uint32_t M2MNode_new (sqlite3 *database, const M2MString *name, const M2MString *property);
+
+
+/**
+ * Set left & right parameters for Nested Sets Model into a node.<br>
+ * If initialize them, set 0 as their arguments in the same time.<br>
+ *
+ * @param[in] database	SQLite3 database object
+ * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] left		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
+ * @param[in] right		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
+ * @return				Number indicating node ID which was set Nested Sets Model parameter or 0 (in case of error)
+ */
+uint32_t M2MNode_setNestedSetsModel (sqlite3 *database, const uint32_t nodeID, const uint32_t left, const uint32_t right);
 
 
 

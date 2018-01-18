@@ -32,6 +32,29 @@
 
 
 /*******************************************************************************
+ * Private variable
+ ******************************************************************************/
+/**
+ * Initialize variable for random seed.<br>
+ */
+static bool this_initSeed = true;
+
+
+
+/*******************************************************************************
+ * Definition of private function
+ ******************************************************************************/
+/**
+ * Return initialized seed variable.<br>
+ *
+ * @param[in] x	A seed variable for Xorshift algorithm
+ * @return		Initialized seed variable
+ */
+static uint32_t this_initSeedVariable (const uint32_t x);
+
+
+
+/*******************************************************************************
  * Private function
  ******************************************************************************/
 /**
@@ -42,18 +65,60 @@
 static uint32_t this_createNewNodeID ()
 	{
 	//========== Variable ==========
-	static uint32_t x = 123456789;
-	static uint32_t y = 362436069;
-	static uint32_t z = 521288629;
-	static uint32_t w = 88675123;
+	static uint32_t x = 123456789UL;
+	static uint32_t y = 362436069UL;
+	static uint32_t z = 521288629UL;
+	static uint32_t w = 88675123UL;
 	uint32_t t = 0UL;
+	uint32_t nodeID = 0UL;
+#ifdef DEBUG
+	M2MString buffer[128];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MNode.this_createNewNodeID()";
+#endif // DEBUG
 
+	//===== Initialize seed (once executed) =====
+	x = this_initSeedVariable(x);
 	//===== Get Xorshift random number =====
 	t = x ^ (x << 11);
 	x = y;
 	y = z;
 	z = w;
-	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+	nodeID = (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+#ifdef DEBUG
+	memset(buffer, 0, sizeof(buffer));
+	snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Succeed to create a node id number(=\"%"PRIu32"\")", nodeID);
+	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
+#endif // DEBUG
+	return nodeID;
+	}
+
+
+/**
+ *
+ * @param x
+ * @return
+ */
+static uint32_t this_initSeedVariable (const uint32_t x)
+	{
+	//========== Variable ==========
+	float random = 0.0;
+
+	//=====  =====
+	if (this_initSeed==true)
+		{
+		//=====  =====
+		this_initSeed = false;
+		//=====  =====
+		srand((unsigned int) time(0));
+		random = (rand() + 0.5) / (RAND_MAX + 1);
+		//=====  =====
+		return (uint32_t)(random * x);
+		}
+	//=====  =====
+	else
+		{
+		return x;
+		}
 	}
 
 
@@ -64,8 +129,8 @@ static uint32_t this_createNewNodeID ()
 static bool this_createNewTable (sqlite3 *database)
 	{
 	//========== Variable ==========
-	M2MString SQL[512];
-	M2MString message[128];
+	M2MString buffer[512];
+	const M2MString *SQL_FORMAT = (M2MString *)"CREATE TABLE %s (%s TEXT PRIMARY KEY  NOT NULL  UNIQUE, %s TEXT NOT NULL  UNIQUE, %s TEXT, %s NUMERIC, %s NUMERIC) ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode.this_createNewTable()";
 
 	//===== Check argument =====
@@ -80,10 +145,10 @@ static bool this_createNewTable (sqlite3 *database)
 		else
 			{
 			//===== Create new SQL string =====
-			memset(SQL, 0, sizeof(SQL));
-			snprintf(SQL,
-					sizeof(SQL)-1,
-					(M2MString *)"CREATE TABLE %s (%s TEXT PRIMARY KEY  NOT NULL  UNIQUE, %s TEXT NOT NULL  UNIQUE, %s TEXT, %s NUMERIC, %s NUMERIC) ",
+			memset(buffer, 0, sizeof(buffer));
+			snprintf(buffer,
+					sizeof(buffer)-1,
+					SQL_FORMAT,
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID,
 					M2MNode_COLUMN_NAME,
@@ -93,20 +158,20 @@ static bool this_createNewTable (sqlite3 *database)
 			//===== Startup transaction =====
 			M2MSQLRunner_beginTransaction(database);
 			//===== Execute SQL =====
-			if (M2MSQLRunner_executeUpdate(database, SQL)==true)
+			if (M2MSQLRunner_executeUpdate(database, buffer)==true)
 				{
 #ifdef DEBUG
-				memset(message, 0, sizeof(message));
-				snprintf(message, sizeof(message)-1, (M2MString *)"Succeed to create a table(=\"%s\") in SQLite3 database", M2MNode_TABLE_NAME);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, message);
+				memset(buffer, 0, sizeof(buffer));
+				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Succeed to create a table(=\"%s\") in SQLite3 database", M2MNode_TABLE_NAME);
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
 #endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				memset(message, 0, sizeof(message));
-				snprintf(message, sizeof(message)-1, (M2MString *)"Failed to create \"%s\" table in SQLite3 database because %s", M2MNode_TABLE_NAME, sqlite3_errmsg(database));
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, message, NULL);
+				memset(buffer, 0, sizeof(buffer));
+				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Failed to create \"%s\" table in SQLite3 database because %s", M2MNode_TABLE_NAME, sqlite3_errmsg(database));
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, buffer, NULL);
 				}
 			//===== Shutdown transaction =====
 			M2MSQLRunner_commitTransaction(database);
@@ -119,12 +184,6 @@ static bool this_createNewTable (sqlite3 *database)
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
 		return false;
 		}
-	}
-
-
-
-static void this_manageNestedSetsModel (sqlite3 *database, const uint32_t nodeID)
-	{
 	}
 
 
@@ -144,6 +203,7 @@ static uint32_t this_setRecord (sqlite3 *database, const M2MString *name, const 
 	M2MString buffer[512];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
+	const M2MString *SQL_FORMAT = (M2MString *)"INSERT INTO %s (%s,%s,%s) VALUES (?,?,?) ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode.this_setRecord()";
 
 	//===== Check argument =====
@@ -155,8 +215,13 @@ static uint32_t this_setRecord (sqlite3 *database, const M2MString *name, const 
 		if ((nodeID=this_createNewNodeID())>0
 				&& M2MString_convertFromUnsignedLongToHexadecimalString(nodeID, hexadecimalString, sizeof(hexadecimalString))!=NULL)
 			{
+#ifdef DEBUG
 			memset(buffer, 0, sizeof(buffer));
-			snprintf(buffer, sizeof(buffer)-1, (M2MString *)"INSERT INTO %s (%s,%s,%s) VALUES (?,?,?) ",
+			snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Converted node ID number into hexadecimal string(=\"%s\")", hexadecimalString);
+			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
+#endif // DEBUG
+			memset(buffer, 0, sizeof(buffer));
+			snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT,
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID,
 					M2MNode_COLUMN_NAME,
@@ -232,50 +297,134 @@ static uint32_t this_setRecord (sqlite3 *database, const M2MString *name, const 
 	}
 
 
-
-/*******************************************************************************
- * Public function
- ******************************************************************************/
 /**
- * Connect nodes specified by arguments with an edge.<br>
- * Actually maintain relationships in a "Nested Sets Model" in the table <br>
- * of SQLite 3 database.<br>
- *
- * @param[in] database		SQLite3 database object
- * @param[in] oneNodeID		Node ID of the connection source to be connected at edge
- * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
- * @return					Edge ID connecting nodes
+ * @param[in] database	SQLite3 database object
+ * @param[in] nodeID	Hexadecimal string indicating node ID number
+ * @param[in] left
+ * @param[in] right
+ * @return
  */
-uint32_t M2MNode_connect (sqlite3 *database, const uint32_t oneNodeID, const uint32_t anotherNodeID)
+static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *nodeID, const M2MString *left, const M2MString *right)
 	{
 	//========== Variable ==========
-	uint32_t edgeID = 0UL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_connect()";
+	size_t nodeIDLength = 0;
+	size_t leftLength = 0;
+	size_t rightLength = 0;
+	M2MString buffer[512];
+	sqlite3_stmt *statement = NULL;
+	int result = 0;
+	const M2MString *SQL_FORMAT = (M2MString *)"UPDATE %s SET %s = ?, %s = ? WHERE %s = ? ";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MNode.this_updateNestedSetsModel()";
 
 	//===== Check argument =====
-	if (database!=NULL && oneNodeID>0 && anotherNodeID>0)
+	if (database!=NULL
+			&& nodeID!=NULL && (nodeIDLength=M2MString_length(nodeID))>0)
 		{
-		return edgeID;
+		//=====  =====
+		memset(buffer, 0, sizeof(buffer));
+		snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT,
+				M2MNode_TABLE_NAME,
+				M2MNode_COLUMN_LEFT,
+				M2MNode_COLUMN_RIGHT,
+				M2MNode_COLUMN_ID);
+		//=====  =====
+		if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+			{
+			//===== In case of setting Nested Sets Model values =====
+			if (left!=NULL && (leftLength=M2MString_length(left))>0
+					&& right!=NULL && (rightLength=M2MString_length(right))>0)
+				{
+				//===== Set values into statement =====
+				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 1, left, leftLength, statement)==true
+						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 2, right, rightLength, statement)==true
+						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
+						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
+					{
+					sqlite3_finalize(statement);
+#ifdef DEBUG
+					memset(buffer, 0, sizeof(buffer));
+					snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Set left = \"%s\" and right = \"%s\" in the record with node ID = \"%s\"", left, right, nodeID);
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
+#endif // DEBUG
+					return true;
+					}
+				//===== Error handling =====
+				else
+					{
+					sqlite3_finalize(statement);
+					memset(buffer, 0, sizeof(buffer));
+					snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Failed to set \"left\" and \"right\" values into a record whose node ID = \"%s\"", nodeID);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, buffer, NULL);
+					return false;
+					}
+				}
+			//===== In case of initializing values =====
+			else if (left==NULL && right==NULL)
+				{
+				//===== Set values into statement =====
+				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NULL, 1, NULL, 0, statement)==true
+						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NULL, 2, NULL, 0, statement)==true
+						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
+						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
+					{
+					sqlite3_finalize(statement);
+#ifdef DEBUG
+					memset(buffer, 0, sizeof(buffer));
+					snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Set left = \"%s\" and right = \"%s\" in the record with node ID = \"%s\"", left, right, nodeID);
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
+#endif // DEBUG
+					return true;
+					}
+				//===== Error handling =====
+				else
+					{
+					sqlite3_finalize(statement);
+					memset(buffer, 0, sizeof(buffer));
+					snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Failed to set \"left\" and \"right\" values into a record whose node ID = \"%s\"", nodeID);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, buffer, NULL);
+					return false;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				sqlite3_finalize(statement);
+				memset(buffer, 0, sizeof(buffer));
+				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"\"left\" (=\"%s\") or \"right\" (=\"%s\") value is invalid", left, right);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, buffer, NULL);
+				return false;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get SQLite3 statement object with SQL string", NULL);
+			return false;
+			}
 		}
 	//===== Argument error =====
 	else if (database==NULL)
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
-		return 0UL;
+		return false;
 		}
-	else if (oneNodeID<=0)
+	else if (nodeID==NULL || M2MString_length(nodeID)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"oneNodeID\" isn't positive", NULL);
-		return 0UL;
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"nodeID\" isn't positive", NULL);
+		return false;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" isn't positive", NULL);
-		return 0UL;
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"left\" number or \"right\" number is invalid", NULL);
+		return false;
 		}
 	}
 
 
+
+/*******************************************************************************
+ * Public function
+ ******************************************************************************/
 /**
  * Destructor.<br>
  * Delete a record indicated with ID in the "m2m_node" table.
@@ -290,6 +439,7 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID)
 	M2MString buffer[512];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
+	const M2MString *SQL_FORMAT = (M2MString *)"DELETE FROM %s WHERE %s = ? ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_delete()";
 
 	//===== Check argument =====
@@ -301,7 +451,7 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID)
 			{
 			//===== Prepare SQL statement =====
 			memset(buffer, 0, sizeof(buffer));
-			snprintf(buffer, sizeof(buffer)-1, (M2MString *)"DELETE FROM %s WHERE %s = ? ", M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
+			snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT, M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
 			//===== Get prepared statement =====
 			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
 				{
@@ -351,7 +501,7 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID)
  * @param[in] name		String indicating node name
  * @return				Number indicating node ID which is unique in "m2m_node" table
  */
-uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name)
+uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name)
 	{
 	//========== Variable ==========
 	size_t nameLength = 0;
@@ -360,6 +510,7 @@ uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name)
 	uint32_t nodeID = 0UL;
 	int result = 0;
 	M2MString *text = NULL;
+	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s WHERE %s = ? ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_getID()";
 
 	//===== Check argument =====
@@ -368,7 +519,7 @@ uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name)
 		{
 		//===== Prepare SQL statement =====
 		memset(buffer, 0, sizeof(buffer));
-		snprintf(buffer, sizeof(buffer)-1, (M2MString *)"SELECT %s FROM %s WHERE %s = ? ", M2MNode_COLUMN_ID, M2MNode_TABLE_NAME, M2MNode_COLUMN_NAME);
+		snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT, M2MNode_COLUMN_ID, M2MNode_TABLE_NAME, M2MNode_COLUMN_NAME);
 		//===== Get prepared statement =====
 		if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
 			{
@@ -380,6 +531,11 @@ uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name)
 				{
 				//===== Release prepared statement object =====
 				sqlite3_finalize(statement);
+#ifdef DEBUG
+				memset(buffer, 0, sizeof(buffer));
+				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Succeed to get the node ID number related to the name(=\"%s\")", name);
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, buffer);
+#endif // DEBUG
 				return nodeID;
 				}
 			//===== Error handling =====
@@ -388,7 +544,7 @@ uint32_t M2MNode_getNodeID (sqlite3 *database, const M2MString *name)
 				//===== Release prepared statement object =====
 				sqlite3_finalize(statement);
 				memset(buffer, 0, sizeof(buffer));
-				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Failed to get node ID related to name because %s", sqlite3_errmsg(database));
+				snprintf(buffer, sizeof(buffer)-1, (M2MString *)"Failed to get node ID related to the name(=\"%s\") because %s", name, sqlite3_errmsg(database));
 				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, buffer, NULL);
 				return 0UL;
 				}
@@ -427,6 +583,7 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
 	M2MString buffer[512];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
+	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s WHERE %s = ? ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_getName()";
 
 	//===== Check argument =====
@@ -437,7 +594,7 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
 		if (M2MString_convertFromUnsignedLongToHexadecimalString(nodeID, hexadecimalString, sizeof(hexadecimalString))!=NULL)
 			{
 			memset(buffer, 0, sizeof(buffer));
-			snprintf(buffer, sizeof(buffer)-1, (M2MString *)"SELECT %s FROM %s WHERE %s = ? ", M2MNode_COLUMN_NAME, M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
+			snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT, M2MNode_COLUMN_NAME, M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
 			//===== Get SQLite3 prepared statement =====
 			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
 				{
@@ -448,6 +605,9 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
 					{
 					//===== Release prepared statement object =====
 					sqlite3_finalize(statement);
+#ifdef DEBUG
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to get the node name string");
+#endif // DEBUG
 					return (*name);
 					}
 				//===== Error handling =====
@@ -499,6 +659,7 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
 	M2MString buffer[512];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
+	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s WHERE %s = ? ";
 	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_getProperty()";
 
 	//===== Check argument =====
@@ -509,7 +670,7 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
 		if (M2MString_convertFromUnsignedLongToHexadecimalString(nodeID, hexadecimalString, sizeof(hexadecimalString))!=NULL)
 			{
 			memset(buffer, 0, sizeof(buffer));
-			snprintf(buffer, sizeof(buffer)-1, (M2MString *)"SELECT %s FROM %s WHERE %s = ? ", M2MNode_COLUMN_PROPERTY, M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
+			snprintf(buffer, sizeof(buffer)-1, SQL_FORMAT, M2MNode_COLUMN_PROPERTY, M2MNode_TABLE_NAME, M2MNode_COLUMN_ID);
 			//===== Get SQLite3 prepared statement =====
 			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
 				{
@@ -520,6 +681,9 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
 					{
 					//===== Release prepared statement object =====
 					sqlite3_finalize(statement);
+#ifdef DEBUG
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to get the node property number");
+#endif // DEBUG
 					return (*property);
 					}
 				//===== Error handling =====
@@ -603,6 +767,97 @@ uint32_t M2MNode_new (sqlite3 *database, const M2MString *name, const M2MString 
 	else
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! indicated \"property\" string is NULL or vacant", NULL);
+		return 0UL;
+		}
+	}
+
+
+/**
+ * Set left & right parameters for Nested Sets Model into a node.<br>
+ * If initialize them, set 0 as their arguments in the same time.<br>
+ *
+ * @param[in] database	SQLite3 database object
+ * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] left		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
+ * @param[in] right		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
+ * @return				Number indicating node ID which was set Nested Sets Model parameter or 0 (in case of error)
+ */
+uint32_t M2MNode_setNestedSetsModel (sqlite3 *database, const uint32_t nodeID, const uint32_t left, const uint32_t right)
+	{
+	//========== Variable ==========
+	M2MString hexadecimalString[16];
+	M2MString leftString[16];
+	M2MString rightString[16];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MNode_setNestedSetsModel()";
+
+	//===== Check argument =====
+	if (database!=NULL && nodeID>0)
+		{
+		memset(hexadecimalString, 0, sizeof(hexadecimalString));
+		//===== Convert node ID into hexadecimal string =====
+		if (M2MString_convertFromUnsignedLongToHexadecimalString(nodeID, hexadecimalString, sizeof(hexadecimalString))!=NULL)
+			{
+			//===== In case of setting parameters =====
+			if (left>0 && right>0 && left!=right
+					&& M2MString_convertFromUnsignedLongToString(left, leftString, sizeof(leftString))!=NULL
+					&& M2MString_convertFromUnsignedLongToString(right, rightString, sizeof(rightString))!=NULL)
+				{
+				//===== Update a record =====
+				if (this_updateNestedSetsModel(database, hexadecimalString, leftString, rightString)==true)
+					{
+#ifdef DEBUG
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set the Nested Set Model information into the node");
+#endif // DEBUG
+					return nodeID;
+					}
+				//===== Error handling =====
+				else
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to update table information about NestedSetsModel", NULL);
+					return 0UL;
+					}
+				}
+			//===== In case of initialize parameters =====
+			else if (left==0 && right==0)
+				{
+				//===== Update a record =====
+				if (this_updateNestedSetsModel(database, hexadecimalString, NULL, NULL)==true)
+					{
+#ifdef DEBUG
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to initialize the Nested Set Model information into the node");
+#endif // DEBUG
+					return nodeID;
+					}
+				//===== Error handling =====
+				else
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to update table information about NestedSetsModel", NULL);
+					return 0UL;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"left\" number or \"right\" number is invalid", NULL);
+				return 0UL;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert numbers into string", NULL);
+			return 0UL;
+			}
+		}
+	//===== Argument error =====
+	else if (database==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
+		return 0UL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"nodeID\" isn't positive", NULL);
 		return 0UL;
 		}
 	}

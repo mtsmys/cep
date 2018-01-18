@@ -279,7 +279,7 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
 
 /**
  * This method converts from unsigned long to string.<br>
- * Generated string is allocated in this method, so caller must free it.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
  *
  * @param[in] number		Conversion target number
  * @param[out] buffer		Array for copying integer string
@@ -287,6 +287,17 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
  * @return					Converted hexadecimal number string or NULL (in case of error)
  */
 M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
+
+
+/**
+ * This method converts from unsigned long to string.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
+ *
+ * @param[in] number		Conversion target number
+ * @param[out] buffer		Array for copying integer string
+ * @param[in] bufferLength	Length of array[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
 
 
 /**

@@ -501,6 +501,34 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 		//===== In case of BOOL type =====
 		else if (dataType==M2MDataType_BOOL)
 			{
+			if (M2MString_compareTo(value, (M2MString *)"true")==0 || M2MString_compareTo(value, (M2MString *)"TRUE")==0)
+				{
+				//===== Set value =====
+				if (sqlite3_bind_int(statement, index, true)==SQLITE_OK)
+					{
+					return true;
+					}
+				//===== Error handling =====
+				else
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value", NULL);
+					return false;
+					}
+				}
+			else
+				{
+				//===== Set value =====
+				if (sqlite3_bind_int(statement, index, false)==SQLITE_OK)
+					{
+					return true;
+					}
+				//===== Error handling =====
+				else
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value", NULL);
+					return false;
+					}
+				}
 			return false;
 			}
 		//===== In case of CHAR type =====
@@ -601,7 +629,17 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 		//===== In case of NUMERIC type =====
 		else if (dataType==M2MDataType_NUMERIC)
 			{
-			return false;
+			//===== Set value =====
+			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToSignedLongLong(value, valueLength))==SQLITE_OK)
+				{
+				return true;
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"NUMERIC\" type value", NULL);
+				return false;
+				}
 			}
 		//===== In case of REAL type =====
 		else if (dataType==M2MDataType_REAL)

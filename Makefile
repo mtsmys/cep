@@ -16,11 +16,13 @@ SRCS        := $(SRCDIR)m2m/io/M2MHeap.c \
                $(SRCDIR)m2m/db/M2MColumn.c \
                $(SRCDIR)m2m/db/M2MColumnList.c \
                $(SRCDIR)m2m/db/M2MTableManager.c \
+               $(SRCDIR)m2m/graph/M2MNode.c \
+               $(SRCDIR)m2m/graph/M2MGraph.c \
                $(SRCDIR)m2m/cep/M2MDataFrame.c \
                $(SRCDIR)m2m/cep/M2MCEP.c 
 OBJS        := $(SRCS:%.c=%.o) 
 DEPS        := $(SRCS:%.c=%.d) 
-TARGET      := libcep.so.0.4.0 
+TARGET      := libcep.so.0.5.0 
 SONAME      := libcep.so.0 
 TARGETLINK  := libcep.so 
 LDFLAGS     := -shared -Wl,-soname=$(SONAME) 

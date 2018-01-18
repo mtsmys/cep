@@ -824,7 +824,7 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
 
 /**
  * This method converts from unsigned long to string.<br>
- * Generated string is allocated in this method, so caller must free it.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
  *
  * @param[in] number		Conversion target number
  * @param[out] buffer		Array for copying integer string
@@ -859,6 +859,45 @@ M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t 
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
 		return NULL;
 		}
+	else
+		{
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
+		return NULL;
+		}
+	}
+
+
+/**
+ * This method converts from unsigned long to string.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
+ *
+ * @param[in] number		Conversion target number
+ * @param[out] buffer		Array for copying integer string
+ * @param[in] bufferLength	Length of array[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromUnsignedLongToString()";
+
+	//===== Check argument =====
+	if (bufferLength>0)
+		{
+		//===== Initialize temporary buffer =====
+		memset(buffer, 0, bufferLength);
+		//===== Convert from unsigned long to string =====
+		if (M2MString_format(buffer, bufferLength-1, "%lu", number)>0)
+			{
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert \"uint32_t\" number into string");
+			return NULL;
+			}
+		}
+	//===== Argument error =====
 	else
 		{
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");

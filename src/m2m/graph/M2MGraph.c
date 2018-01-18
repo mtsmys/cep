@@ -145,6 +145,56 @@ static M2MGraph *this_setDatabaseName (M2MGraph *self, const M2MString *database
  * Public function
  ******************************************************************************/
 /**
+ * Connect nodes specified by arguments with an edge.<br>
+ * Actually maintain relationships in a "Nested Sets Model" in the table <br>
+ * of SQLite 3 database.<br>
+ *
+ * @param[in] self			M2MGraph structure object
+ * @param[in] nodeID		Node ID of the connection source to be connected at edge
+ * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
+ * @return					M2MGraph structure object relationships updated or NULL (in case of error)
+ */
+M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const uint32_t anotherNodeID)
+	{
+	//========== Variable ==========
+	sqlite3 *fileDatabase = NULL;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph_connect()";
+
+	//===== Check argument =====
+	if (self!=NULL && nodeID>0 && anotherNodeID>0)
+		{
+		//===== Get SQLite3 object =====
+		if ((fileDatabase=M2MGraph_getFileDatabase(self))!=NULL)
+			{
+			return (M2MGraph *)self;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get \"sqlite3\" object possessed by \"M2MGraph\" object", NULL);
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
+		return NULL;
+		}
+	else if (nodeID<=0)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"oneNodeID\" isn't positive", NULL);
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" isn't positive", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
  * Destructor.<br>
  *
  * @param[in,out] self	M2MGraph structure object to be freed of memory area
@@ -187,6 +237,29 @@ M2MString *M2MGraph_getDatabaseName (const M2MGraph *self)
 	else
 		{
 		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in] self		M2MGraph structure object
+ * @return				SQLite3 database object
+ */
+sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph_getFileDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		return self->fileDatabase;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL", NULL);
 		return NULL;
 		}
 	}
