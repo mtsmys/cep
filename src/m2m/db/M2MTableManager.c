@@ -37,7 +37,7 @@
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
  * オブジェクトを返す。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @return			カラム構造体オブジェクト or NULL（エラーの場合）
  */
 static M2MColumnList *this_getColumnList (const M2MTableManager *self);
@@ -46,7 +46,7 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self);
 /**
  * 引数で指定されたテーブル構築オブジェクトが保有しているテーブル名文字列を取得する。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @return			テーブル名を示す文字列
  */
 static unsigned char *this_getTableName (const M2MTableManager *self);
@@ -55,8 +55,8 @@ static unsigned char *this_getTableName (const M2MTableManager *self);
 /**
  * 引数で指定されたテーブル構築オブジェクトの前のオブジェクトを返す．<br>
  *
- * @param[in] self		テーブル構築オブジェクト
- * @return				引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
+ * @param[in] self	Table construction object
+ * @return			引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
  */
 static M2MTableManager *this_previous (const M2MTableManager *self);
 
@@ -68,7 +68,7 @@ static M2MTableManager *this_previous (const M2MTableManager *self);
 /**
  * 引数で指定されたテーブル構築オブジェクトの先頭ノードを取得する。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @return			先頭に位置するテーブル構築オブジェクト
  */
 static M2MTableManager *this_begin (M2MTableManager *self)
@@ -98,7 +98,7 @@ static M2MTableManager *this_begin (M2MTableManager *self)
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
  * オブジェクトのヒープメモリ領域を解放する。<br>
  *
- * @param[in,out] self	テーブル構築オブジェクト
+ * @param[in,out] self	Table construction object
  */
 static void this_deleteColumnList (M2MTableManager *self)
 	{
@@ -132,7 +132,7 @@ static void this_deleteColumnList (M2MTableManager *self)
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するテーブル名を<br>
  * 示す文字列のヒープメモリ領域を解放する。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  */
 static void this_deleteTableName (M2MTableManager *self)
 	{
@@ -272,7 +272,7 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
  * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
  * オブジェクトを返す。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @return			カラム構造体オブジェクト or NULL（エラーの場合）
  */
 static M2MColumnList *this_getColumnList (const M2MTableManager *self)
@@ -295,7 +295,7 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self)
 
 
 /**
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @param[out] sql	テーブル構築のためのSQL文を示す文字列をコピーするためのバッファ（バッファリング自体は関数内で実施するため呼び出し側はポインタ指定のみ）
  * @return			引数に与えた"sql"ポインタにコピーされた文字列の先頭ポインタ or NULL（エラーの場合）
  */
@@ -384,7 +384,7 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 /**
  * 引数で指定されたテーブル構築オブジェクトが保有しているテーブル名文字列を取得する。<br>
  *
- * @param[in] self	テーブル構築オブジェクト
+ * @param[in] self	Table construction object
  * @return			テーブル名を示す文字列
  */
 static M2MString *this_getTableName (const M2MTableManager *self)
@@ -409,8 +409,8 @@ static M2MString *this_getTableName (const M2MTableManager *self)
 /**
  * 引数で指定されたテーブル構築オブジェクトの1つ次のノードを返す．<br>
  *
- * @param[in] tableBuilder	テーブル構築オブジェクト
- * @return					引数で指定されたテーブル構築オブジェクトの1つ次のノード or NULL（エラーの場合）
+ * @param[in] self	Table construction object
+ * @return			引数で指定されたテーブル構築オブジェクトの1つ次のノード or NULL（エラーの場合）
  */
 static M2MTableManager *this_next (const M2MTableManager *self)
 	{
@@ -434,8 +434,8 @@ static M2MTableManager *this_next (const M2MTableManager *self)
 /**
  * 引数で指定されたテーブル構築オブジェクトの1つ前のノードを返す．<br>
  *
- * @param[in] tableBuilder	テーブル構築オブジェクト
- * @return					引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
+ * @param[in] self	Table construction object
+ * @return			引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
  */
 static M2MTableManager *this_previous (const M2MTableManager *self)
 	{
@@ -460,7 +460,7 @@ static M2MTableManager *this_previous (const M2MTableManager *self)
  * 引数で指定されたテーブル構築オブジェクトのメンバ変数として, カラム構造体<br>
  * オブジェクトをセットする。<br>
  *
- * @param[in] self			テーブル構築オブジェクト
+ * @param[in] self			Table construction object
  * @param[in] columnList	カラム構造体オブジェクト
  * @return					テーブル構築オブジェクト or NULL（エラーの場合）
  */
@@ -493,7 +493,7 @@ static M2MTableManager *this_setColumnList (M2MTableManager *self, M2MColumnList
  * 引数で指定されたテーブル構築オブジェクトに対し, 1つ後ろに位置するテーブル構築<br>
  * オブジェクトのノードをセットする。<br>
  *
- * @param[in,out] self	テーブル構築オブジェクト
+ * @param[in,out] self	Table construction object
  * @param[in] next		テーブル構築オブジェクト
  * @return				テーブル構築オブジェクト or NULL（エラーの場合）
  */
@@ -521,7 +521,7 @@ static M2MTableManager *this_setNext (M2MTableManager *self, M2MTableManager *ne
  * 引数で指定されたテーブル構築オブジェクトに対し, 1つ前に位置するテーブル構築<br>
  * オブジェクトのノードをセットする。<br>
  *
- * @param[in,out] self	テーブル構築オブジェクト
+ * @param[in,out] self	Table construction object
  * @param[in] previous	テーブル構築オブジェクト
  * @return				テーブル構築オブジェクト or NULL（エラーの場合）
  */
@@ -553,7 +553,7 @@ static M2MTableManager *this_setPrevious (M2MTableManager *self, M2MTableManager
 /**
  * テーブル構築オブジェクトのメンバ変数としてテーブル名を示す文字列をセットする。<br>
  *
- * @param[in,out] self		テーブル構築オブジェクト
+ * @param[in,out] self		Table construction object
  * @param[in] tableName		テーブル名を示す文字列
  * @return					テーブル構築オブジェクト or NULL（エラーの場合）
  */

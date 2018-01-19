@@ -52,7 +52,7 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * @param databaseName
+ * @param databaseName	String indicating SQLite3 database file name
  * @param fileDatabase	Handler of SQLite3 file database connection
  */
 #ifndef M2MGraph
