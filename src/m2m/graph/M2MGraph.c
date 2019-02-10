@@ -75,12 +75,45 @@ static void this_deleteDatabaseName (M2MGraph *self)
 static void this_deleteFileDatabase (M2MGraph *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph.this_deleteDatabaseName()";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph.this_deleteFileDatabase()";
 
 	//===== Check argument =====
 	if (self!=NULL && self->fileDatabase!=NULL)
 		{
 		M2MSQLiteConfig_closeDatabase(self->fileDatabase);
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed the SQLite3 database object");
+#endif // DEBUG
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL", NULL);
+		}
+	else
+		{
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3 database object hasn't been set yet");
+#endif // DEBUG
+		}
+	return;
+	}
+
+
+/**
+ * Releases the heap memory of the SQLite3 database object possessed by the M2MGraph object.<br>
+ *
+ * @param[in,out] self	M2MGraph structure object
+ */
+static void this_deleteMemoryDatabase (M2MGraph *self)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph.this_deleteMemoryDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL && self->memoryDatabase!=NULL)
+		{
+		M2MSQLiteConfig_closeDatabase(self->memoryDatabase);
 #ifdef DEBUG
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed the SQLite3 database object");
 #endif // DEBUG
@@ -253,6 +286,55 @@ static M2MGraph *this_setFileDatabase (M2MGraph *self, sqlite3 *fileDatabase)
 	}
 
 
+/**
+ * Set SQLite3 database object as member variable of the M2MGraph structure object.<br>
+ *
+ * @param[in,out] self			M2MGraph structure object to be set SQLite3 file database
+ * @param[in] memoryDatabase	SQLite3 in-memory database object
+ * @return						M2MGraph structure object with member variable updated or NULL (in case of error)
+ */
+static M2MGraph *this_setMemoryDatabase (M2MGraph *self, sqlite3 *memoryDatabase)
+	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph.this_setMemoryDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL
+			&& memoryDatabase!=NULL && this_isClosed(memoryDatabase)==false)
+		{
+		//===== In case of existing the connection with SQLite3 database =====
+		if (self->memoryDatabase!=NULL)
+			{
+			//===== Initialize the connection with SQLite3 database =====
+			M2MSQLiteConfig_closeDatabase(self->memoryDatabase);
+			self->memoryDatabase = NULL;
+			}
+		//===== In case of not existing the connection with SQLite3 database =====
+		else
+			{
+			// do nothing
+			}
+		//===== Set the connection with SQLite3 database =====
+		self->memoryDatabase = memoryDatabase;
+#ifdef DEBUG
+		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set the SQLite3 file database into indicated \"M2MGraph\" object");
+#endif // DEBUG
+		return self;
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL", NULL);
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
 
 /*******************************************************************************
  * Public function
@@ -321,8 +403,10 @@ void M2MGraph_delete (M2MGraph **self)
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
+		//===== Release allocated memory =====
 		this_deleteDatabaseName((*self));
 		this_deleteFileDatabase((*self));
+		this_deleteMemoryDatabase((*self));
 		M2MHeap_free((*self));
 #ifdef DEBUG
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Release the heap memory for \"M2MGraph\" object");
@@ -404,6 +488,63 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
 			//===== Error handling =====
 			else
 				{
+				M2MSQLiteConfig_closeDatabase(fileDatabase);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to connect with SQLite3 database", NULL);
+				return NULL;
+				}
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL", NULL);
+		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in] self		M2MGraph structure object
+ * @return				SQLite3 database object
+ */
+sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
+	{
+	//========== Variable ==========
+	sqlite3 *memoryDatabase = NULL;
+	const M2MString *DATA_SOURCE_NAME = (M2MString *)":memory:";
+	const M2MString *METHOD_NAME = (M2MString *)"M2MGraph_getMemoryDatabase()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== In case of existing SQLite3 database object =====
+		if ((self->memoryDatabase)!=NULL)
+			{
+			//===== Check the connection with SQLite3 database =====
+			if (this_isClosed(self->memoryDatabase)==false)
+				{
+				return self->memoryDatabase;
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the SQLite3 database object whose connection is alive", NULL);
+				return NULL;
+				}
+			}
+		//===== In case of not existing SQLite3 database object =====
+		else
+			{
+			//===== Get the connection with SQLite3 database =====
+			if ((memoryDatabase=M2MSQLiteConfig_openDatabase(DATA_SOURCE_NAME))!=NULL
+					&& this_setMemoryDatabase((M2MGraph *)self, memoryDatabase)!=NULL)
+				{
+				return self->memoryDatabase;
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MSQLiteConfig_closeDatabase(memoryDatabase);
 				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to connect with SQLite3 database", NULL);
 				return NULL;
 				}

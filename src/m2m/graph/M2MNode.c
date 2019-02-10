@@ -94,27 +94,28 @@ static uint32_t this_createNewNodeID ()
 
 
 /**
+ * Only when called in the first time, multiply the input value by a random number. <br>
  *
- * @param x
- * @return
+ * @param[in] x	Input number
+ * @return		Randomized number or intact input value
  */
 static uint32_t this_initSeedVariable (const uint32_t x)
 	{
 	//========== Variable ==========
 	float random = 0.0;
 
-	//=====  =====
+	//===== In case of first time =====
 	if (this_initSeed==true)
 		{
-		//=====  =====
+		//===== Lower the flag =====
 		this_initSeed = false;
-		//=====  =====
+		//===== Get random number =====
 		srand((unsigned int) time(0));
 		random = (rand() + 0.5) / (RAND_MAX + 1);
-		//=====  =====
+		//===== Return the randomized number =====
 		return (uint32_t)(random * x);
 		}
-	//=====  =====
+	//===== In case of the second and subsequent =====
 	else
 		{
 		return x;

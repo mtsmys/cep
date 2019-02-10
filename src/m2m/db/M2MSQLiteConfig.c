@@ -290,7 +290,7 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
  * Otherwise, caller should SQLite3 file pathname string as "filename" <br>
  * argument.<br>
  *
- * @param[in] filename	String indicating database name
+ * @param[in] filename	String indicating database name(if you want to use in-memory database, please set ":memory:" string)
  * @return				Connection handler of opened SQLite3 database or NULL (in case of error)
  */
 sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)

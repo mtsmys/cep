@@ -52,14 +52,16 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * @param databaseName	String indicating SQLite3 database file name
- * @param fileDatabase	Handler of SQLite3 file database connection
+ * @param databaseName		String indicating SQLite3 database file name
+ * @param fileDatabase		Handler of SQLite3 file database connection
+ * @param memoryDatabase	Handler of SQLite3 memory database connection
  */
 #ifndef M2MGraph
 typedef struct
 	{
 	M2MString *databaseName;
 	sqlite3 *fileDatabase;
+	sqlite3 *memoryDatabase;
 	} M2MGraph;
 #endif /* M2MGraph */
 
@@ -103,6 +105,13 @@ M2MString *M2MGraph_getDatabaseName (const M2MGraph *self);
  * @return				SQLite3 database object
  */
 sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self);
+
+
+/**
+ * @param[in] self		M2MGraph structure object
+ * @return				SQLite3 database object
+ */
+sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self);
 
 
 /**

@@ -66,10 +66,10 @@ static M2MTableManager *this_previous (const M2MTableManager *self);
  * Private function
  ******************************************************************************/
 /**
- * 引数で指定されたテーブル構築オブジェクトの先頭ノードを取得する。<br>
+ * Get the first node of the table construction object.<br>
  *
  * @param[in] self	Table construction object
- * @return			先頭に位置するテーブル構築オブジェクト
+ * @return			First node of the table construction object
  */
 static M2MTableManager *this_begin (M2MTableManager *self)
 	{
@@ -95,8 +95,7 @@ static M2MTableManager *this_begin (M2MTableManager *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
- * オブジェクトのヒープメモリ領域を解放する。<br>
+ * Release the heap memory of column list held by table construction object.<br>
  *
  * @param[in,out] self	Table construction object
  */
@@ -109,7 +108,7 @@ static void this_deleteColumnList (M2MTableManager *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== カラム構造体オブジェクトの存在を確認 =====
+		//===== Check existence of column structure object =====
 		if ((columnList=this_getColumnList(self))!=NULL)
 			{
 			M2MColumnList_delete(columnList);
@@ -129,8 +128,7 @@ static void this_deleteColumnList (M2MTableManager *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するテーブル名を<br>
- * 示す文字列のヒープメモリ領域を解放する。<br>
+ * Release the heap memory of string indicating the table name.<br>
  *
  * @param[in] self	Table construction object
  */
@@ -143,7 +141,7 @@ static void this_deleteTableName (M2MTableManager *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== テーブル名を示す文字列の存在を確認 =====
+		//===== Check existence of table name string =====
 		if ((tableName=this_getTableName(self))!=NULL)
 			{
 			M2MHeap_free(tableName);
