@@ -50,18 +50,18 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * CEP用レコード管理オブジェクト。<br>
- * （レコード挿入対象である）テーブル名毎にノードを分割し、リスト構造として連結<br>
- * する。<br>
- * なお、同一テーブル名のレコード情報を示す構造体オブジェクトは、M2MCEP構造体の<br>
- * メンバ変数によって、その保持可能な最大数が規定される。<br>
+ * Record management object for CEP.<br>
+ * Divide nodes for each table name (to be inserted into records) and concatenate <br>
+ * them as a list structure.<br>
+ * Note that the maximum number of structure objects showing record information of <br>
+ * the same table name can be held by member variables of the M2MCEP structure.<br>
  *
- * @param previousRecord	1つ前のレコード管理オブジェクトのポインタ（先頭の場合は自分のポインタを示す）
- * @param nextRecord		1つ後ろのレコード管理オブジェクトのポインタ（末端の場合はNULLを示す）
- * @param tableName			テーブル名を示す文字列
- * @param columnName		テーブルのフィールド名を示すCSV形式の文字列（＝[フィールド名,フィールド名,フィールド名・・・]）
- * @param newRecordList 	新規に挿入したレコード情報（文字列）を示す構造体オブジェクト（＝[CSV1行 -> CSV1行 -> CSV1行・・・]）
- * @param newRecordList 	過去に挿入されたレコード情報（文字列）を示す構造体オブジェクト（＝[CSV1行 -> CSV1行 -> CSV1行・・・]）．過去データより昇順
+ * @param previousRecord	A pointer of the record management object one before (indicating its own pointer in the case of the head)
+ * @param nextRecord		A pointer of the record management object immediately after (indicating NULL in the case of the end)
+ * @param tableName			String indicating table name
+ * @param columnName		CSV format string (= [field name, field name, field name ···]) indicating the field name of the table
+ * @param newRecordList 	A structure object (= [CSV 1 line -> CSV 1 line -> CSV 1 line ····)] indicating newly inserted record information (character string))
+ * @param newRecordList 	A structure object (= [CSV 1 line -> CSV 1 line -> CSV 1 line ...)] indicating the record information (character string) inserted in the past. Ascending order from past data
  */
 #ifndef M2MDataFrame
 typedef struct M2MDataFrame
@@ -81,152 +81,155 @@ typedef struct M2MDataFrame
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたレコード管理オブジェクトから先頭のレコード管理オブジェクト<br>
- * を取得して返す．<br>
- * 【注意】<br>
- * 先頭のレコード管理オブジェクトは1つ前のポインタが自分と同じアドレスを示す．<br>
+ * Acquires the first record management object from the record management object <br>
+ * specified by the argument and returns it.<br>
+ * <br>
+ * [Attention!]<br>
+ * The first record indicates the same address as the previous pointer to itself.<br>
  *
- * @param[in] self	レコード管理オブジェクト
- * @return			先頭のレコード管理オブジェクト
+ * @param[in] self	Record management object
+ * @return			First record management object
  */
 M2MDataFrame *M2MDataFrame_begin (M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトのメモリ領域を全て解放する．<br>
+ * Free all memory area of record management object specified by argument.<br>
  *
- * @param[in,out] self	メモリ領域解放対象のレコード管理オブジェクト
+ * @param[in,out] self	Record management object to release memory area
  */
 void M2MDataFrame_delete (M2MDataFrame **self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持するカラム名<br>
- * を示すCSV形式の文字列を返す．<br>
+ * Returns a CSV format string indicating the column name held by the record <br>
+ * management object specified by the argument as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持するカラム名を示すCSV形式の文字列 or NULL（エラーの場合）
+ * @param[in] self		Record management object
+ * @return				CSV format string indicating the column name held by record management object specified by argument or NULL (in case of error)
  */
 M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する、新規に<br>
- * 挿入されたレコードリストを返す．<br>
+ * Returns a newly inserted record list that the record management object specified <br>
+ * by argument holds as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する、新規に挿入された（未だメモリーDB未挿入の）レコードリスト
+ * @param[in] self		Record management object
+ * @return				A record list newly inserted (not yet inserted in the memory DB) held by the record management object specified by the argument
  */
 M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する、過去に<br>
- * 挿入されたレコードリストを返す．<br>
+ * Returns a record list inserted in the past that the record management object <br>
+ * specified by argument holds as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する、過去に挿入された（メモリーDB挿入済みの）レコードリスト
+ * @param[in] self		Record management object
+ * @return				Record list (inserted in the memory DB) inserted in the past that is held by the record management object specified by the argument
  */
 M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持するテーブル名<br>
- * 文字列を返す．<br>
+ * Returns the table name string held by the record management object specified <br>
+ * by the argument as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持するテーブル名
+ * @param[in] self		Record management object
+ * @return				Table name held by record management object specified by argument
  */
 M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトの“新規に挿入したレコード情報”<br>
- * 構造体オブジェクトのレコード情報を、“過去に挿入されたレコード情報”構造体<br>
- * オブジェクトへコピーする。<br>
- * この操作は、メモリ上のSQLite3データベースへレコードを挿入した後、ファイル上の<br>
- * SQLite3データベースへ永続化のためデータを整理するために実行する。<br>
+ * Copy the record information of the "newly inserted record information" structure <br>
+ * object of the record management object designated by the argument to the "record <br>
+ * information inserted in the past" structure object.<br>
+ * This operation is executed to insert data into the SQLite 3 database in memory <br>
+ * and then organize the data for persistence into the SQLite 3 database on the file.<br>
  *
- * @param[in,out] self
+ * @param[in,out] self	Record management object
  */
 void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self);
 
 
 /**
- * （ヒープ）メモリ領域を新規に獲得し，レコード管理オブジェクトを生成する．<br>
+ * A heap memory area is newly acquired, and a record management object is generated.<br>
  *
- * @return	新規に生成したレコード管理オブジェクト
+ * @return	A newly created record management object
  */
 M2MDataFrame *M2MDataFrame_new ();
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する，1つ後ろの<br>
- * レコード管理オブジェクトを返す．<br>
+ * Returns the record management object after the record management object specified <br>
+ * by the argument is held as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ後ろのレコード管理オブジェクト
+ * @param[in] self		Record management object
+ * @return				The record management object immediately following the record management object specified by the argument
  */
 M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する，1つ手前の<br>
- * レコード管理オブジェクトを返す．<br>
+ * Returns the record management object immediately before which the record management <br>
+ * object specified by the argument is held as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する，1つ手前のレコード管理オブジェクト
+ * @param[in] self		Record management object
+ * @return				The record management object immediately before the record management object specified by the argument
  */
 M2MDataFrame *M2MDataFrame_previous (const M2MDataFrame *self);
 
 
 /**
- * 引数で指定されたテーブル名に該当するレコード管理オブジェクトだけ，メモリ領域<br>
- * を解放する（ポインタで接続された他のレコード管理オブジェクトは存続する）．<br>
+ * Only the record management object corresponding to the table name specified by <br>
+ * the argument releases the memory area (other record management objects connected <br>
+ * by the pointer will survive).<br>
  *
- * @param[in,out] self		レコード管理オブジェクト
- * @param[in] tableName		削除対象のレコード管理オブジェクトが保有するテーブル名を示す文字列
+ * @param[in,out] self		Record management object
+ * @param[in] tableName		String indicating the table name possessed by the record management object to be deleted
  */
 void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName);
 
 
 /**
- * 引数で指定されたテーブル名をメンバ変数に持つレコード管理オブジェクトに対し，<br>
- * CSV形式の文字列データをリスト構造体オブジェクトに格納する．<br>
+ * String data in CSV format is stored in the list structure object for the record <br>
+ * management object having the table name designated by the argument as the member <br>
+ * variable.<br>
  *
- * @param[in,out] self		レコード管理オブジェクト
- * @param[in] tableName		テーブル名を示す文字列
- * @param[in] csv			CSV形式の文字列データ（1行目にカラム名を示すヘッダ，2行目以降がデータとなる）
- * @return					オブジェクトに格納したレコード数[個] or -1（エラーの場合）
+ * @param[in,out] self		Record management object
+ * @param[in] tableName		String indicating table name
+ * @param[in] csv			String data in CSV format (header showing column name in the first row, data after the second row)
+ * @return					Number of records stored in object [number] or -1 (in case of error)
  */
 int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M2MString *csv);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し，1つ後ろのレコード管理<br>
- * オブジェクトをセットする．<br>
+ * Set the record management object one record behind the record management object <br>
+ * specified by the argument.<br>
  *
- * @param[in] self			レコード管理オブジェクト
- * @param[in] nextRecord	1つ後ろのレコード管理オブジェクト
+ * @param[in] self			Record management object
+ * @param[in] nextRecord	The record management object one behind
  */
 void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し，1つ手前のレコード管理<br>
- * オブジェクトをセットする．<br>
+ * Set the record management object one before the record management object specified <br>
+ * by the argument.<br>
  *
- * @param[in,out] self			レコード管理オブジェクト
- * @param[in] previousRedord	1つ手前のレコード管理オブジェクト
+ * @param[in,out] self			Record management object
+ * @param[in] previousRedord	Record management object one before
  */
 void M2MDataFrame_setPreviousRecord (M2MDataFrame *self, M2MDataFrame *previousRecord);
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトの要素数を返す。<br>
+ * Returns the number of elements of record management object specified by argument.<br>
  *
- * @param[in] self	レコード管理オブジェクト
- * @return			要素数
+ * @param[in] self	Record management object
+ * @return			The number of element
  */
 unsigned int M2MDataFrame_size (M2MDataFrame *self);
 
