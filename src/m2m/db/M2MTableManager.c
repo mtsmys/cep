@@ -34,29 +34,29 @@
  * Definition of private function
  ******************************************************************************/
 /**
- * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
- * オブジェクトを返す。<br>
+ * Returns a column structure object that the table construction object <br>
+ * specified by the argument holds as a member variable.<br>
  *
  * @param[in] self	Table construction object
- * @return			カラム構造体オブジェクト or NULL（エラーの場合）
+ * @return			Column structure object or NULL (in case of error)
  */
 static M2MColumnList *this_getColumnList (const M2MTableManager *self);
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトが保有しているテーブル名文字列を取得する。<br>
+ * Get the table name string held by the table construction object.<br>
  *
  * @param[in] self	Table construction object
- * @return			テーブル名を示す文字列
+ * @return			String indicating table name
  */
 static unsigned char *this_getTableName (const M2MTableManager *self);
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトの前のオブジェクトを返す．<br>
+ * Returns the object before the table construction object.<br>
  *
  * @param[in] self	Table construction object
- * @return			引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
+ * @return			Node immediately before the table construction object or NULL (in case of error)
  */
 static M2MTableManager *this_previous (const M2MTableManager *self);
 
@@ -177,101 +177,100 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 	//===== Check argument =====
 	if (columnList!=NULL && columnDefinition!=NULL)
 		{
-		//===== カラム情報オブジェクトの取得 =====
+		//===== Get a column information object =====
 		if ((column=M2MColumnList_getColumn(columnList))!=NULL
 				&& (columnName=M2MColumn_getName(column))!=NULL
 				&& (dataTypeString=M2MDataType_toString(dataType=M2MColumn_getDataType(column)))!=NULL)
 			{
-			//===== カラム名をセット =====
+			//===== Set column names =====
 			M2MString_append(columnDefinition, M2MString_QUOTATION);
 			M2MString_append(columnDefinition, columnName);
 			M2MString_append(columnDefinition, (M2MString *)"' ");
-			//===== データ型をセット =====
+			//===== Set data type =====
 			M2MString_append(columnDefinition, dataTypeString);
 			M2MString_append(columnDefinition, (M2MString *)M2MString_SPACE);
-			//===== NULLを許す場合 =====
+			//===== When NULL is allowed =====
 			if (M2MColumn_getAllowNULL(column)==true)
 				{
 				}
-			//===== NULLを許さない場合 =====
+			//===== When NULL is not permitted =====
 			else
 				{
 				M2MString_append(columnDefinition, (M2MString *)"NOT NULL ");
 				}
-			//===== 主キーの場合 =====
+			//===== For primary key =====
 			if (M2MColumn_getPrimaryKey(column)==true)
 				{
-				//===== 主キーをセット =====
+				//===== Set primary key =====
 				M2MString_append(columnDefinition, (M2MString *)"PRIMARY KEY ");
-				//===== 更にデータ型が整数で自動インクリメント設定の場合 =====
+				//===== When the data type is an integer and auto increment is set =====
 				if (dataType==M2MDataType_INTEGER
 						&& M2MColumn_getAutoIncrement(column)==true)
 					{
-					//===== 自動インクリメントをセット =====
+					//===== Set auto increment =====
 					M2MString_append(columnDefinition, (M2MString *)"AUTOINCREMENT ");
 					}
-				//===== 自動インクリメント設定でない場合 =====
+				//===== When it is not the automatic increment setting =====
 				else
 					{
-					// 何もしない
+					// do nothing
 					}
 				}
-			//===== 主キーでない場合 =====
+			//===== When it is not a primary key =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== 値がユニークな場合 =====
+			//===== When the value is unique =====
 			if (M2MColumn_getUnique(column)==true)
 				{
-				//===== ユニーク設定をセット =====
+				//===== Set unique setting =====
 				M2MString_append(columnDefinition, (M2MString *)"UNIQUE ");
 				}
-			//===== 値がユニークでない場合 =====
+			//===== When the value is not unique =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== カラム定義を示す文字列を返す =====
+			//===== Returns a string indicating the column definition =====
 			return (*columnDefinition);
 			}
 		//===== Error handling =====
 		else if (column==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"から取得した\"M2MColumn *\"がNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL", NULL);
 			return NULL;
 			}
 		else if (columnName==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"から取得した\"M2MColumn *\"のメンバ変数であるカラム名がNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Column name which is a member variable of \"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL", NULL);
 			return NULL;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"から取得した\"M2MColumn *\"のデータ型を示す文字列がNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data type of \"M2MColumn *\" obtained from \"M2MColumnList *\" specified by argument is NULL", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (columnList==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MColumnList *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2MColumnList *\" specified as argument is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"columnDefinition\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"ColumnDefinition\" specified as argument is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトがメンバ変数として保持するカラム構造体<br>
- * オブジェクトを返す。<br>
+ * Returns a column structure object that the table construction object holds as a member variable.<br>
  *
  * @param[in] self	Table construction object
- * @return			カラム構造体オブジェクト or NULL（エラーの場合）
+ * @return			Column structure object or NULL (in case of error)
  */
 static M2MColumnList *this_getColumnList (const M2MTableManager *self)
 	{
@@ -294,8 +293,8 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self)
 
 /**
  * @param[in] self	Table construction object
- * @param[out] sql	テーブル構築のためのSQL文を示す文字列をコピーするためのバッファ（バッファリング自体は関数内で実施するため呼び出し側はポインタ指定のみ）
- * @return			引数に与えた"sql"ポインタにコピーされた文字列の先頭ポインタ or NULL（エラーの場合）
+ * @param[out] sql	A buffer for copying string indicating a SQL statement for building a table (buffering itself is carried out within this function, so the caller only designates a pointer)
+ * @return			Pointer of string copied to "sql" given as argument or NULL (in case of error)
  */
 static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString **sql)
 	{
@@ -310,53 +309,53 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 	//===== Check argument =====
 	if (self!=NULL && sql!=NULL)
 		{
-		//===== テーブル情報の取得 =====
+		//===== Get table information =====
 		if ((tableName=this_getTableName(self))!=NULL
 				&& (columnList=M2MColumnList_begin(this_getColumnList(self)))!=NULL
 				&& (columnListLength=M2MColumnList_length(columnList))>0)
 			{
-			//===== SQLコマンドとテーブル名をセット =====
+			//===== Set SQL command and table name =====
 			M2MString_append(sql, (M2MString *)"CREATE TABLE '");
 			M2MString_append(sql, tableName);
-			//===== カラム定義の準備 =====
+			//===== Prepare column definitions =====
 			M2MString_append(sql, (M2MString *)"' (");
-			//===== カラム数だけ繰り返し =====
+			//===== Repeat as many columns =====
 			for (i=0; i<columnListLength; i++)
 				{
-				//===== カラム定義文字列を取得 =====
+				//===== Get column definition string =====
 				if (this_getColumnDefinition(columnList, &columnDefinition)!=NULL)
 					{
-					//===== カラム定義文字列をセット =====
+					//===== Set column definition string =====
 					M2MString_append(sql, columnDefinition);
-					//===== 最後のカラム定義でない場合 =====
+					//===== When it is not the last column definition =====
 					if (i!=columnListLength-1)
 						{
-						//===== カンマ文字を追加 =====
+						//===== Add comma character =====
 						M2MString_append(sql, (M2MString *)", ");
 						}
-					//===== 最後のカラム定義の場合 =====
+					//===== In the case of the last column definition =====
 					else
 						{
-						// 何もしない
+						// do nothing
 						}
-					//===== カラム定義文字列のヒープメモリ領域を解放 =====
+					//===== Free heap memory area of column definition string =====
 					M2MHeap_free(columnDefinition);
 					}
-				//===== カラム定義文字列の取得に失敗した場合 =====
+				//===== When acquisition of column definition character string failed =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"カラム定義文字列の作成に失敗しました", NULL);
-					//===== ヒープメモリ領域の解放 =====
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An attempt to create a column definition character string has failed", NULL);
+					//===== Free heap memory area =====
 					M2MHeap_free(columnDefinition);
 					M2MHeap_free((*sql));
 					return NULL;
 					}
-				//===== 次のカラムに移動 =====
+				//===== Move to the next column =====
 				columnList = M2MColumnList_next(columnList);
 				}
-			//===== SQL文の作成を終了 =====
+			//===== Finish the creation of SQL statement =====
 			M2MString_append(sql, (M2MString *)") ");
-			//===== SQL文を返す =====
+			//===== Return a SQL statement =====
 			return (*sql);
 			}
 		//===== Error handling =====
@@ -380,10 +379,10 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトが保有しているテーブル名文字列を取得する。<br>
+ * Get the table name string held by the table construction object specified by the argument.<br>
  *
  * @param[in] self	Table construction object
- * @return			テーブル名を示す文字列
+ * @return			String indicating table name
  */
 static M2MString *this_getTableName (const M2MTableManager *self)
 	{
@@ -405,10 +404,10 @@ static M2MString *this_getTableName (const M2MTableManager *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトの1つ次のノードを返す．<br>
+ * Returns the next node of the table construction object specified by the argument.<br>
  *
  * @param[in] self	Table construction object
- * @return			引数で指定されたテーブル構築オブジェクトの1つ次のノード or NULL（エラーの場合）
+ * @return			Next node of the table construction object specified by argument or NULL (in case of error)
  */
 static M2MTableManager *this_next (const M2MTableManager *self)
 	{
@@ -430,10 +429,10 @@ static M2MTableManager *this_next (const M2MTableManager *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトの1つ前のノードを返す．<br>
+ * Returns the previous node of the table construction object specified by the argument.<br>
  *
  * @param[in] self	Table construction object
- * @return			引数で指定されたテーブル構築オブジェクトの1つ前のノード or NULL（エラーの場合）
+ * @return			Node before the table construction object specified by argument or NULL (in case of error)
  */
 static M2MTableManager *this_previous (const M2MTableManager *self)
 	{
@@ -455,12 +454,11 @@ static M2MTableManager *this_previous (const M2MTableManager *self)
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトのメンバ変数として, カラム構造体<br>
- * オブジェクトをセットする。<br>
+ * Set the column structure object as member variable of the table construction object.<br>
  *
  * @param[in] self			Table construction object
- * @param[in] columnList	カラム構造体オブジェクト
- * @return					テーブル構築オブジェクト or NULL（エラーの場合）
+ * @param[in] columnList	Column structure object
+ * @return					Table manager object or NULL (in case of error)
  */
 static M2MTableManager *this_setColumnList (M2MTableManager *self, M2MColumnList *columnList)
 	{
@@ -488,12 +486,11 @@ static M2MTableManager *this_setColumnList (M2MTableManager *self, M2MColumnList
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトに対し, 1つ後ろに位置するテーブル構築<br>
- * オブジェクトのノードをセットする。<br>
+ * Set the node of the table manager object located one behind the object specified as argument.<br>
  *
  * @param[in,out] self	Table construction object
- * @param[in] next		テーブル構築オブジェクト
- * @return				テーブル構築オブジェクト or NULL（エラーの場合）
+ * @param[in] next		Table construction object
+ * @return				Table construction object or NULL (in case of error)
  */
 static M2MTableManager *this_setNext (M2MTableManager *self, M2MTableManager *next)
 	{
@@ -516,12 +513,12 @@ static M2MTableManager *this_setNext (M2MTableManager *self, M2MTableManager *ne
 
 
 /**
- * 引数で指定されたテーブル構築オブジェクトに対し, 1つ前に位置するテーブル構築<br>
- * オブジェクトのノードをセットする。<br>
+ * Set the node of the table building object located immediately before the table <br>
+ * building object specified by the argument.<br>
  *
  * @param[in,out] self	Table construction object
- * @param[in] previous	テーブル構築オブジェクト
- * @return				テーブル構築オブジェクト or NULL（エラーの場合）
+ * @param[in] previous	Table construction object
+ * @return				Table construction object or NULL (in case of error)
  */
 static M2MTableManager *this_setPrevious (M2MTableManager *self, M2MTableManager *previous)
 	{
@@ -549,11 +546,11 @@ static M2MTableManager *this_setPrevious (M2MTableManager *self, M2MTableManager
 
 
 /**
- * テーブル構築オブジェクトのメンバ変数としてテーブル名を示す文字列をセットする。<br>
+ * Set a string indicating the table name as a member variable of the table construction object.<br>
  *
  * @param[in,out] self		Table construction object
- * @param[in] tableName		テーブル名を示す文字列
- * @return					テーブル構築オブジェクト or NULL（エラーの場合）
+ * @param[in] tableName		Table construction object
+ * @return					Table construction object or NULL (in case of error)
  */
 static M2MTableManager *this_setTableName (M2MTableManager *self, const M2MString *tableName)
 	{
@@ -564,29 +561,29 @@ static M2MTableManager *this_setTableName (M2MTableManager *self, const M2MStrin
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
-		//===== テーブル名を示す文字列の長さを取得 =====
+		//===== Get length of string indicating table name =====
 		if ((tableNameLength=M2MString_length(tableName))>0)
 			{
-			//===== テーブル名を示すメンバ変数の初期化 =====
+			//===== Initialization of member variable indicating table name =====
 			this_deleteTableName(self);
-			//===== ヒープメモリ領域の獲得 =====
+			//===== Get the heap memory area =====
 			if ((self->tableName=(M2MString *)M2MHeap_malloc(tableNameLength+1))!=NULL)
 				{
-				//===== テーブル名を示す文字列のコピー =====
+				//===== Copy of the table name string =====
 				memcpy(self->tableName, tableName, tableNameLength);
 				return self;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"テーブル名を示す文字列をコピーするためのヒープメモリ領域の獲得に失敗しました", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for copying the character string indicating the table name", NULL);
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"tableName\"の文字列の大きさが0以下です", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The length of the string of \"tableName\" specified by argument is 0 or less", NULL);
 			return NULL;
 			}
 		}
@@ -626,44 +623,44 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 	//===== Check argument =====
 	if (self!=NULL && database!=NULL)
 		{
-		//===== テーブル構築オブジェクトの先頭ノードを取得 =====
+		//===== Get the head node of table building object =====
 		if ((self=this_begin(self))!=NULL)
 			{
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while ((next=this_next(self))!=NULL)
 				{
-				//===== 同一名のテーブルが存在する場合 =====
+				//===== When a table with the same name exists =====
 				if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
 					{
-					// 何もしない
+					// do nothing
 					}
-				//===== 同一名のテーブルが存在しない場合 =====
+				//===== When there is no table with the same name =====
 				else
 					{
-					//===== テーブル構築用のSQL文を実行済みの場合 =====
+					//===== When executing SQL statement for table construction =====
 					if (executeUpdate==true)
 						{
-						// 何もしない
+						// do nothing
 						}
-					//===== テーブル構築用のSQL文が未実行の場合 =====
+					//===== When the SQL statement for table construction has not been executed yet =====
 					else
 						{
 #ifdef DEBUG
-						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブルの構築処理を開始します");
+						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
 #endif // DEBUG
-						//===== トランザクション開始 =====
+						//===== Start transaction =====
 						M2MSQLRunner_beginTransaction(database);
-						//===== フラグを立てる =====
+						//===== Set a flag =====
 						executeUpdate = true;
 						}
-					//===== テーブル構築用のSQL文の文字列を取得 =====
+					//===== Get string of SQL statement for building table =====
 					if (this_getTableCreateSQL(self, &sql)!=NULL)
 						{
-						//===== SQL実行 =====
+						//===== Execute SQL =====
 						if (M2MSQLRunner_executeUpdate(database, sql)==true)
 							{
 #ifdef DEBUG
-							M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築のためのCREATE文を実行しました");
+							M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 #endif // DEBUG
 							}
 						//===== Error handling =====
@@ -671,52 +668,52 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 							{
 							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
 							}
-						//===== SQL文のヒープメモリ領域を解放 =====
+						//===== Free heap memory area of SQL statement =====
 						M2MHeap_free(sql);
 						}
 					//===== Error handling =====
 					else
 						{
 						memset(MESSAGE, 0, sizeof(MESSAGE));
-						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"テーブル（＝\"%s\"）を構築するためのSQL文を取得するのに失敗しました", this_getTableName(self));
+						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to retrieve SQL statement for building table(= \"%s\")", this_getTableName(self));
 						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
 						}
 					}
-				//===== 次のノードへ進む =====
+				//===== Proceed to the next node =====
 				self = next;
 				}
-			//===== 同一名のテーブルが存在する場合 =====
+			//===== When a table with the same name exists =====
 			if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== 同一名のテーブルが存在しない場合 =====
+			//===== When there is no table with the same name =====
 			else
 				{
-				//===== テーブル構築用のSQL文を実行済みの場合 =====
+				//===== When executing SQL statement for table construction =====
 				if (executeUpdate==true)
 					{
-					// 何もしない
+					// do nothing
 					}
-				//===== テーブル構築用のSQL文が未実行の場合 =====
+				//===== When the SQL statement for table construction has not been executed yet =====
 				else
 					{
 #ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブルの構築処理を開始します");
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
 #endif // DEBUG
-					//===== トランザクション開始 =====
+					//===== Start transaction =====
 					M2MSQLRunner_beginTransaction(database);
-					//===== フラグを立てる =====
+					//===== Set a flag =====
 					executeUpdate = true;
 					}
-				//===== 末端ノードのテーブル構築用のSQL文の文字列を取得 =====
+				//===== Retrieve the character string of the SQL statement for constructing the table of the terminal node =====
 				if (this_getTableCreateSQL(self, &sql)!=NULL)
 					{
-					//===== SQL実行 =====
+					//===== Execute SQL =====
 					if (M2MSQLRunner_executeUpdate(database, sql)==true)
 						{
 #ifdef DEBUG
-						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築のためのCREATE文を実行しました");
+						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 #endif // DEBUG
 						}
 					//===== Error handling =====
@@ -724,38 +721,38 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 						{
 						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, sqlite3_errmsg(database), NULL);
 						}
-					//===== SQL文のヒープメモリ領域を解放 =====
+					//===== Free heap memory area of SQL statement =====
 					M2MHeap_free(sql);
 					}
 				//===== Error handling =====
 				else
 					{
 					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"テーブル（＝\"%s\"）を構築するためのSQL文を取得するのに失敗しました", this_getTableName(self));
+					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to retrieve SQL statement for building table(=\"%s\")", this_getTableName(self));
 					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
 					}
 				}
-			//===== テーブル構築用のSQL文を実行済みの場合 =====
+			//===== When executing SQL statement for table construction =====
 			if (executeUpdate==true)
 				{
-				//===== トランザクション終了 =====
+				//===== End transaction =====
 				M2MSQLRunner_commitTransaction(database);
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築処理を終了します");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish CEP table construction processing");
 #endif // DEBUG
 				}
-			//===== テーブル構築用のSQL文が未実行の場合 =====
+			//===== When the SQL statement for table construction has not been executed yet =====
 			else
 				{
-				// 何もしない
+				// do nothing
 				}
-			//===== 正常終了 =====
+			//===== Successful completion =====
 			return;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MTableManager *\"から先頭ノードを取得するのに失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node from \"M2MTableManager *\" specified by argument", NULL);
 			return;
 			}
 		}
@@ -789,40 +786,40 @@ void M2MTableManager_delete (M2MTableManager **self)
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
-		//===== テーブル構築オブジェクトの先頭ノード取得 =====
+		//===== Get the head node of the table construction object =====
 		if (((*self)=this_begin((*self)))!=NULL)
 			{
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while ((*self)!=NULL && (next=this_next((*self)))!=NULL)
 				{
-				//===== テーブル構築オブジェクトのヒープメモリ領域を解放 =====
+				//===== Free heap memory area of table building object =====
 				this_deleteTableName((*self));
 				this_deleteColumnList((*self));
 				M2MHeap_free((*self));
-				//===== 次のノードへ移動 =====
+				//===== Move to the next node =====
 				(*self) = next;
 				}
-			//===== （末端の）テーブル構築オブジェクトの確認 =====
+			//===== Confirm (end) table building object =====
 			if ((*self)!=NULL)
 				{
-				//===== （末端の）テーブル構築オブジェクトのヒープメモリ領域を解放 =====
+				//===== Releases heap memory area of (end) table building object =====
 				this_deleteTableName((*self));
 				this_deleteColumnList((*self));
 				M2MHeap_free((*self));
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築オブジェクトのメモリ領域を解放しました");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Free memory area of CEP table construction object");
 #endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築オブジェクトの末端ノードがNULLのため, メモリ領域を解放出来ません", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Since the end node of the CEP table construction object is NULL, the memory area can not be released", NULL);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPテーブル構築オブジェクトのメモリ領域を解放する処理において先頭ノードの取得に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Acquisition of the first node failed in the process of releasing the memory area of the CEP table construction object", NULL);
 			}
 		}
 	//===== Argument error =====
