@@ -187,51 +187,54 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
 
 
 /**
- * メモリ上のSQLite3データベースに対し，引数で指定されたSQL文を実行し，その結果を<br>
- * CSV形式の文字列で返す．<br>
- * 実行結果であるCSV形式の文字列は，1行めにカラム名文字列，2行目以降がデータとなる．<br>
+ * Executes the SQL statement specified by the argument on the SQLite 3 database <br>
+ * in memory and returns the result as a CSV format string.<br>
+ * For the character string of the CSV format as the execution result, the <br>
+ * column name character string is the first line, and the data after the second <br>
+ * line is the data.<br>
  *
- * @param[in] self		CEP構造体オブジェクト（データベース管理に使用する）
- * @param[in] sql		SQL文を示す文字列
- * @param[out] result	実行結果のCSV文字列 or NULL（エラーの場合）
+ * @param[in] self		CEP structure object (used for database management)
+ * @param[in] sql		String indicating SQL statement
+ * @param[out] result	CSV character string of execution result or NULL (in case of error)
  * @return
  */
 unsigned char *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result);
 
 
 /**
- * メモリに存在するSQLite3データベース内の各テーブルに格納可能な最大レコード数を<br>
- * 引数で指定された整数値に変更する．<br>
+ * Change the maximum number of records that can be stored in each table in the <br>
+ * SQLite 3 database existing in memory to the integer value specified by the <br>
+ * argument.<br>
  *
- * @param[in,out] self		最大レコード数変更対象のCEP実行オブジェクト
- * @param[in] maxRecord		1つのテーブルにおける最大レコード数を示す整数 or 0（エラーの場合）
- * @return					最大レコード数を設定したCEP実行オブジェクト or 0（エラーの場合）
+ * @param[in,out] self		Maximum number of records CEP execution object to be changed
+ * @param[in] maxRecord		Integer indicating the maximum number of records in one table or 0 (in case of error)
+ * @return					CEP execution object or 0 (maximum number of records set)
  */
 M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord);
 
 
 /**
- * 引数で指定されたCEP構造体オブジェクトに対し、永続性（ファイル上のSQLite3<br>
- * データベースへの記録)の可否を示すフラグをセットする．<br>
- * true を設定した場合、M2MCEP_insertCSV() で挿入されたレコードは全て、<br>
- * ファイル上のSQLite3データベースへ記録する．<br>
- * false を設定した場合、ファイル上のSQLite3データベースへの記録は実行しない．<br>
+ * Set a flag indicating permanence (recording in the SQLite 3 database on the <br>
+ * file) to the CEP structure object specified by the argument.<br>
+ * When set to true, all records inserted by M2MCEP_insertCSV () are recorded in <br>
+ * the SQLite 3 database on the file.<br>
+ * If set to false, do not record to the SQLite 3 database on the file.<br>
  *
- * @param[in,out] self		CEP構造体オブジェクト
- * @param[in] persistence	永続性（ファイル上のSQLite3データベースへの記録)の可否を示すフラグ
- * @return					永続性の可否を示すフラグを設定したCEP実行オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		CEP structure object
+ * @param[in] persistence	Flag indicating permanence (record in SQLite 3 database on file)
+ * @return					CEP execution object with a flag indicating permanence availability or NULL (in case of error)
  */
 M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence);
 
 
 /**
- * SQLite3データベースのバキューム処理を行うレコード数を設定する．<br>
- * このバキューム処理設定については，メモリ上のSQLite3データベースとファイル上の
- * SQLite3データベース共用の設定となる．<br>
+ * SQLite 3 Sets the number of records for vacuuming the database.<br>
+ * For this vacuum processing setting, it is a setting of sharing SQLite 3 <br>
+ * database on memory and SQLite 3 database on file.<br>
  *
- * @param self			バキューム処理のレコード数設定対象のCEP実行オブジェクト
- * @param vacuumRecord	バキューム処理のレコード数を示す整数値（0を指定した場合は自動バキューム設定)
- * @return				バキューム処理を行うレコード数を設定したCEP実行オブジェクト or NULL（エラーの場合）
+ * @param self			Number of records for vacuum processing CEP execution object to be set
+ * @param vacuumRecord	An integer value indicating the number of records of vacuum processing (automatic vacuum setting when 0 is specified)
+ * @return				CEP execution object or number of records to be vacuum processed or NULL (in case of error)
  */
 M2MCEP *M2MCEP_setVacuumRecord (M2MCEP *self, const unsigned int vacuumRecord);
 
