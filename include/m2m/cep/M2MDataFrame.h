@@ -50,7 +50,7 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * Record management object for CEP.<br>
+ * Record management object for CEP(Complex Event Processing).<br>
  * Divide nodes for each table name (to be inserted into records) and concatenate <br>
  * them as a list structure.<br>
  * Note that the maximum number of structure objects showing record information of <br>
@@ -81,8 +81,7 @@ typedef struct M2MDataFrame
  * Public function
  ******************************************************************************/
 /**
- * Acquires the first record management object from the record management object <br>
- * specified by the argument and returns it.<br>
+ * Get the first record management object from the argument and returns it.<br>
  * <br>
  * [Attention!]<br>
  * The first record indicates the same address as the previous pointer to itself.<br>
@@ -95,6 +94,13 @@ M2MDataFrame *M2MDataFrame_begin (M2MDataFrame *self);
 
 /**
  * Free all memory area of record management object specified by argument.<br>
+ * <br>
+ * [Attention!]<br>
+ * The record management object holds a pointer which is a link structure as a <br>
+ * member variable.
+ * Therefore, when releasing the heap memory, it is unnecessary to use it as a <br>
+ * pointer pointer, and it is possible to acquire the correct address through <br>
+ * the pointer held internally.<br>
  *
  * @param[in,out] self	Record management object to release memory area
  */
@@ -102,8 +108,8 @@ void M2MDataFrame_delete (M2MDataFrame **self);
 
 
 /**
- * Returns a CSV format string indicating the column name held by the record <br>
- * management object specified by the argument as a member variable.<br>
+ * Returns a CSV format string indicating the column name held by the argument <br>
+ * as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				CSV format string indicating the column name held by record management object specified by argument or NULL (in case of error)
@@ -112,8 +118,7 @@ M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self);
 
 
 /**
- * Returns a newly inserted record list that the record management object specified <br>
- * by argument holds as a member variable.<br>
+ * Returns a newly inserted record list that the argument holds as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				A record list newly inserted (not yet inserted in the memory DB) held by the record management object specified by the argument
@@ -122,8 +127,7 @@ M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self);
 
 
 /**
- * Returns a record list inserted in the past that the record management object <br>
- * specified by argument holds as a member variable.<br>
+ * Returns a record list inserted in the past that the argument holds as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				Record list (inserted in the memory DB) inserted in the past that is held by the record management object specified by the argument
@@ -132,8 +136,7 @@ M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self);
 
 
 /**
- * Returns the table name string held by the record management object specified <br>
- * by the argument as a member variable.<br>
+ * Returns the table name string held by the argument as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				Table name held by record management object specified by argument
@@ -155,6 +158,8 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self);
 
 /**
  * A heap memory area is newly acquired, and a record management object is generated.<br>
+ * Keep in mind that the forward node of this record management object is its own <br>
+ * pointer and the backward node is initialized to NULL.<br>
  *
  * @return	A newly created record management object
  */
@@ -162,8 +167,7 @@ M2MDataFrame *M2MDataFrame_new ();
 
 
 /**
- * Returns the record management object after the record management object specified <br>
- * by the argument is held as a member variable.<br>
+ * Returns the record management object after the argument is held as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				The record management object immediately following the record management object specified by the argument
@@ -172,8 +176,8 @@ M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self);
 
 
 /**
- * Returns the record management object immediately before which the record management <br>
- * object specified by the argument is held as a member variable.<br>
+ * Returns the record management object immediately before which the argument is <br>
+ * held as a member variable.<br>
  *
  * @param[in] self		Record management object
  * @return				The record management object immediately before the record management object specified by the argument
@@ -193,9 +197,23 @@ void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName);
 
 
 /**
- * String data in CSV format is stored in the list structure object for the record <br>
- * management object having the table name designated by the argument as the member <br>
- * variable.<br>
+ * String data in CSV format is stored in the list structure object for the <br>
+ * record management object having the table name designated by the argument as <br>
+ * the member variable.<br>
+ * If no record management object having a table name as a member variable exists, <br>
+ * a record management object is newly generated, CSV format character string <br>
+ * data is set and added to the record management object specified by the argument.<br>
+ * <br>
+ * Strings in CSV format must comply with the following specifications.<br>
+ * - Character code: UTF-8<br>
+ * - Line feed code: "\r\n"<br>
+ * - The header showing the column name in the first line, the data after the second line<br>
+ * <br>
+ * [Example of CSV format string set as argument]<br>
+ * date, temperature, humidity\r\n ← Header row<br>
+ * 1395984160, 23.8, 46\r\n ← Record 1st line<br>
+ * 1395984254, 24.0, 45\r\n ← record second line<br>
+ * ...<br>
  *
  * @param[in,out] self		Record management object
  * @param[in] tableName		String indicating table name
@@ -206,8 +224,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 
 
 /**
- * Set the record management object one record behind the record management object <br>
- * specified by the argument.<br>
+ * Set the record management object one record behind the argument.<br>
  *
  * @param[in] self			Record management object
  * @param[in] nextRecord	The record management object one behind
@@ -216,8 +233,7 @@ void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord);
 
 
 /**
- * Set the record management object one before the record management object specified <br>
- * by the argument.<br>
+ * Set the record management object one before the argument.<br>
  *
  * @param[in,out] self			Record management object
  * @param[in] previousRedord	Record management object one before

@@ -31,95 +31,115 @@
 
 
 /*******************************************************************************
- * 内部関数
+ * Private function
  ******************************************************************************/
 /**
- * @param[in,out] self	レコード管理オブジェクト
+ * Delete the culumn name string owned by argument as a member variable.<br>
+ *
+ * @param[in,out] self	Record management object
  */
 static void this_deleteColumnName (M2MDataFrame *self)
 	{
-	//===== フィールド名リストの存在を確認 =====
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_deleteColumnName()";
+
+	//===== Confirm existence of field name list =====
 	if (M2MDataFrame_getColumnName(self)!=NULL)
 		{
-		//===== ヒープメモリ領域を解放 =====
+		//===== Release heap memory area =====
 		M2MHeap_free(self->columnName);
 		}
 	//===== Error handling =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no column name", NULL);
 		}
 	return;
 	}
 
 
 /**
- * @param[in,out] self	レコード管理オブジェクト
+ * Delete the newRecordList object owned by argument as a member variable.<br>
+ *
+ * @param[in,out] self	Record management object
  */
 static void this_deleteNewRecordList (M2MDataFrame *self)
 	{
-	//===== 新規レコード管理リストの存在を確認 =====
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_deleteNewRecordList()";
+
+	//===== Confirm existence of new record management list =====
 	if (M2MDataFrame_getNewRecordList(self)!=NULL)
 		{
-		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
+		//===== Release heap memory area (it is a pointer in the structure so it can be released) =====
 		M2MList_delete(self->newRecordList);
 		}
 	//===== Error handling =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"newRecordList\" object", NULL);
 		}
 	return;
 	}
 
 
 /**
- * @param[in,out] self	レコード管理オブジェクト
+ * Delete the oldRecordList object owned by argument as a member variable.<br>
+ *
+ * @param[in,out] self	Record management object
  */
 static void this_deleteOldRecordList (M2MDataFrame *self)
 	{
-	//===== 過去のレコード管理リストの存在を確認 =====
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_deleteOldRecordList()";
+
+	//===== Confirm existence of record management list in the past =====
 	if (M2MDataFrame_getOldRecordList(self)!=NULL)
 		{
-		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
+		//===== Release heap memory area (it is a pointer in the structure so it can be released) =====
 		M2MList_delete(self->oldRecordList);
 		}
 	//===== Error handling =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"oldRecordList\" object", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトが保有しているテーブル名文字列の<br>
- * メモリ領域を解放する。<br>
+ * Releases the memory area of the table name string held by the argument.<br>
  *
- * @param[in,out] self	レコード管理オブジェクト
+ * @param[in,out] self	Record management object
  */
 static void this_deleteTableName (M2MDataFrame *self)
 	{
-	//===== テーブル名文字列の存在を確認 =====
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_deleteTableName()";
+
+	//===== Confirm the existence of table name string =====
 	if (M2MDataFrame_getTableName(self)!=NULL)
 		{
-		//===== ヒープメモリ領域を解放（構造体内のポインタなので解放可能） =====
+		//===== Free heap memory area (it is a pointer in the structure so it can be released) =====
 		M2MHeap_free(self->tableName);
 		}
 	//===== Error handling =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has not table name string", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクト（群）の中から, 指定されたテーブル名<br>
- * と一致するノードを取得して返す。<br>
- * 見つからなかった場合はNULLを返す。<br>
+ * Get and return the node that matches the table name specified by the argument.<br>
+ * If not found, return NULL.<br>
  *
- * @param[in] self			レコード管理オブジェクト
- * @param[in] tableName		ノード検索に利用するテーブル名文字列
- * @return					テーブル名が一致したレコード管理オブジェクト or NULL（エラーの場合）
+ * @param[in] self			Record management object
+ * @param[in] tableName		Table name string used for node search
+ * @return					Record management object with matching table name or NULL (in case of error)
  */
 static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MString *tableName)
 	{
@@ -134,55 +154,55 @@ static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MStrin
 		{
 #ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
-		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"レコード管理オブジェクトの中に引数で指定されたテーブル名(=\"%s\")と一致するノードが存在するかどうか探索します", tableName);
+		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"It searches whether there is a node matching the table name (=\"%s\") specified in the argument in the record management object", tableName);
 		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
-		//===== レコード管理オブジェクトの先頭ノードを取得 =====
+		//===== Get the begin node of record management object =====
 		if ((self=M2MDataFrame_begin(self))!=NULL)
 			{
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while (M2MDataFrame_next(self)!=NULL)
 				{
-				//===== ノードが保有するテーブル名と一致した場合 =====
+				//===== When it matches the table name held by the node =====
 				if (M2MString_compareTo(M2MDataFrame_getTableName(self), tableName)==0)
 					{
 #ifdef DEBUG
 					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"レコード管理オブジェクトのテーブル名(=\"%s\")と引数で指定されたテーブル名)(=\"%s\")が一致しました", M2MDataFrame_getTableName(self), tableName);
+					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name specified by the argument (=\"%s\") matched", M2MDataFrame_getTableName(self), tableName);
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"探索処理を終了します");
+					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish the search process");
 #endif // DEBUG
 					return self;
 					}
-				//===== テーブル名が異なる場合 =====
+				//===== When table names are different =====
 				else
 					{
 #ifdef DEBUG
 					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"レコード管理オブジェクトのテーブル名(=\"%s\")と引数で指定されたテーブル名(=\"%s\")は異なります", M2MDataFrame_getTableName(self), tableName);
+					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name (=\"%s\") specified by the argument are different", M2MDataFrame_getTableName(self), tableName);
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
-					//===== 次のノードへ移動 =====
+					//===== Go to next node =====
 					self = M2MDataFrame_next(self);
 					}
 				}
-			//===== 末端ノードが保有するテーブル名と一致した場合 =====
+			//===== When matches the table name possessed by the terminal node =====
 			if (M2MString_compareTo(M2MDataFrame_getTableName(self), tableName)==0)
 				{
 #ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"レコード管理オブジェクトのテーブル名(=\"%s\")と引数で指定されたテーブル名)(=\"%s\")が一致しました", M2MDataFrame_getTableName(self), tableName);
+				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name specified by the argument (=\"%s\") matched", M2MDataFrame_getTableName(self), tableName);
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"探索処理を終了します");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish the search process");
 #endif // DEBUG
 				return self;
 				}
-			//===== 末端ノードが保有するテーブル名が異なる場合 =====
+			//===== When the table name owned by the terminal node is different =====
 			else
 				{
 #ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"レコード管理オブジェクトのテーブル名(=\"%s\")と引数で指定されたテーブル名(=\"%s\")は異なります", M2MDataFrame_getTableName(self), tableName);
+				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name (=\"%s\") specified by the argument are different", M2MDataFrame_getTableName(self), tableName);
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
 				return NULL;
@@ -191,34 +211,39 @@ static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MStrin
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"から取得した先頭ノードがNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The first node obtained from \"M2MDataFrame *\" argument object is NULL", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"tableName\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param[in] self	レコード管理オブジェクト
- * @return			レコード管理オブジェクトの末端ノード or NULL（エラーの場合）
+ * Get the end node of record management object.<br>
+ *
+ * @param[in] self	Record management object
+ * @return			The end node of record management object or NULL (in case of error)
  */
 static M2MDataFrame *this_end (M2MDataFrame *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_end()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 末端ノードに辿り着くまで繰り返し =====
+		//===== Repeat until reaching the end node =====
 		while (M2MDataFrame_next(self)!=NULL)
 			{
 			self = M2MDataFrame_next(self);
@@ -228,13 +253,14 @@ static M2MDataFrame *this_end (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * @param[in] self
+ * @param[in] self	Record management object
  */
 static void this_init (M2MDataFrame *self)
 	{
@@ -246,31 +272,31 @@ static void this_init (M2MDataFrame *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== メンバ変数の初期化 =====
+		//===== Initialization of member variables =====
 		this_deleteTableName(self);
 		this_deleteColumnName(self);
 		this_deleteNewRecordList(self);
 		this_deleteOldRecordList(self);
-		//===== 新旧レコード情報オブジェクトの新規作成 =====
+		//===== Create old and new record information objects =====
 		if ((newRecordList=M2MList_new())!=NULL
 				&& (oldRecordList=M2MList_new())!=NULL)
 			{
-			//===== 新規に挿入するレコード情報を格納するためのオブジェクトをセット =====
+			//===== Set an object to store newly inserted record information =====
 			self->newRecordList = newRecordList;
-			//===== 過去に挿入したレコード情報を格納するためのオブジェクトをセット =====
+			//===== Set an object for storing record information inserted in the past =====
 			self->oldRecordList = oldRecordList;
-			//===== 正常終了 =====
+			//===== Successful completion =====
 			return;
 			}
 		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規に挿入したレコード情報を格納するためのリスト構造オブジェクトの作成に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object to store newly inserted record information", NULL);
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"過去に挿入したレコード情報を格納するためのリスト構造オブジェクトの作成に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object for storing record information inserted in the past", NULL);
 			this_deleteNewRecordList(self);
 			return;
 			}
@@ -278,77 +304,95 @@ static void this_init (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return;
 		}
 	}
 
 
 /**
- * @param[in] self
- * @return
+ * Get the number of record management object.<br>
+ *
+ * @param[in] self	Record management object
+ * @return			The number of record management object
  */
 static unsigned int this_length (M2MDataFrame *self)
 	{
 	//========== Variable ==========
 	unsigned int length = 0;
 	M2MString *tableName = NULL;
+	M2MString *columnNameCSV = NULL;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_length()";
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MDataFrame_begin(self))!=NULL)
 			{
-			//===== テーブル名とCSV形式のカラム名の存在を確認 =====
+			//===== Confirm existence of table name and CSV column name string =====
 			if ((tableName=M2MDataFrame_getTableName(self))!=NULL
-					&& M2MDataFrame_getColumnName(self)!=NULL)
+					&& M2MString_length(tableName)>0
+					&& (columnNameCSV=M2MDataFrame_getColumnName(self))!=NULL
+					&& M2MString_length(columnNameCSV)>0)
 				{
 				//=====  =====
 				length++;
 				}
 			//===== Error handling =====
+			else if (tableName==NULL || M2MString_length(tableName)<=0)
+				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant", NULL);
+				}
 			else
 				{
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant", NULL);
 				}
 			//=====  =====
 			while (M2MDataFrame_next(self)!=NULL)
 				{
-				//===== テーブル名とCSV形式のカラム名の存在を確認 =====
+				//===== Confirm existence of table name and column name in CSV format =====
 				if ((tableName=M2MDataFrame_getTableName(self))!=NULL
-						&& M2MDataFrame_getColumnName(self)!=NULL)
+						&& M2MString_length(tableName)>0
+						&& (columnNameCSV=M2MDataFrame_getColumnName(self))!=NULL
+						&& M2MString_length(columnNameCSV)>0)
 					{
 					length++;
 					}
 				//===== Error handling =====
+				else if (tableName==NULL || M2MString_length(tableName)<=0)
+					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant", NULL);
+					}
 				else
 					{
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant", NULL);
 					}
 				}
+			//===== Return the number of record management object =====
 			return length;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから先頭ノードの取得に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node from the argument object", NULL);
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return 0;
 		}
 	}
 
 
 /**
- * @param[in,out] self		レコード管理オブジェクト
- * @param[in] csv			CSV1行目のカラム名を記述した文字列
- * @param[in] lineLength	CSV1行目のカラム名を記述した文字列の長さ[バイト]
- * @return					カラム名文字列がセットされたレコード管理オブジェクト or NULL（エラーの場合）
+ * @param[in,out] self		Record management object
+ * @param[in] csv			CSV string describing the column name of the first line
+ * @param[in] lineLength	CSV Length of string describing column name of line 1 [byte]
+ * @return					Column name record management object with character string set or NULL (in case of error)
  */
 static M2MDataFrame *this_setColumnName (M2MDataFrame *self, const M2MString *csv, const size_t lineLength)
 	{
@@ -356,54 +400,55 @@ static M2MDataFrame *this_setColumnName (M2MDataFrame *self, const M2MString *cs
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_setColumnName()";
 
 	//===== Check argument =====
-	if (self!=NULL && csv!=NULL && lineLength>0 && lineLength<=M2MString_length(csv))
+	if (self!=NULL
+			&& csv!=NULL && lineLength>0 && lineLength<=M2MString_length(csv))
 		{
-		//===== 初期化（ヒープメモリ領域の解放） =====
+		//===== Initialization (release of heap memory area) =====
 		this_deleteColumnName(self);
-		//===== ヒープメモリ領域の獲得 =====
+		//===== Get the heap memory area =====
 		if ((self->columnName=(M2MString *)M2MHeap_malloc(lineLength+1))!=NULL)
 			{
-			//===== カラム名を示すCSV形式の文字列をコピー =====
+			//===== Copy CSV string indicating column name =====
 			memcpy(self->columnName, csv, lineLength);
 			return self;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式のカラム名を示す文字列をコピーするための, ヒープメモリ領域の獲得に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get of the heap memory area to copy the string indicating the column name in CSV format", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	else if (csv==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"csv\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"csv\" string is NULL", NULL);
 		return NULL;
 		}
 	else if (lineLength<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"lineLength\"が0以下の整数です", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is less than or equal to 0", NULL);
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"lineLength\"が\"csv\"の文字列数よりも大きい値です", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is larger than the number of \"csv\" string", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定された新規レコード情報オブジェクトにCSV形式のレコードをセットする．<br>
+ * Set a record in CSV format to the new record information object specified by the argument.<br>
  *
- * @param[in] newRecordList	新規レコード情報オブジェクト
- * @param[in] csv			CSV形式の文字列を示すレコード
- * @return					セットしたレコード数 or -1（エラーの場合)
+ * @param[in] newRecordList	New record information object
+ * @param[in] csv			A record indicating a character string in CSV format
+ * @return					Number of set records or -1 (in case of error)
  */
 static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString *csv)
 	{
@@ -419,52 +464,53 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_setCSVIntoNewRecordList()";
 
 	//===== Check argument =====
-	if (newRecordList!=NULL && csv!=NULL && M2MString_length(csv)>0)
+	if (newRecordList!=NULL
+			&& csv!=NULL && M2MString_length(csv)>0)
 		{
-		//===== 1行目のヘッダ行を無視する =====
+		//===== Ignore the header line of the first line =====
 		if ((lineEnd=M2MString_indexOf(csv, M2MString_CRLF))!=NULL
 				&& (lineEnd+=CRLF_LENGTH)!=NULL)
 			{
-			//===== 先頭の位置を取得 =====
+			//===== Get begin position of CSV data area =====
 			lineHead = lineEnd;
-			//===== 最終行に辿り着くまで繰り返し =====
+			//===== Repeat until reaching the last line =====
 			while ((lineEnd=M2MString_indexOf(lineHead, M2MString_CRLF))!=NULL)
 				{
-				//===== CSV1行のデータサイズ取得 =====
+				//===== Get data size of CSV 1 row =====
 				if ((lineLength=M2MString_length(lineHead)-M2MString_length(lineEnd))>0)
 					{
-					//===== CSV1行を新規レコード情報オブジェクトへコピー =====
+					//===== Copy CSV 1 line to new record information object =====
 					if (M2MList_add(newRecordList, lineHead, lineLength)!=NULL)
 						{
-						//===== コピーしたレコード行数をインクリメント =====
+						//===== Increment the number of copied record lines =====
 						numberOfRecord++;
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトへ格納する処理に失敗しました．．．処理を継続します", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to store record in CSV format to record information object. . . Continue processing", NULL);
 						}
 					}
 				//===== Error handling =====
 				else
 					{
-//					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式の文字列の文字列数が0[Byte]以下です．．．処理を継続します", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in the CSV format character string is 0 [Byte] or less. . . Continue processing", NULL);
 					}
-				//===== 次の行の先頭へ移動 =====
+				//===== Move to the beginning of the next line =====
 				lineEnd += CRLF_LENGTH;
 				lineHead = lineEnd;
 				}
-			//===== CSV最終行のコピー =====
+			//===== Copy CSV last line =====
 			if ((lineLength=M2MString_length(lineHead))>0)
 				{
-				//===== CSV1行を新規レコード情報オブジェクトへコピー =====
+				//===== Copy CSV 1 line to new record information object =====
 				if (M2MList_add(newRecordList, lineHead, lineLength)!=NULL)
 					{
-					//===== コピーしたレコード行数をインクリメント =====
+					//===== Increment the number of copied record lines =====
 					numberOfRecord++;
 #ifdef DEBUG
 					memset(MESSAGE, 0, sizeof(MESSAGE)-1l);
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"引数で指定されたCSV形式の文字列からレコード情報を\"%u\"[件]取得しました", numberOfRecord);
+					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"We retrieved \"%u\" records information from the CSV format string specified by argument", numberOfRecord);
 					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
 					return numberOfRecord;
@@ -472,13 +518,13 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式の文字列をレコード情報オブジェクトへ格納する処理に失敗しました", NULL);
-					//===== セットしたレコード数が1以上の場合 =====
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to store CSV format character string in record information object", NULL);
+					//===== When the number of records set is 1 or more =====
 					if (numberOfRecord>=1)
 						{
 						return numberOfRecord;
 						}
-					//===== セットしたレコード数が0以下の場合 =====
+					//===== When the number of set records is 0 or less =====
 					else
 						{
 						return -1;
@@ -488,73 +534,82 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 			//===== Error handling =====
 			else
 				{
-//				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式の文字列の文字列数が0[Byte]以下です", NULL);
-				//===== セットしたレコード数が1以上の場合 =====
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in CSV format string is 0 [Byte] or less", NULL);
+				//===== When the number of records set is 1 or more =====
 				if (numberOfRecord>=1)
 					{
 					return numberOfRecord;
 					}
-				//===== セットしたレコード数が0以下の場合 =====
+				//===== When the number of records set is 0 or less =====
 				else
 					{
 					return -1;
 					}
 				}
 			}
-		//===== データ行が存在しない場合 =====
+		//===== When there is no data row =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列は1行目のヘッダ行しか存在しない不正なデータです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The CSV format character string specified by argument is illegal data with only the header line of the first line", NULL);
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else if (newRecordList==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された新規挿入用のレコード情報オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The record information object for new insertion specified by argument is NULL", NULL);
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列がNULL, もしくは空白です", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CSV format string specified by argument is NULL or blank", NULL);
 		return -1;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトにテーブル名文字列をセットする。<br>
+ * Set the table name string in the record management object specified by the argument.<br>
  *
- * @param[in,out] self		レコード管理オブジェクト
- * @param[in] tableName		テーブル名を示す文字列
- * @return					テーブル名のセット（もしくは更新）に成功したレコード管理オブジェクト
+ * @param[in,out] self		Record management object
+ * @param[in] tableName		String indicating table name
+ * @return					A record management object that succeeded in setting (or updating) the table name
  */
 static M2MDataFrame *this_setTableName (M2MDataFrame *self, const M2MString *tableName)
 	{
 	//========== Variable ==========
 	unsigned int tableNameLength = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_setTableName()";
 
 	//===== Check argument =====
-	if (self!=NULL && tableName!=NULL && (tableNameLength=M2MString_length(tableName))>0)
+	if (self!=NULL
+			&& tableName!=NULL && (tableNameLength=M2MString_length(tableName))>0)
 		{
-		//===== テーブル名の初期化 =====
+		//===== Initialize the table name string =====
 		this_deleteTableName(self);
-		//===== ヒープメモリ領域の獲得 =====
+		//===== Get the heap memory area =====
 		if ((self->tableName=(M2MString *)M2MHeap_malloc(tableNameLength+1))!=NULL)
 			{
-			//===== テーブル名を示す文字列のコピー =====
+			//===== Copy of the table name string =====
 			memcpy(self->tableName, tableName, tableNameLength);
 			return self;
 			}
 		//===== Error handling =====
 		else
 			{
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory area for copying \"tableName\" string", NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		return NULL;
+		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
 		return NULL;
 		}
 	}
@@ -565,23 +620,23 @@ static M2MDataFrame *this_setTableName (M2MDataFrame *self, const M2MString *tab
  * Public function
  ******************************************************************************/
 /**
- * 引数で指定されたレコード管理オブジェクトから先頭のレコード管理オブジェクト<br>
- * を取得して返す．<br>
- * 【注意】<br>
- * 先頭のレコード管理オブジェクトは1つ前のポインタが自分と同じアドレスを示す．<br>
+ * Get the first record management object from the argument and returns it.<br>
+ * <br>
+ * [Attention!]<br>
+ * The first record indicates the same address as the previous pointer to itself.<br>
  *
- * @param[in] self	レコード管理オブジェクト
- * @return			先頭のレコード管理オブジェクト or NULL（エラーの場合）
+ * @param[in] self	Record management object
+ * @return			First record management object
  */
 M2MDataFrame *M2MDataFrame_begin (M2MDataFrame *self)
 	{
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードに辿り着くまで繰り返し =====
+		//===== Repeat until reaching the first node =====
 		while (self!=NULL && M2MDataFrame_previous(self)!=self)
 			{
-			//===== 1つ前のノードへ移動 =====
+			//===== Move to previous node =====
 			self = M2MDataFrame_previous(self);
 			}
 		return self;
@@ -595,14 +650,16 @@ M2MDataFrame *M2MDataFrame_begin (M2MDataFrame *self)
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトのメモリ領域を全て解放する．<br>
+ * Free all memory area of record management object specified by argument.<br>
  * <br>
- * 【注意】<br>
- * レコード管理オブジェクトはメンバ変数として, リンク構造となっているポインタ<br>
- * を保持している。そのため, ヒープメモリの解放の際, ポインタのポインタとする必要<br>
- * は無く, 内部で保持しているポインタを通して正しいアドレスを取得する事が出来る。<br>
+ * [Attention!]<br>
+ * The record management object holds a pointer which is a link structure as a <br>
+ * member variable.
+ * Therefore, when releasing the heap memory, it is unnecessary to use it as a <br>
+ * pointer pointer, and it is possible to acquire the correct address through <br>
+ * the pointer held internally.<br>
  *
- * @param[in,out] self	メモリ領域解放対象のレコード管理オブジェクト
+ * @param[in,out] self	Record management object to release memory area
  */
 void M2MDataFrame_delete (M2MDataFrame **self)
 	{
@@ -613,25 +670,25 @@ void M2MDataFrame_delete (M2MDataFrame **self)
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
 		{
-		//===== 先頭のM2MList構造体オブジェクトの取得 =====
+		//===== Get the first M2MList structure object =====
 		if (((*self)=M2MDataFrame_begin((*self)))!=NULL)
 			{
-			//===== 後方のM2MList構造体オブジェクトの有無を確認 =====
+			//===== Confirm existence of backward M2MList structure object =====
 			while ((*self)!=NULL && (next=M2MDataFrame_next((*self)))!=NULL)
 				{
-				//===== M2MList構造体オブジェクトをリンクから外す =====
+				//===== Remove the M2MList structure object from the link =====
 				M2MDataFrame_setNextRecord((*self), NULL);
 				M2MDataFrame_setPreviousRecord(next, next);
-				//===== M2MList構造体オブジェクトのメモリ領域を解放 =====
+				//===== Free memory area of M2MList structure object =====
 				this_deleteTableName((*self));
 				this_deleteColumnName((*self));
 				this_deleteNewRecordList((*self));
 				this_deleteOldRecordList((*self));
 				M2MHeap_free((*self));
-				//===== 次のM2MList構造体オブジェクトへ移る =====
+				//===== Move to the next M2MList structure object =====
 				(*self) = next;
 				}
-			//===== M2MList構造体オブジェクトのメモリ領域を解放 =====
+			//===== Free the last memory area of M2MList structure object =====
 			if ((*self)!=NULL)
 				{
 				this_deleteTableName((*self));
@@ -642,30 +699,30 @@ void M2MDataFrame_delete (M2MDataFrame **self)
 				}
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"内部エラー！引数で指定された\"M2MDataFrame *\"のノードの中にNULLが混入しています", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Internal error! NULL is included in the node of \"M2MDataFrame *\" specified by argument", NULL);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"の先頭ノードの取得に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node of \"M2MDataFrame *\" specified by argument", NULL);
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2MDataFrame *\" specified by argument is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持するカラム名<br>
- * を示すCSV形式の文字列を返す．<br>
+ * Returns a CSV format string indicating the column name held by the argument <br>
+ * as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持するカラム名を示すCSV形式の文字列 or NULL（エラーの場合）
+ * @param[in] self		Record management object
+ * @return				CSV format string indicating the column name held by record management object specified by argument or NULL (in case of error)
  */
 M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self)
 	{
@@ -680,41 +737,48 @@ M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトが保持するCSV形式のカラム名がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 新規に<br>
- * 挿入されたレコードリストを返す．<br>
+ * Returns a newly inserted record list that the argument holds as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する, 新規に挿入された（未だメモリーDB未挿入の）レコードリスト
+ * @param[in] self		Record management object
+ * @return				A record list newly inserted (not yet inserted in the memory DB) held by the record management object specified by the argument
  */
 M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getNewRecordList()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->newRecordList;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 過去に<br>
- * 挿入されたレコードリストを返す．<br>
+ * Returns a record list inserted in the past that the argument holds as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する, 過去に挿入された（メモリーDB挿入済みの）レコードリスト
+ * @param[in] self		Record management object
+ * @return				Record list (inserted in the memory DB) inserted in the past that is held by the record management object specified by the argument
  */
 M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getOldRecordList()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -723,17 +787,17 @@ M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持するテーブル名<br>
- * を返す．<br>
+ * Returns the table name string held by the argument as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持するテーブル名
+ * @param[in] self		Record management object
+ * @return				Table name held by record management object specified by argument
  */
 M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self)
 	{
@@ -748,20 +812,20 @@ M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトが保持するテーブル名がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトの“新規に挿入したレコード情報”<br>
- * 構造体オブジェクトのレコード情報を, “過去に挿入されたレコード情報”構造体<br>
- * オブジェクトへコピーする。<br>
- * この操作は, メモリ上のSQLite3データベースへレコードを挿入した後, ファイル上の<br>
- * SQLite3データベースへ永続化のためデータを整理するために実行する。<br>
+ * Copy the record information of the "newly inserted record information" structure <br>
+ * object of the record management object designated by the argument to the "record <br>
+ * information inserted in the past" structure object.<br>
+ * This operation is executed to insert data into the SQLite 3 database in memory <br>
+ * and then organize the data for persistence into the SQLite 3 database on the file.<br>
  *
- * @param[in,out] self
+ * @param[in,out] self	Record management object
  */
 void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 	{
@@ -779,21 +843,21 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 新旧レコード情報オブジェクトの取得 =====
+		//===== Retrieve old and new record information objects =====
 		if ((newRecordList=M2MDataFrame_getNewRecordList(self))!=NULL
 				&& (oldRecordList=M2MDataFrame_getOldRecordList(self))!=NULL)
 			{
-			//===== 新規レコード情報オブジェクトの先頭ノードを取得 =====
+			//===== Get the begin node of the new record information object =====
 			if ((newRecordList=M2MList_begin(newRecordList))!=NULL)
 				{
-				//===== 末端のノードに辿り着くまで繰り返し =====
+				//===== Repeat until reaching the terminal node =====
 				while (newRecordList!=NULL && M2MList_next(newRecordList)!=NULL)
 					{
-					//===== 新規レコード情報オブジェクトのレコードの存在を確認 =====
+					//===== Confirm existence of record of new record information object =====
 					if ((value=M2MList_getValue(newRecordList))!=NULL
 							&& (valueLength=M2MList_getValueLength(newRecordList))>0)
 						{
-						//===== 新規レコード情報オブジェクトのレコードを過去のレコード情報オブジェクトへコピー =====
+						//===== Copy record of new record information object to past record information object =====
 						if (M2MList_add(oldRecordList, value, valueLength)!=NULL)
 							{
 							counter++;
@@ -801,22 +865,22 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトを過去のレコード情報オブジェクトへコピーする処理でエラーが発生しました", NULL);
+							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object", NULL);
 							}
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less", NULL);
 						}
-					//===== 新規レコード情報オブジェクトから移動済みレコードを削除して次のノードへ移動 =====
+					//===== Delete the moved record from the new record information object and move to the next node =====
 					newRecordList = M2MList_remove(newRecordList);
 					}
-				//===== 新規レコード情報オブジェクトのレコードの存在を確認 =====
+				//===== Confirm existence of record of new record information object =====
 				if ((value=M2MList_getValue(newRecordList))!=NULL
 						&& (valueLength=M2MList_getValueLength(newRecordList))>0)
 					{
-					//===== 末端ノードのレコードを過去のレコード情報オブジェクトへコピー =====
+					//===== Copy the record of the terminal node to the past record information object =====
 					if (M2MList_add(oldRecordList, value, valueLength)!=NULL)
 						{
 						counter++;
@@ -824,19 +888,19 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトを過去のレコード情報オブジェクトへコピーする処理でエラーが発生しました", NULL);
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object", NULL);
 						}
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトのレコード値がNULL, もしくはレコードサイズが0[Byte]以下です", NULL);
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less", NULL);
 					}
-				//===== 新規レコード情報オブジェクトから移動済みレコードを削除 =====
+				//===== Delete moved record from new record information object =====
 				self->newRecordList = M2MList_remove(newRecordList);
 #ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"\"%s\"テーブルの新規レコード情報オブジェクトから過去のレコード情報オブジェクトへ\"%u\"個のレコードを移動しました", M2MDataFrame_getTableName(self), counter);
+				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"\"%u\" records were moved from the new record information object in the \"%s\" table to the past record information object", M2MDataFrame_getTableName(self), counter);
 				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 #endif // DEBUG
 				return;
@@ -844,37 +908,37 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"から取得した\"newRecordList\"の先頭ノードがNULLです", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The first node of \"newRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
 				return;
 				}
 			}
 		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"から取得した\"newRecordList\"がNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"NewRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"から取得した\"oldRecordList\"がNULLです", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"OldRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
 			return;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定された\"M2MDataFrame *\"がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return;
 		}
 	}
 
 
 /**
- * ヒープメモリ領域を新規に獲得し, レコード管理オブジェクトを生成する．<br>
- * このレコード管理オブジェクトの前方ノードは自分自身のポインタ, 後方ノードは<br>
- * NULLに初期化されている点に留意する事。<br>
+ * A heap memory area is newly acquired, and a record management object is generated.<br>
+ * Keep in mind that the forward node of this record management object is its own <br>
+ * pointer and the backward node is initialized to NULL.<br>
  *
- * @return	新規に生成したレコード管理オブジェクト
+ * @return	A newly created record management object
  */
 M2MDataFrame *M2MDataFrame_new ()
 	{
@@ -882,25 +946,25 @@ M2MDataFrame *M2MDataFrame_new ()
 	M2MDataFrame *self = NULL;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_new()";
 
-	//===== ヒープメモリ領域の獲得 =====
+	//===== Get the heap memory area =====
 	if ((self=(M2MDataFrame *)M2MHeap_malloc(sizeof(M2MDataFrame)))!=NULL)
 		{
 		if ((self->newRecordList=M2MList_new())!=NULL)
 			{
 			if ((self->oldRecordList=M2MList_new())!=NULL)
 				{
-				//===== メンバ変数の初期化 =====
+				//===== Initialization of member variables =====
 				M2MDataFrame_setPreviousRecord(self, self);
 				M2MDataFrame_setNextRecord(self, NULL);
 #ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CEPレコード管理オブジェクトを新規作成しました");
+				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Created a new CEP record management object");
 #endif // DEBUG
 				return self;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"挿入済みレコード情報を管理するオブジェクトの作成に失敗しました", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create an object to manage inserted record information", NULL);
 				this_deleteNewRecordList(self);
 				this_deleteColumnName(self);
 				M2MHeap_free(self);
@@ -910,7 +974,7 @@ M2MDataFrame *M2MDataFrame_new ()
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報を管理するオブジェクトの作成に失敗しました", NULL);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create an object to manage new record information", NULL);
 			this_deleteColumnName(self);
 			M2MHeap_free(self);
 			return NULL;
@@ -919,58 +983,70 @@ M2MDataFrame *M2MDataFrame_new ()
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトの作成に失敗しました", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a record management object", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 1つ後ろの<br>
- * レコード管理オブジェクトを返す．<br>
+ * Returns the record management object after the argument is held as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する, 1つ後ろのレコード管理オブジェクト
+ * @param[in] self		Record management object
+ * @return				The record management object immediately following the record management object specified by the argument
  */
 M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_next()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->next;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトがメンバ変数として保持する, 1つ手前の<br>
- * レコード管理オブジェクトを返す．<br>
+ * Returns the record management object immediately before which the argument is <br>
+ * held as a member variable.<br>
  *
- * @param[in] self		レコード管理オブジェクト
- * @return				引数で指定されたレコード管理オブジェクトが保持する, 1つ手前のレコード管理オブジェクト
+ * @param[in] self		Record management object
+ * @return				The record management object immediately before the record management object specified by the argument
  */
 M2MDataFrame *M2MDataFrame_previous (const M2MDataFrame *self)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_previous()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->previous;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return NULL;
 		}
 	}
 
 
 /**
- * 引数で指定されたテーブル名に該当するレコード管理オブジェクトだけ, メモリ領域<br>
- * を解放する（ポインタで接続された他のレコード管理オブジェクトは存続する）．<br>
+ * Only the record management object corresponding to the table name specified by <br>
+ * the argument releases the memory area (other record management objects connected <br>
+ * by the pointer will survive).<br>
  *
- * @param[in,out] self
- * @param[in] tableName
+ * @param[in,out] self		Record management object
+ * @param[in] tableName		String indicating the table name possessed by the record management object to be deleted
  */
 void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName)
 	{
@@ -978,53 +1054,56 @@ void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName)
 	M2MDataFrame *record = NULL;
 	M2MDataFrame *previous = NULL;
 	M2MDataFrame *next = NULL;
+	M2MString MESSAGE[256];
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_remove()";
 
 	//===== Check argument =====
-	if (self!=NULL && tableName!=NULL)
+	if (self!=NULL
+			&& tableName!=NULL && M2MString_length(tableName)>0)
 		{
-		//===== レコード管理オブジェクトノードを取得 =====
+		//===== Get records management object node =====
 		if ((record=this_detectM2MDataFrame(self, tableName))!=NULL)
 			{
-			//===== メンバ変数のヒープメモリ領域を解放 =====
+			//===== Free heap memory area of member variable =====
 			this_deleteTableName(record);
 			this_deleteColumnName(record);
 			this_deleteNewRecordList(record);
 			this_deleteOldRecordList(record);
-			//===== 指定のレコード管理オブジェクトの前方／後方ノードの取得 =====
+			//===== Get forward / backward node of designated record management object =====
 			previous = M2MDataFrame_previous(record);
 			next = M2MDataFrame_next(record);
-			//===== 指定のレコード管理オブジェクトが先頭ノードの場合 =====
+			//===== When the designated record management object is the first node =====
 			if (previous==record)
 				{
-				//===== 指定のレコード管理オブジェクトに後続ノードが存在する場合 =====
+				//===== If there is a succeeding node in the specified record management object =====
 				if (next!=NULL)
 					{
-					//===== ノード間の連結を切り離し =====
+					//===== Detach the connection between the nodes =====
 					M2MDataFrame_setPreviousRecord(next, next);
-					//===== ノードのヒープメモリ領域を解放 =====
+					//===== Free heap memory area of node =====
 					M2MHeap_free(record);
 					}
-				//===== 指定のレコード管理オブジェクトに後続ノードが存在しない（1つしか存在しない）場合 =====
+				//===== If there is no subsequent node in the specified record management object (only one exists) =====
 				else
 					{
-					// 何もしない
+					// do nothing
 					}
 				}
-			//===== 指定のレコード管理オブジェクトが末端ノードの場合（但し, 前方ノードは必ず存在する） =====
+			//===== If the specified record management object is an end node (however, the front node always exists) =====
 			else if (next==NULL)
 				{
-				//===== ノード間の連結を切り離し =====
+				//===== Detach the connection between the nodes =====
 				M2MDataFrame_setNextRecord(previous, NULL);
-				//===== ノードのヒープメモリ領域を解放 =====
+				//===== Free heap memory area of node =====
 				M2MHeap_free(record);
 				}
-			//===== 指定のレコード管理オブジェクトの前方／後方ノードが存在する場合 =====
+			//===== If there is a forward / backward node of the specified record management object =====
 			else
 				{
-				//===== ノード間の連結を切り離し =====
+				//===== Detach the connection between the nodes =====
 				M2MDataFrame_setNextRecord(previous, next);
 				M2MDataFrame_setPreviousRecord(next, previous);
-				//===== ノードのヒープメモリ領域を解放 =====
+				//===== Free heap memory area of node =====
 				M2MHeap_free(record);
 				}
 			return;
@@ -1032,43 +1111,53 @@ void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName)
 		//===== Error handling =====
 		else
 			{
+			memset(MESSAGE, 0, sizeof(MESSAGE));
+			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"There is not a table matched the name(=\"%s\")", tableName);
+			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
 			return;
 			}
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		return;
+		}
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
 		return;
 		}
 	}
 
 
 /**
- * 引数で指定されたテーブル名をメンバ変数に持つレコード管理オブジェクトに対し, <br>
- * CSV形式の文字列データをリスト構造体オブジェクトに格納する．<br>
- * テーブル名をメンバ変数に持つレコード管理オブジェクトが存在しなかった場合, <br>
- * レコード管理オブジェクトを新たに生成し, CSV形式の文字列データをセットして<br>
- * 引数で指定されたレコード管理オブジェクトに追加する。<br>
+ * String data in CSV format is stored in the list structure object for the <br>
+ * record management object having the table name designated by the argument as <br>
+ * the member variable.<br>
+ * If no record management object having a table name as a member variable exists, <br>
+ * a record management object is newly generated, CSV format character string <br>
+ * data is set and added to the record management object specified by the argument.<br>
  * <br>
- * CSV形式の文字列は以下の仕様に従っている事。<br>
- * ・文字コード：UTF-8<br>
- * ・改行コード："\r\n"<br>
- * ・1行目にカラム名を示すヘッダ, 2行目以降がデータとなる<br>
+ * Strings in CSV format must comply with the following specifications.<br>
+ * - Character code: UTF-8<br>
+ * - Line feed code: "\r\n"<br>
+ * - The header showing the column name in the first line, the data after the second line<br>
  * <br>
- * [引数にセットするCSV形式の文字列例]<br>
- * date,temperature,humidity\r\n	← ヘッダ行<br>
- * 1395984160,23.8,46\r\n			← レコード1行目<br>
- * 1395984254,24.0,45\r\n			← レコード2行目<br>
- * ・・・<br>
+ * [Example of CSV format string set as argument]<br>
+ * date, temperature, humidity\r\n	Header row<br>
+ * 1395984160, 23.8, 46\r\n			Record 1st line<br>
+ * 1395984254, 24.0, 45\r\n			Record 2nd line<br>
+ * ...<br>
  *
- * @param[in,out] self		レコード管理オブジェクト
- * @param[in] tableName		テーブル名を示す文字列
- * @param[in] csv			CSV形式の文字列データ
- * @return					オブジェクトに格納したレコード数[個] or -1（エラーの場合）
+ * @param[in,out] self		Record management object
+ * @param[in] tableName		String indicating table name
+ * @param[in] csv			String data in CSV format (header showing column name in the first row, data after the second row)
+ * @return					Number of records stored in object [number] or -1 (in case of error)
  */
 int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M2MString *csv)
 	{
-	//========== メンバ変数 ==========
+	//========== Variable ==========
 	M2MDataFrame *record = NULL;
 	M2MList *newRecordList = NULL;
 	M2MString *lineEnd = NULL;
@@ -1081,38 +1170,38 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 			&& tableName!=NULL && M2MString_length(tableName)>0
 			&& csv!=NULL && M2MString_length(csv)>0)
 		{
-		//===== テーブル名が既にセットされていた場合（既存ノードが存在する場合） =====
+		//===== If the table name has already been set (if an existing node exists) =====
 		if ((record=this_detectM2MDataFrame(self, tableName))!=NULL)
 			{
-			//===== 新規レコード情報管理オブジェクトを取得 =====
+			//===== Get new Record Information Management Object =====
 			if ((newRecordList=M2MDataFrame_getNewRecordList(record))!=NULL)
 				{
-				//===== 新規レコード情報管理オブジェクトにCSV形式のレコードをセット =====
+				//===== Set record of CSV format to new record information management object =====
 				return this_setCSVIntoNewRecordList(newRecordList, csv);
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトから新規レコード情報リストが取得出来ません", NULL);
+				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"A new record information list can not be acquired from the record management object specified by the argument", NULL);
 				return -1;
 				}
 			}
-		//===== 指定されたテーブル名を持つノードが存在しなかった場合 =====
+		//===== If there is no node with the specified table name =====
 		else
 			{
-			//===== レコード管理オブジェクトに値を持つノードが1つも存在していない場合 =====
+			//===== When there is no node having a value in the record management object =====
 			if (this_length(self)==0)
 				{
-				//===== レコード管理オブジェクトの1つ目のノードを設定（1つ目のノードは"必ず存在する"事に留意) =====
+				//===== Set the first node of the record management object (keep in mind that the first node "always exists") =====
 				if (this_setTableName(self, tableName)!=NULL
 						&& (newRecordList=M2MDataFrame_getNewRecordList(self))!=NULL)
 					{
-					//===== テーブルのカラム名をレコード管理オブジェクトにセット =====
+					//===== Set column name of table to record management object =====
 					if ((lineEnd=M2MString_indexOf(csv, M2MString_CRLF))!=NULL
 							&& (lineLength=M2MString_length(csv)-M2MString_length(lineEnd))>0
 							&& this_setColumnName(self, (M2MString *)csv, lineLength)!=NULL)
 						{
-						//===== 新規レコード情報管理オブジェクトにCSV形式のレコードをセット =====
+						//===== Set record of CSV format to new record information management object =====
 						if ((numberOfRecord=this_setCSVIntoNewRecordList(newRecordList, csv))>=1)
 							{
 							return numberOfRecord;
@@ -1120,8 +1209,8 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"CSV形式のレコードをレコード情報オブジェクトセットするのに失敗しました", NULL);
-							//===== レコード管理オブジェクトのノードを初期化（テーブル名と新規レコード情報オブジェクトを削除) =====
+							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set record information object in CSV format record", NULL);
+							//===== Initialize node of record management object (delete table name and new record information object) =====
 							this_init(self);
 							return -1;
 							}
@@ -1129,8 +1218,8 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式の文字列の1行目のヘッダ行取得に失敗しました", NULL);
-						//===== 生成したレコード管理オブジェクトを削除 =====
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the header line of the first line of the CSV format character string specified by the argument", NULL);
+						//===== Delete generated record management object =====
 						this_init(self);
 						return -1;
 						}
@@ -1138,40 +1227,40 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報オブジェクトの作成に失敗しました", NULL);
-					//===== 生成したレコード管理オブジェクトを削除 =====
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new record information object", NULL);
+					//===== Delete generated record management object =====
 					this_init(self);
 					return -1;
 					}
 				}
-			//===== レコード管理オブジェクトにノードが1つ以上存在している場合 =====
+			//===== When there is at least one node in the record management object =====
 			else
 				{
-				//===== レコード管理オブジェクトのノードを新規生成 =====
+				//===== Generate new record management object nodes =====
 				if ((self=this_end(self))!=NULL
 						&& (record=M2MDataFrame_new())!=NULL
 						&& this_setTableName(record, tableName)!=NULL
 						&& (newRecordList=M2MDataFrame_getNewRecordList(record))!=NULL)
 					{
-					//===== テーブルのカラム名をレコード管理オブジェクトにセット =====
+					//===== Set column name of table to record management object =====
 					if ((lineEnd=M2MString_indexOf(csv, M2MString_CRLF))!=NULL
 							&& (lineLength=M2MString_length(csv)-M2MString_length(lineEnd))>0
 							&& this_setColumnName(record, (M2MString *)csv, lineLength)!=NULL)
 						{
-						//===== 新規レコード情報管理オブジェクトにCSV形式のレコードをセット =====
+						//===== Set record of CSV format to new record information management object =====
 						if ((numberOfRecord=this_setCSVIntoNewRecordList(newRecordList, csv))>0)
 							{
-							//===== 既存のレコード管理オブジェクトと連結 =====
+							//===== Concatenate with existing record management objects =====
 							M2MDataFrame_setNextRecord(self, record);
 							M2MDataFrame_setPreviousRecord(record, self);
-							//===== セットしたレコード数を返す =====
+							//===== Returns the number of records set =====
 							return numberOfRecord;
 							}
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトへCSV形式のレコードをセットするのに失敗しました", NULL);
-							//===== 生成したレコード管理オブジェクトを削除 =====
+							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set record in CSV format to record management object", NULL);
+							//===== Delete generated record management object =====
 							M2MDataFrame_delete(&record);
 							return -1;
 							}
@@ -1179,8 +1268,8 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"レコード管理オブジェクトにカラム名をセットするのに失敗しました", NULL);
-						//===== 生成したレコード管理オブジェクトを削除 =====
+						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set column name in record management object", NULL);
+						//===== Delete generated record management object =====
 						M2MDataFrame_delete(&record);
 						return -1;
 						}
@@ -1188,8 +1277,8 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"新規レコード情報リストの作成処理に失敗しました", NULL);
-					//===== 生成したレコード管理オブジェクトを削除 =====
+					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new record information list", NULL);
+					//===== Delete generated record management object =====
 					M2MDataFrame_delete(&record);
 					return -1;
 					}
@@ -1199,86 +1288,97 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたレコード管理オブジェクトがNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return -1;
 		}
-	else if (tableName==NULL)
+	else if (tableName==NULL || M2MString_length(tableName)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたテーブル名を示す文字列がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name is NULL", NULL);
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"引数で指定されたCSV形式のレコードを示す文字列がNULLです", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the CSV format record is NULL", NULL);
 		return -1;
 		}
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し, 1つ後ろのレコード管理<br>
- * オブジェクトをセットする．<br>
+ * Set the record management object one record behind the argument.<br>
  *
- * @param[in] self			レコード管理オブジェクト
- * @param[in] nextRecord	1つ後ろのレコード管理オブジェクト
+ * @param[in] self			Record management object
+ * @param[in] nextRecord	The record management object one behind
  */
 void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_setNextRecord()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->next = nextRecord;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトに対し, 1つ手前のレコード管理<br>
- * オブジェクトをセットする．<br>
+ * Set the record management object one before the argument.<br>
  *
- * @param[in,out] self			レコード管理オブジェクト
- * @param[in] previousRedord	1つ手前のレコード管理オブジェクト
+ * @param[in,out] self			Record management object
+ * @param[in] previousRedord	Record management object one before
  */
 void M2MDataFrame_setPreviousRecord (M2MDataFrame *self, M2MDataFrame *previousRecord)
 	{
+	//========== Variable ==========
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_setPreviousRecord()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->previous = previousRecord;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		}
 	return;
 	}
 
 
 /**
- * 引数で指定されたレコード管理オブジェクトの要素数[個]を返す。<br>
+ * Returns the number of elements of record management object specified by argument.<br>
  *
- * @param[in] self	レコード管理オブジェクト
- * @return			レコード管理オブジェクトの要素数[個]
+ * @param[in] self	Record management object
+ * @return			The number of element
  */
 unsigned int M2MDataFrame_size (M2MDataFrame *self)
 	{
 	//========== Variable ==========
 	unsigned int size = 0;
+	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_size()";
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
-		//===== 先頭ノードの取得 =====
+		//===== Get the first node =====
 		if ((self=M2MDataFrame_begin(self))!=NULL)
 			{
 			size++;
-			//===== 末端ノードに辿り着くまで繰り返し =====
+			//===== Repeat until reaching the end node =====
 			while ((self=M2MDataFrame_next(self))!=NULL)
 				{
 				size++;
 				}
-			//===== 要素数を返す =====
+			//===== Returns the number of elements =====
 			return size;
 			}
 		//===== Error handling =====
@@ -1290,6 +1390,7 @@ unsigned int M2MDataFrame_size (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
 		return 0;
 		}
 	}
