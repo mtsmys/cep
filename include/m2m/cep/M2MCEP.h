@@ -37,6 +37,7 @@
 #include "m2m/db/M2MTableManager.h"
 #include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/db/M2MSQLRunner.h"
+#include "m2m/io/M2MDirectory.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
 #include "m2m/util/M2MBase64.h"
@@ -192,6 +193,15 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
  * For the character string of the CSV format as the execution result, the <br>
  * column name character string is the first line, and the data after the second <br>
  * line is the data.<br>
+ * <br>
+ * [Attention!]<br>
+ * In order to execute this function, "SQLITE_ENABLE_COLUMN_METADATA" must be <br>
+ * enabled as option setting at compile time of SQLite 3.<br>
+ * This is because this function can not create a character string of CSV format <br>
+ * to be output as a result unless table information is acquired from the SELECT <br>
+ * result.<br>
+ * If "SQLITE_ENABLE_COLUMN_METADATA" is not valid, keep in mind that this <br>
+ * function will cause a compile error (because undefined functions are called).<br>
  *
  * @param[in] self		CEP structure object (used for database management)
  * @param[in] sql		String indicating SQL statement
@@ -205,6 +215,8 @@ unsigned char *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **re
  * Change the maximum number of records that can be stored in each table in the <br>
  * SQLite 3 database existing in memory to the integer value specified by the <br>
  * argument.<br>
+ * Note that it is not possible to set an integer number of 500 or more to the <br>
+ * record number upper limit value.<br>
  *
  * @param[in,out] self		Maximum number of records CEP execution object to be changed
  * @param[in] maxRecord		Integer indicating the maximum number of records in one table or 0 (in case of error)
@@ -218,13 +230,22 @@ M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord);
  * file) to the CEP structure object specified by the argument.<br>
  * When set to true, all records inserted by M2MCEP_insertCSV () are recorded in <br>
  * the SQLite 3 database on the file.<br>
- * If set to false, do not record to the SQLite 3 database on the file.<br>
+ * If set to "false", do not record to the SQLite 3 database on the file.<br>
  *
  * @param[in,out] self		CEP structure object
  * @param[in] persistence	Flag indicating permanence (record in SQLite 3 database on file)
  * @return					CEP execution object with a flag indicating permanence availability or NULL (in case of error)
  */
 M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence);
+
+
+/**
+ * When forcibly terminating when using the shared library (libcep.so), set the <br>
+ * event handler to acquire the signal and perform the termination processing.<br>
+ *
+ * @param[in] self	CEP structure object
+ */
+void M2MCEP_setSignalHandler (const M2MCEP *self);
 
 
 /**
