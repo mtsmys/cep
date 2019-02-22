@@ -1,7 +1,9 @@
 /*******************************************************************************
- * M2MDate.h
+ * M2MMemory.h
  *
- * Copyright (c) 2018, Akihisa Yasuda
+ * Copyright © 2005-2013 Rich Felker
+ *
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +31,8 @@
 
 #pragma once
 
-#ifndef M2M_TIME_M2MDATE_H_
-#define M2M_TIME_M2MDATE_H_
+#ifndef M2M_IO_M2MMEMORY_H_
+#define M2M_IO_M2MMEMORY_H_
 
 
 
@@ -41,37 +43,21 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
-#include <sys/time.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <stdint.h>
+
 
 
 /*******************************************************************************
- * Public function
+ * Public method
  ******************************************************************************/
 /**
- * This method returns milliseconds number of current time.<br>
  *
- * @return	Milliseconds number of current time or 0 (in case of error)
+ * @param dest
+ * @param c
+ * @param n
  */
-uint32_t M2MDate_getCurrentTimeMillis ();
-
-
-/**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
- *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0 (in case of error)
- */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+void *M2MMemory_set (void *dest, int c, size_t n);
 
 
 
@@ -81,4 +67,4 @@ size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 
 
 
-#endif /* M2M_TIME_M2MDATE_H_ */
+#endif /* M2M_IO_M2MMEMORY_H_ */

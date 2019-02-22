@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MDate.h
+ * M2MFileDescriptor.h :
  *
- * Copyright (c) 2018, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_TIME_M2MDATE_H_
-#define M2M_TIME_M2MDATE_H_
+#ifndef M2M_IO_M2MFILEDESCRIPTOR_H_
+#define M2M_IO_M2MFILEDESCRIPTOR_H_
 
 
 
@@ -42,36 +42,62 @@ extern "C"
 
 
 #include "m2m/lang/M2MString.h"
+#include "m2m/net/network/M2MIPAddress.h"
+#include <errno.h>
+#include <sys/select.h>
+#include <sys/socket.h>
 #include <sys/time.h>
-#include <stddef.h>
-#include <stdint.h>
+#include <sys/types.h>
+#include <netinet/tcp.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <unistd.h>
 
 
 /*******************************************************************************
- * Public function
+ * Public method
  ******************************************************************************/
 /**
- * This method returns milliseconds number of current time.<br>
+ * This method closes indicated socket.<br>
  *
- * @return	Milliseconds number of current time or 0 (in case of error)
+ * @param[in,out] socket	opened socket
  */
-uint32_t M2MDate_getCurrentTimeMillis ();
+void M2MFileDescriptor_closeSocket (int socket);
 
 
 /**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
+ * This method returns opened socket with indicated IP address.<br>
  *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0 (in case of error)
+ * @param[in] address	IP address information object
+ * @return				opened socket or -1(means error)
  */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+int M2MFileDescriptor_getSocket (const M2MIPAddress *address);
+
+
+/**
+ * Receive data with TCP/IP connection network.<br>
+ *
+ * @param[in] socket		TCP/IP socket
+ * @param[in] address		target address for receiving message
+ * @param[out] buffer		buffer for received data
+ * @param[in] bufferLength	length of buffer[byte]
+ * @param[in] readTimeout	read timeout[usec]
+ * @return					received data size[Byte] or 0(error happened)
+ */
+unsigned int M2MFileDescriptor_read (int socket, const M2MIPAddress *address, unsigned char *buffer, const unsigned int bufferLength, const unsigned long readTimeout);
+
+
+/**
+ * This method send message with TCP/IP connection network.<br>
+ *
+ * @param[in] socket		TCP/IP socket
+ * @param[in] address		target address for sending message
+ * @param[in] data			send message
+ * @param[in] dataLength	length of send message
+ * @return					length of sent message
+ */
+unsigned long M2MFileDescriptor_write (int socket, const M2MIPAddress *address, const unsigned char *data, const unsigned long dataLength);
 
 
 
@@ -81,4 +107,4 @@ size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 
 
 
-#endif /* M2M_TIME_M2MDATE_H_ */
+#endif /* M2M_IO_M2MFILEDESCRIPTOR_H_ */

@@ -79,6 +79,16 @@ void *M2MHeap_calloc (const size_t count, const size_t base);
 void *M2MHeap_malloc (const size_t size);
 
 
+/**
+ * This method changes the size of the allocation pointed to by ptr to size.<br>
+ *
+ * @param ptr	Allocated memory pointer
+ * @param size	Memory size for allocation[Byte]
+ * @return		Reallocated memory pointer or NULL(means error)
+ */
+void *M2MHeap_realloc (void *ptr, const size_t size);
+
+
 
 #ifdef __cplusplus
 }

@@ -58,27 +58,27 @@ static bool this_overMaxLogFileLength (const FILE *file);
  * Therefore, on the caller side, it is necessary to call the "M2MHeap_free()" <br>
  * function in order to prevent memory leak after using the variable.<br>
  *
- * @param[in] methodName		String indicating function name
+ * @param[in] functionName		String indicating function name
  * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
  * @param[in] message			Message string indicating error content
  * @param[out] debugMessage		Buffer to copy the error message
  * @return						Error message copied to argument pointer or NULL (in case of error)
  */
 #ifdef DEBUG
-static M2MString *this_createNewDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **debugMessage)
+static M2MString *this_createNewDebugMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message, M2MString **debugMessage)
 	{
 	//========== Variable ==========
 	M2MString time[128];
 	M2MString lineNumberString[16];
 	size_t errorMessageLength = 0;
 	size_t timeLength = 0;
-	size_t methodNameLength = 0;
+	size_t functionNameLength = 0;
 	size_t lineNumberLength = 0;
 	size_t messageLength = 0;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MLogger.this_createNewDebugMessage()";
 
 	//===== Check argument =====
-	if (methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
+	if (functionName!=NULL && (functionNameLength=M2MString_length(functionName))>0
 			&& (messageLength=M2MString_length(message))>0
 			&& debugMessage!=NULL)
 		{
@@ -93,10 +93,10 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 				&& (timeLength=M2MString_length(time))>0)
 			{
 			//===== Get heap memory ======
-			if ((errorMessageLength=M2MString_length((M2MString *)"[DEBUG]%s %s:%d[l]: %s\n")+timeLength+methodNameLength+lineNumberLength+messageLength)>0
+			if ((errorMessageLength=M2MString_length((M2MString *)"[DEBUG]%s %s:%d[l]: %s\n")+timeLength+functionNameLength+lineNumberLength+messageLength)>0
 					&& ((*debugMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 				{
-				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s %s:%d[l]: %s\n", time, methodName, lineNumber, message);
+				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s %s:%d[l]: %s\n", time, functionName, lineNumber, message);
 				return (*debugMessage);
 				}
 			//===== Error handling ======
@@ -110,10 +110,10 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 		else
 			{
 			//===== Get heap memory ======
-			if ((errorMessageLength=M2MString_length((M2MString *)"[DEBUG]%s:%d[l]: %s\n")+methodNameLength+lineNumberLength+messageLength)>0
+			if ((errorMessageLength=M2MString_length((M2MString *)"[DEBUG]%s:%d[l]: %s\n")+functionNameLength+lineNumberLength+messageLength)>0
 					&& ((*debugMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 				{
-				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s:%d[l]: %s\n", methodName, lineNumber, message);
+				snprintf((*debugMessage), errorMessageLength, (M2MString *)"[DEBUG]%s:%d[l]: %s\n", functionName, lineNumber, message);
 				return (*debugMessage);
 				}
 			//===== Error handling ======
@@ -125,9 +125,9 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
 			}
 		}
 	//===== Argument error =====
-	else if (methodName==NULL || methodNameLength<=0)
+	else if (functionName==NULL || functionNameLength<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"methodName\" is NULL", NULL);
+		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"functionName\" is NULL", NULL);
 		return NULL;
 		}
 	else
@@ -145,13 +145,13 @@ static M2MString *this_createNewDebugMessage (const M2MString *methodName, const
  * Therefore, it is necessary for caller to call the "M2MHeap_free()" <br>
  * function in order to prevent memory leak after using the variable.<br>
  *
- * @param[in] methodName		String indicating function name
+ * @param[in] functionName		String indicating function name
  * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
  * @param[in] message			Message string indicating error content
  * @param[out] errorMessage		Buffer to copy the error message
  * @return						Error message copied to argument pointer or NULL (in case of error)
  */
-static M2MString *this_createNewErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **errorMessage)
+static M2MString *this_createNewErrorMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message, M2MString **errorMessage)
 	{
 	//========== Variable ==========
 	M2MString time[128];
@@ -159,13 +159,13 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 	M2MString buffer[256];
 	size_t errorMessageLength = 0;
 	size_t timeLength = 0;
-	size_t methodNameLength = 0;
+	size_t functionNameLength = 0;
 	size_t lineNumberLength = 0;
 	size_t messageLength = 0;
 	size_t bufferLength = 0;
 
 	//===== Check argument =====
-	if (methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
+	if (functionName!=NULL && (functionNameLength=M2MString_length(functionName))>0
 			&& (messageLength=M2MString_length(message))>0
 			&& errorMessage!=NULL)
 		{
@@ -185,10 +185,10 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					&& (timeLength=M2MString_length(time))>0)
 				{
 				//===== Get heap memory ======
-				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s %s:%d[l]: %s: %s\r\n")+timeLength+methodNameLength+lineNumberLength+messageLength+bufferLength)>0
+				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s %s:%d[l]: %s: %s\r\n")+timeLength+functionNameLength+lineNumberLength+messageLength+bufferLength)>0
 						&& ((*errorMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 					{
-					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s %s:%d[l]: %s: %s\r\n", time, methodName, lineNumber, message, buffer);
+					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s %s:%d[l]: %s: %s\r\n", time, functionName, lineNumber, message, buffer);
 					this_initErrorNumber();
 					return (*errorMessage);
 					}
@@ -203,10 +203,10 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 			else
 				{
 				//===== Get heap memory ======
-				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s:%d[l]: %s: %s\r\n")+methodNameLength+lineNumberLength+messageLength+bufferLength)>0
+				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s:%d[l]: %s: %s\r\n")+functionNameLength+lineNumberLength+messageLength+bufferLength)>0
 						&& ((*errorMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 					{
-					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s:%d[l]: %s: %s\r\n", methodName, lineNumber, message, buffer);
+					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s:%d[l]: %s: %s\r\n", functionName, lineNumber, message, buffer);
 					this_initErrorNumber();
 					return (*errorMessage);
 					}
@@ -226,10 +226,10 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 					&& (timeLength=M2MString_length(time))>0)
 				{
 				//===== Get heap memory ======
-				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s %s:%d[l]: %s\r\n")+timeLength+methodNameLength+lineNumberLength+messageLength)>0
+				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s %s:%d[l]: %s\r\n")+timeLength+functionNameLength+lineNumberLength+messageLength)>0
 						&& ((*errorMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 					{
-					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s %s:%d[l]: %s\r\n", time, methodName, lineNumber, message);
+					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s %s:%d[l]: %s\r\n", time, functionName, lineNumber, message);
 					return (*errorMessage);
 					}
 				//===== Error handling ======
@@ -242,10 +242,10 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 			else
 				{
 				//===== Get heap memory ======
-				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s:%d[l]: %s\r\n")+methodNameLength+lineNumberLength+messageLength)>0
+				if ((errorMessageLength=M2MString_length((M2MString *)"[ERROR]%s:%d[l]: %s\r\n")+functionNameLength+lineNumberLength+messageLength)>0
 						&& ((*errorMessage)=(M2MString *)M2MHeap_malloc(errorMessageLength+1))!=NULL)
 					{
-					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s:%d[l]: %s\r\n", methodName, lineNumber, message);
+					snprintf((*errorMessage), errorMessageLength, (M2MString *)"[ERROR]%s:%d[l]: %s\r\n", functionName, lineNumber, message);
 					return (*errorMessage);
 					}
 				//===== Error handling ======
@@ -257,7 +257,7 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 			}
 		}
 	//===== Argument error =====
-	else if (methodName==NULL || methodNameLength<=0)
+	else if (functionName==NULL || functionNameLength<=0)
 		{
 		return NULL;
 		}
@@ -265,6 +265,33 @@ static M2MString *this_createNewErrorMessage (const M2MString *methodName, const
 		{
 		return NULL;
 		}
+	}
+
+
+/**
+ *
+ * @param[in,out] self
+ */
+static void this_deleteLoggerName (M2MLogger *self)
+	{
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//=====  =====
+		if (M2MLogger_getLoggerName(self)!=NULL)
+			{
+			M2MHeap_free(self->loggerName);
+			}
+		//=====  =====
+		else
+			{
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		}
+	return;
 	}
 
 
@@ -365,7 +392,7 @@ static M2MString *this_getLogFileName ()
 
 
 /**
- * Initialize "errorno".<br>
+ * Initialize "errorno" variable.<br>
  */
 static void this_initErrorNumber ()
 	{
@@ -427,18 +454,18 @@ static void this_outputLogMessage (const M2MString *logFileName, const M2MString
 /**
  * Output debug message to file or standard error output.<br>
  *
- * @param[in] methodName		String indicating function name
+ * @param[in] functionName		String indicating function name
  * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
  * @param[in] message			Message string indicating error content
  */
 #ifdef DEBUG
-static void this_printDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+static void this_printDebugMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *debugMessage = NULL;
 
 	//===== Get formatted debug message =====
-	if (this_createNewDebugMessage(methodName, lineNumber, message, &debugMessage)!=NULL)
+	if (this_createNewDebugMessage(functionName, lineNumber, message, &debugMessage)!=NULL)
 		{
 		//===== Output debug message into log file =====
 		this_outputLogMessage(this_getLogFileName(), debugMessage);
@@ -458,17 +485,17 @@ static void this_printDebugMessage (const M2MString *methodName, const unsigned 
 /**
  * Output error message to file or standard error output.<br>
  *
- * @param[in] methodName		String indicating function name
+ * @param[in] functionName		String indicating function name
  * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
  * @param[in] message			Message string indicating error content
  */
-static void this_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+static void this_printErrorMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *errorMessage = NULL;
 
 	//===== Get formatted error message =====
-	if (this_createNewErrorMessage(methodName, lineNumber, message, &errorMessage)!=NULL)
+	if (this_createNewErrorMessage(functionName, lineNumber, message, &errorMessage)!=NULL)
 		{
 		//===== Output error message into log file =====
 		this_outputLogMessage(this_getLogFileName(), errorMessage);
@@ -487,19 +514,167 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
  * Public function
  ******************************************************************************/
 /**
+ * Destructor.<br>
+ * This function releases the heap memory area of logger structure object.<br>
+ *
+ * @param[in,out] self
+ */
+void M2MLogger_delete (M2MLogger **self)
+	{
+	//===== Check argument =====
+	if (self!=NULL && (*self)!=NULL)
+		{
+		//===== Release heap memory area of logger name =====
+		this_deleteLoggerName((*self));
+		//===== Release heap memory area of logger object =====
+		M2MHeap_free((*self));
+		}
+	//===== Argument error =====
+	else
+		{
+		}
+	return;
+	}
+
+
+/**
+ *
+ * @param[in] self
+ * @return
+ */
+M2MString *M2MLogger_getLoggerName (const M2MLogger *self)
+	{
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		return self->loggerName;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MLogger\" structure object is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in] self
+ * @return
+ */
+M2MLogLevel M2MLogger_getLogLevel (const M2MLogger *self)
+	{
+	//========== Variable ==========
+	M2MLogLevel DEFAULT_LOG_LEVE = M2MLogLevel_INFO;
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		return self->level;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MLogger\" structure object is NULL");
+		return DEFAULT_LOG_LEVE;
+		}
+	}
+
+
+/**
+ * Constructor.<br>
+ * This method allocates new memory for creating Logger structure object.<br>
+ *
+ * @return	created new Logger object or NULL (in case of error)
+ */
+M2MLogger *M2MLogger_new ()
+	{
+	//========== Variable ==========
+	M2MLogger *self = NULL;
+	const M2MLogLevel DEFAULT_LOG_LEVEL = M2MLogLevel_INFO;
+
+	//===== Allocate new memory =====
+	if ((self=(M2MLogger *)M2MHeap_malloc(sizeof(M2MLogger)))!=NULL)
+		{
+		//===== Set log level =====
+		if (M2MLogger_setLogLevel(self, DEFAULT_LOG_LEVEL)!=NULL)
+			{
+			return self;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to set log level into \"M2MLogger\" structure object");
+			//===== Release allocated memory area =====
+			M2MLogger_delete(&self);
+			return NULL;
+			}
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MLogger\" structure object");
+		return NULL;
+		}
+	}
+
+
+/**
  * Output debug messages to standard output.<br>
  * Debug message is based on the function name, line number, and message.<br>
  *
- * @param[in] methodName	String indicating function name
+ * @param[in] functionName	String indicating function name
  * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
  * @param[in] message		Message string indicating error content
  */
-void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_printDebugMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 #ifdef DEBUG
 	//===== Output debug message =====
-	this_printDebugMessage(methodName, lineNumber, message);
+	this_printDebugMessage(functionName, lineNumber, message);
 #endif /* DEBUG */
+	return;
+	}
+
+
+/**
+ * This method prints out debug message if "DEBUG" symbol is set.<br>
+ *
+ * @param[in] functionName	method name string
+ * @param[in] lineNumber	the line for registering
+ * @param[in] message		debug information string
+ */
+void M2MLogger_printDebugMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
+	{
+#ifdef DEBUG
+	//========== Variable ==========
+	const size_t TIME_LENGTH = 128;
+	M2MString TIME[TIME_LENGTH];
+
+	//===== Check argument =====
+	if (functionName!=NULL && message!=NULL)
+		{
+		//===== Initialize buffer =====
+		memset(TIME, 0, TIME_LENGTH);
+		//===== Get local time string =====
+		if (M2MDate_getLocalTimeString(TIME, TIME_LENGTH)>0)
+			{
+			fprintf(stdout, (M2MString *)"[DEBUG]%s %s:%d[l]: %s\n", TIME, functionName, lineNumber, message);
+			}
+		else
+			{
+			}
+		}
+	//===== Argument error =====
+	else if (functionName==NULL)
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"functionName\" string is NULL");
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"message\" string is NULL");
+		}
+#endif // DEBUG
 	return;
 	}
 
@@ -510,17 +685,17 @@ void M2MLogger_printDebugMessage (const M2MString *methodName, const unsigned in
  * Also, when a pointer for copying error message is specified as argument, <br>
  * buffering is performed inside this function, and error message is copied.<br>
  *
- * @param[in] methodName					String indicating function name
+ * @param[in] functionName					String indicating function name
  * @param[in] lineNumber					Line number in source file (can be embedded with "__LINE__")
  * @param[in] message						Message string indicating error content
  * @param[out] bufferForCopyingErrorMessage	Buffer to copy the error message or NULL (if copying is unnecessary)
  */
-void M2MLogger_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **bufferForCopyingErrorMessage)
+void M2MLogger_printErrorMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message, M2MString **bufferForCopyingErrorMessage)
 	{
 	//===== In the case of copying error message to argument =====
 	if (bufferForCopyingErrorMessage!=NULL)
 		{
-		this_createNewErrorMessage(methodName, lineNumber, message, bufferForCopyingErrorMessage);
+		this_createNewErrorMessage(functionName, lineNumber, message, bufferForCopyingErrorMessage);
 		}
 	//===== In the case of not copying error message =====
 	else
@@ -528,10 +703,186 @@ void M2MLogger_printErrorMessage (const M2MString *methodName, const unsigned in
 		// do nothing
 		}
 	//===== Output error message into log file =====
-	this_printErrorMessage(methodName, lineNumber, message);
+	this_printErrorMessage(functionName, lineNumber, message);
 	return;
 	}
 
+
+/**
+ * This method print out error message and if the variable "errorMessage"<br>
+ * isn't NULL, copy the message into it.<br>
+ * If "errorMessage" isn't NULL, caller must release the memory out of<br>
+ * this method.<br>
+ * <br>
+ * if defined "NOERROR" symbol, doesn't output message.<br>
+ *
+ * @param[in] functionName	method name string
+ * @param[in] lineNumber	the line detected error
+ * @param[in] message		error information string
+ */
+void M2MLogger_printErrorMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
+	{
+#ifndef NOERROR
+	//========== Variable ==========
+	const size_t TIME_LENGTH = 128;
+	M2MString TIME[TIME_LENGTH];
+	const size_t ERROR_MESSAGE_LENGTH = 256;
+	M2MString errorMessage[ERROR_MESSAGE_LENGTH];
+
+	//===== Check argument =====
+	if (functionName!=NULL && message!=NULL)
+		{
+		//===== Initialize buffer =====
+		memset(TIME, 0, TIME_LENGTH);
+		memset(errorMessage, 0, ERROR_MESSAGE_LENGTH);
+		//===== Get local time string =====
+		if (M2MDate_getLocalTimeString(TIME, TIME_LENGTH)>0)
+			{
+			//===== Check existence of system error message =====
+			if (errno!=0
+					&& strerror_r(errno, errorMessage, ERROR_MESSAGE_LENGTH)==0)
+				{
+				fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s: %s\n", TIME, functionName, lineNumber, message, errorMessage);
+				//===== Initialize error number =====
+				this_initErrorNumber();
+				}
+			//===== In the case of not existing error number and message =====
+			else
+				{
+				fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s\n", TIME, functionName, lineNumber, message);
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			}
+		}
+	//===== Argument error =====
+	else if (functionName==NULL)
+		{
+		}
+	else
+		{
+		}
+#endif // NOERROR
+	return;
+	}
+
+
+/**
+ * This method prints out info level message if "DEBUG" symbol is set.<br>
+ *
+ * @param[in] functionName	method name string
+ * @param[in] lineNumber	the line detected error
+ * @param[in] message		error information string
+ */
+void M2MLogger_printInfoMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
+	{
+#ifdef DEBUG
+	//========== Variable ==========
+	const size_t TIME_LENGTH = 128;
+	M2MString TIME[TIME_LENGTH];
+
+	//===== Check argument =====
+	if (functionName!=NULL && message!=NULL)
+		{
+		//===== Initialize buffer =====
+		memset(TIME, 0, TIME_LENGTH);
+		//===== Get local time string =====
+		if (M2MDate_getLocalTimeString(TIME, TIME_LENGTH)>0)
+			{
+			fprintf(stdout, (M2MString *)"[INFO]%s %s:%d[l]: %s\n", TIME, functionName, lineNumber, message);
+			}
+		else
+			{
+			}
+		}
+	//===== Argument error =====
+	else if (functionName==NULL)
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"functionName\" string is NULL");
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"message\" string is NULL");
+		}
+#endif // DEBUG
+	return;
+	}
+
+
+/**
+ * @param[in,out] self
+ * @param[in] level
+ * @return
+ */
+M2MLogger *M2MLogger_setLogLevel (M2MLogger *self, const M2MLogLevel level)
+	{
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== Set log level =====
+		self->level = level;
+		return self;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MLogger\" structure object is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in,out] self
+ * @param[in] loggerName
+ * @return
+ */
+M2MString *M2MLogger_setLoggerName (M2MLogger *self, const M2MString *loggerName)
+	{
+	//========== Variable ==========
+	unsigned int loggerNameLength = 0;
+
+	//===== Check argument =====
+	if (self!=NULL
+			&& loggerName!=NULL
+			&& (loggerNameLength=M2MString_length(loggerName))>0)
+		{
+		//===== Release allocated memory =====
+		this_deleteLoggerName(self);
+		//===== Allocate new memory =====
+		if ((self->loggerName=(M2MString *)M2MHeap_malloc(loggerNameLength+1))!=NULL)
+			{
+			//===== Set logger name into appender =====
+			memset(self->loggerName, 0, loggerNameLength+1);
+			memcpy(self->loggerName, loggerName, loggerNameLength);
+			return self->loggerName;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to allocate new memory for copying logger name string");
+			return NULL;
+			}
+		}
+	//===== Check argument =====
+	else if (self==NULL)
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MLogger\" structure object is NULL");
+		return NULL;
+		}
+	else if (loggerName==NULL)
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"loggerName\" string is NULL");
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Length of indicated \"loggerName\" string isn't positive");
+		return NULL;
+		}
+	}
 
 
 /* End Of File */

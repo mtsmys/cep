@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MDate.h
+ * M2MByteOrder.h
  *
- * Copyright (c) 2018, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_TIME_M2MDATE_H_
-#define M2M_TIME_M2MDATE_H_
+#ifndef M2M_IO_M2MBYTEORDER_H_
+#define M2M_IO_M2MBYTEORDER_H_
 
 
 
@@ -41,37 +41,42 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
-#include <sys/time.h>
-#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 
 
 /*******************************************************************************
- * Public function
+ * Class variable
  ******************************************************************************/
 /**
- * This method returns milliseconds number of current time.<br>
  *
- * @return	Milliseconds number of current time or 0 (in case of error)
  */
-uint32_t M2MDate_getCurrentTimeMillis ();
+#ifndef M2MByteOrder_Endian
+typedef enum
+	{
+	M2MByteOrder_BIG_ENDIAN,  //!< ByteOrder_BIG_ENDIAN
+	M2MByteOrder_LITTLE_ENDIAN//!< ByteOrder_LITTLE_ENDIAN
+	} M2MByteOrder_Endian;
+#endif /* M2MByteOrder_Endian */
+
+
+
+/*******************************************************************************
+ * Public method
+ ******************************************************************************/
+/**
+ * @param intNumber
+ * @param targetEndian
+ * @return
+ */
+uint32_t M2MByteOrder_convertInteger (const uint32_t intNumber, const M2MByteOrder_Endian targetEndian);
 
 
 /**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
- *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0 (in case of error)
+ * @param shortNumber
+ * @param targetEndian
+ * @return
  */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+uint32_t M2MByteOrder_convertShort (const uint16_t shortNumber, const M2MByteOrder_Endian targetEndian);
 
 
 
@@ -81,4 +86,4 @@ size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 
 
 
-#endif /* M2M_TIME_M2MDATE_H_ */
+#endif /* M2M_IO_M2MBYTEORDER_H_ */

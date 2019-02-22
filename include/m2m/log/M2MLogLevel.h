@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MDate.h
+ * M2MLogLevel.h
  *
- * Copyright (c) 2018, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_TIME_M2MDATE_H_
-#define M2M_TIME_M2MDATE_H_
+#ifndef M2M_LOG_M2MLOGLEVEL_H_
+#define M2M_LOG_M2MLOGLEVEL_H_
 
 
 
@@ -42,36 +42,44 @@ extern "C"
 
 
 #include "m2m/lang/M2MString.h"
-#include <sys/time.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 
 /*******************************************************************************
- * Public function
+ * Definition
  ******************************************************************************/
 /**
- * This method returns milliseconds number of current time.<br>
- *
- * @return	Milliseconds number of current time or 0 (in case of error)
+ * Log level denifition
  */
-uint32_t M2MDate_getCurrentTimeMillis ();
+#ifndef M2MLogLevel
+typedef enum
+	{
+	M2MLogLevel_TRACE,
+	M2MLogLevel_DEBUG,
+	M2MLogLevel_INFO,
+	M2MLogLevel_WARN,
+	M2MLogLevel_ERROR,
+	M2MLogLevel_FATAL,
+	} M2MLogLevel;
+#endif /* M2MLogLevel */
+
+
+
+/*******************************************************************************
+ * Public method
+ ******************************************************************************/
+/**
+ * @param logLevel
+ * @return
+ */
+M2MString *M2MLogLevel_toString (const M2MLogLevel logLevel);
 
 
 /**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
- *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0 (in case of error)
+ * @param[in] logLevelString
+ * @return
  */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString);
 
 
 
@@ -81,4 +89,4 @@ size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 
 
 
-#endif /* M2M_TIME_M2MDATE_H_ */
+#endif /* M2M_LOG_M2MLOGLEVEL_H_ */

@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MDate.h
+ * M2MACL.h : ACL(Access Control List) permission manager.
  *
- * Copyright (c) 2018, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_TIME_M2MDATE_H_
-#define M2M_TIME_M2MDATE_H_
+#ifndef M2M_SECURITY_ACL_M2MACL_H_
+#define M2M_SECURITY_ACL_M2MACL_H_
 
 
 
@@ -41,37 +41,77 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
-#include <sys/time.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
+#include "m2m/security/acl/M2MACLUser.h"
+#include "m2m/security/acl/M2MACLGroup.h"
 
 
 /*******************************************************************************
- * Public function
+ * Class variable
  ******************************************************************************/
 /**
- * This method returns milliseconds number of current time.<br>
+ * ACL structure object manages access control list information.<br>
  *
- * @return	Milliseconds number of current time or 0 (in case of error)
+ * @param user
+ * @param group
  */
-uint32_t M2MDate_getCurrentTimeMillis ();
+#ifndef M2MACL
+typedef struct
+	{
+	M2MACLUser *user;
+	M2MACLGroup *group;
+	} M2MACL;
+#endif /* M2MACL */
+
+
+/*******************************************************************************
+ * Public method
+ ******************************************************************************/
+/**
+ * @param[in,out] self	ACL object
+ */
+void M2MACL_delete (M2MACL **self);
 
 
 /**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
  *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0 (in case of error)
+ * @param self
+ * @return
  */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+M2MACLGroup *M2MACL_getGroup (const M2MACL *self);
+
+
+/**
+ *
+ * @param self
+ * @return
+ */
+M2MACLUser *M2MACL_getUser (const M2MACL *self);
+
+
+/**
+ * Constructor.<br>
+ *
+ * @return	ACL object
+ */
+M2MACL *M2MACL_new ();
+
+
+/**
+ *
+ * @param self
+ * @param groupID
+ * @return
+ */
+M2MACL *M2MACL_setGroupID (M2MACL *self, const uint64_t groupID);
+
+
+/**
+ *
+ * @param self
+ * @param userID
+ * @return
+ */
+M2MACL *M2MACL_setUserID (M2MACL *self, const uint64_t userID);
 
 
 
@@ -81,4 +121,4 @@ size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 
 
 
-#endif /* M2M_TIME_M2MDATE_H_ */
+#endif /* M2M_SECURITY_ACL_M2MACL_H_ */

@@ -34,10 +34,15 @@
 
 
 #include "m2m/io/M2MHeap.h"
+#include "m2m/lang/M2MCharacterEncoding.h"
 #include <ctype.h>
 #include <errno.h>
 #include <iconv.h>
+#include <limits.h>
+#include <locale.h>
+#include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -65,6 +70,14 @@ typedef unsigned char M2MString;
 
 
 /**
+ *
+ */
+#ifndef M2MString_COLON
+#define M2MString_COLON (M2MString *)":"
+#endif /* M2MString_COLON */
+
+
+/**
  * COMMA (=",")
  */
 #ifndef M2MString_COMMA
@@ -73,11 +86,27 @@ typedef unsigned char M2MString;
 
 
 /**
- * Line feed and carriage return (="\r\n")
+ * Carriage return (="\r")
+ */
+#ifndef M2MString_CR
+#define M2MString_CR (M2MString *)"\r"
+#endif /* M2MString_CR */
+
+
+/**
+ * Carriage return and line feed (="\r\n")
  */
 #ifndef M2MString_CRLF
 #define M2MString_CRLF (M2MString *)"\r\n"
 #endif /* M2MString_CRLF */
+
+
+/**
+ *
+ */
+#ifndef M2MString_DOT
+#define M2MString_DOT (M2MString *)"."
+#endif /* M2MString_DOT */
 
 
 /**
@@ -97,11 +126,43 @@ typedef unsigned char M2MString;
 
 
 /**
+ *
+ */
+#ifndef M2MString_HYPHEN
+#define M2MString_HYPHEN (M2MString *)"-"
+#endif /* M2MString_HYPHEN */
+
+
+/**
+ *
+ */
+#ifndef M2MString_LEFT_CURLY_BRACKET
+#define M2MString_LEFT_CURLY_BRACKET (M2MString *)"{"
+#endif /* M2MString_LEFT_CURLY_BRACKET */
+
+
+/**
+ *
+ */
+#ifndef M2MString_LEFT_SQUARE_BRACKET
+#define M2MString_LEFT_SQUARE_BRACKET (M2MString *)"["
+#endif /* M2MString_LEFT_SQUARE_BRACKET */
+
+
+/**
  * Line feed (="\n")
  */
 #ifndef M2MString_LF
 #define M2MString_LF (M2MString *)"\n"
 #endif /* M2MString_LF */
+
+
+/**
+ * Null-Terminated Byte String
+ */
+#ifndef M2MString_NTBS
+#define M2MString_NTBS (M2MString *)'\0'
+#endif /* M2MString_NTBS */
 
 
 /**
@@ -121,11 +182,82 @@ typedef unsigned char M2MString;
 
 
 /**
+ *
+ */
+#ifndef M2MString_RIGHT_CURLY_BRACKET
+#define M2MString_RIGHT_CURLY_BRACKET (M2MString *)"}"
+#endif /* M2MString_RIGHT_CURLY_BRACKET */
+
+
+/**
+ *
+ */
+#ifndef M2MString_RIGHT_SQUARE_BRACKET
+#define M2MString_RIGHT_SQUARE_BRACKET (M2MString *)"]"
+#endif /* M2MString_RIGHT_SQUARE_BRACKET */
+
+
+/**
+ *
+ */
+#ifndef M2MString_SEMI_COLON
+#define M2MString_SEMI_COLON (M2MString *)";"
+#endif /* M2MString_SEMI_COLON */
+
+
+/**
+ *
+ */
+#ifndef M2MString_SLASH
+#define M2MString_SLASH (M2MString *)"/"
+#endif /* M2MString_SLASH */
+
+
+/**
  * White space (=" ")
  */
 #ifndef M2MString_SPACE
 #define M2MString_SPACE (M2MString *)" "
 #endif /* M2MString_SPACE */
+
+/**
+ *
+ */
+#ifndef M2MString_TAB
+#define M2MString_TAB (M2MString *)"\t"
+#endif /* M2MString_TAB */
+
+
+/**
+ *
+ */
+#ifndef M2MString_TILDE
+#define M2MString_TILDE (M2MString *)"~"
+#endif /* M2MString_TILDE */
+
+
+/**
+ *
+ */
+#ifndef M2MString_TWO_DOT_LEADER
+#define M2MString_TWO_DOT_LEADER (M2MString *)".."
+#endif /* M2MString_TWO_DOT_LEADER */
+
+
+/**
+ *
+ */
+#ifndef M2MString_UNDER_LINE
+#define M2MString_UNDER_LINE (M2MString *)"_"
+#endif /* M2MString_UNDER_LINE */
+
+
+/**
+ *
+ */
+#ifndef M2MString_ZENKAKU_SPACE
+#define M2MString_ZENKAKU_SPACE (M2MString *)"　"
+#endif /* M2MString_ZENKAKU_SPACE */
 
 
 
@@ -176,6 +308,14 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string);
  * @return						Pointer of converted string or NULL(means error)
  */
 M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2MString *fromCharacterSetName, const M2MString *toCharacterSetName, M2MString **toString);
+
+
+/**
+ * @param[in] boolean
+ * @param[out] buffer
+ * @param[in] bufferLength
+ */
+M2MString *M2MString_convertFromBooleanToString (const bool boolean, M2MString *buffer, const size_t bufferLength);
 
 
 /**
@@ -231,7 +371,7 @@ M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, 
  * leak after using the string. <br>
  *
  * @param[in] number	Signed long number to be converted
- * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
+ * @param[out] string	Pointer for copying the converted string (buffering is executed inside this function)
  * @return				Copied string or NULL (in case of error)
  */
 M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2MString **string);
@@ -254,7 +394,7 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
  * @param[in] stringLength	Size of string[Byte]
  * @return					Signed long integer converted from string
  */
-long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength);
+int32_t M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength);
 
 
 /**
@@ -264,7 +404,7 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
  * @param[in] stringLength	Size of string[Byte]
  * @return					Signed integer converted from string
  */
-signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength);
+int32_t M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength);
 
 
 /**
@@ -275,6 +415,28 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
  * @return					Signed 64bit integer number converted from string
  */
 int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, const size_t stringLength);
+
+
+
+/**
+ * This method convert from string to 32bit unsigned integer number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Unsigned 32bit integer number converted from string
+ */
+uint32_t M2MString_convertFromStringToUnsignedInteger (const M2MString *string, const size_t stringLength);
+
+
+/**
+ * This method converts from unsigned integer to string.<br>
+ * Generated string is allocated in this method, so caller must free it.<br>
+ *
+ * @param[in] number		conversion target number
+ * @param[out] buffer		array for copying integer string
+ * @param[in] bufferLength	length of array[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedIntegerToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
 
 
 /**
@@ -298,6 +460,17 @@ M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t 
  * @param[in] bufferLength	Length of array[Byte]
  */
 M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
+
+
+/**
+ * Converts a UTF-16 string to UTF-8. Returns a new string that must be freed<br>
+ * or NULL if no conversion was needed.<br>
+ *
+ * @param[in,out]
+ * @param[in] length
+ * @return
+ */
+M2MString *M2MString_convertFromUTF16ToUTF8 (M2MString **string, size_t *stringLenngth);
 
 
 /**
@@ -346,6 +519,27 @@ M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 
 
 /**
+ * @param self
+ * @return
+ */
+bool M2MString_isNumber (const M2MString self);
+
+
+/**
+ * @param self
+ * @return
+ */
+bool M2MString_isSpace (const M2MString *self);
+
+
+/**
+ * @param self
+ * @return
+ */
+bool M2MString_isUTF (const M2MString *self);
+
+
+/**
  * Returns the pointer that the "keyword" string last appears. <br>
  * If "keyword" string isn't found, returns NULL.
  *
@@ -366,6 +560,21 @@ size_t M2MString_length (const M2MString *self);
 
 
 /**
+ * This method replaces each substring of this string.<br>
+ * It matches the literal target sequence with the specified literal <br>
+ * replacement sequence.<br>
+ *
+ * @param[in] self			original string
+ * @param[in] target		sequence of character values to be replaced
+ * @param[in] replacement	replacement sequence of character values
+ * @param[out] buffer		buffer for copying replaced string
+ * @param[in] bufferLength	length of buffer[Byte]
+ * @return					replaced string or NULL(means error)
+ */
+M2MString *M2MString_replace (const M2MString *self, const M2MString *target, const M2MString *replacement, M2MString *buffer, const size_t bufferLength);
+
+
+/**
  * Return dividing result of the source string (="string") by "delimiter". <br>
  * When acquiring consecutively, specify the source character string only <br>
  * for the first time, and specify NULL as the source string from the next <br>
@@ -378,9 +587,27 @@ size_t M2MString_length (const M2MString *self);
  * @param[in] delimiter		Delimiter string
  * @param[in] savePointer	Copy buffer of divided source string (set the same variable each time)
  * @return					String corresponding to a fragment of a divided source string
- *
+ */
 M2MString *M2MString_split (M2MString *string, const M2MString *delimiter, M2MString **savePoint);
-*/
+
+
+/**
+ * @param self
+ * @param buffer
+ * @param bufferLength
+ * @return
+ */
+M2MString *M2MString_toLowerCase (const M2MString *self, M2MString *buffer, const size_t bufferLength);
+
+
+/**
+ * @param self
+ * @param buffer
+ * @param bufferLength
+ * @return
+ */
+M2MString *M2MString_toUpperCase (const M2MString *self, M2MString *buffer, const size_t bufferLength);
+
 
 
 #ifdef __cplusplus
