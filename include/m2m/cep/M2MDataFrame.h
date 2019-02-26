@@ -34,7 +34,7 @@
 
 
 #include "m2m/lang/M2MString.h"
-#include "m2m/log/M2MLogger.h"
+#include "m2m/log/M2MFileAppender.h"
 #include "m2m/util/list/M2MList.h"
 
 

@@ -41,27 +41,24 @@ extern "C"
 
 
 
+#include "m2m/M2MSystem.h"
 #include "m2m/io/M2MDirectory.h"
 #include "m2m/io/M2MFile.h"
 #include "m2m/io/M2MHeap.h"
-/*
-#include "ng/json/NGJSONParser.h"
-#include "ng/json/NGJSONPointer.h"
-#include "ng/lang/NGCharacterEncoding.h"
-*/
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
 #include "m2m/log/M2MLogLevel.h"
 #include "m2m/util/list/M2MList.h"
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
 /*******************************************************************************
- * Class variable
+ * Definition
  ******************************************************************************/
 /**
  * FileAppender object
@@ -82,8 +79,8 @@ typedef struct
 	M2MString *encoding;
 	M2MFile *logFile;
 	M2MString *logFilePath;
-	unsigned int maxBackupIndex;
-	unsigned int maxFileSize;
+	uint32_t maxBackupIndex;
+	uint32_t maxFileSize;
 	} M2MFileAppender;
 #endif /* M2MFileAppender */
 
@@ -141,19 +138,21 @@ void M2MLogger_warnImpl (M2MFileAppender *self, const M2MString *methodName, con
 
 
 /**
- * This method creates new FileAppender object which must set-up configurations.<br>
- *
- * @return 	new logger object(caller must release this memory with "Heap_free()") or NULL(means error)
- */
-M2MFileAppender *M2MFileAppender_createNewFileAppender ();
-
-
-/**
  * This method releases allocated memory for FileAppender structure object.<br>
  *
  * @param[in,out] self	logger object
  */
 void M2MFileAppender_delete (M2MFileAppender **self);
+
+
+/**
+ * Create new default log file pathname string and copy it into the argument buffer.<br>
+ *
+ * @param[out] buffer		Buffer for copying default log file pathname string
+ * @param[in] bufferLength	Length of prepared buffer
+ * @return					The pointer of buffer copied log file pathname string or NULL (in case of error)
+ */
+M2MString *M2MFileAppender_getDefaultLogFilePath (M2MString *buffer, const size_t bufferLength);
 
 
 /**
@@ -187,24 +186,32 @@ M2MString *M2MFileAppender_getLoggerName (const M2MFileAppender *self);
 
 
 /**
+ * This method creates new FileAppender object which must set-up configurations.<br>
+ *
+ * @return 	new logger object(caller must release this memory with "Heap_free()") or NULL(means error)
+ */
+M2MFileAppender *M2MFileAppender_new ();
+
+
+/**
  * This method parses configuration file and creates new FileAppender object.<br>
  * The configuration file must be written in JSON format and caller must<br>
  * release the memory of created FileAppender object with "FileAppender_delete()".<br>
  *
  * @param[in] jsonFilePath	configuration file path
  * @return					logger object or NULL(error happened)
- */
+ *
 M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath);
-
+*/
 
 /**
  * This method parses JSON format string for constructing FileAppendar object.<br>
  *
  * @param[in] jsonString	JSON format configuration string
  * @return					new created logging object or NULL(means error)
- */
+ *
 M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString);
-
+*/
 
 /**
  * @param[in] self

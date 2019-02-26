@@ -92,7 +92,7 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 		memset(TIME, 0, TIME_LENGTH);
 		memset(errorMessage, 0, ERROR_MESSAGE_LENGTH);
 		//===== Get local time string =====
-		if (M2MString_getLocalTime(TIME, TIME_LENGTH)>0)
+		if (M2MDate_getLocalTimeString(TIME, TIME_LENGTH)>0)
 			{
 			fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s\n", TIME, methodName, lineNumber, message);
 			}

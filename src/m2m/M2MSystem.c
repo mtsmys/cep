@@ -1,5 +1,5 @@
 /*******************************************************************************
- * M2MCharacterEncoding.h
+ * M2MFileAppender.c :
  *
  * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
@@ -27,52 +27,101 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#pragma once
-
-#ifndef M2M_LANG_M2MCHARACTERENCODING_H_
-#define M2M_LANG_M2MCHARACTERENCODING_H_
-
-
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
+#include "m2m/log/M2MFileAppender.h"
 
 
 
 /*******************************************************************************
- * Class variable
+ * Private function
  ******************************************************************************/
 /**
- * This is a character encoding capable of encoding all possible characters in Unicode.
+ * Get the length of the string. <br>
+ *
+ * @param[in] self	String (always be null terminated)
+ * @return			Length of string or 0 (in case of error)
  */
-#ifndef M2MCharacterEncoding_UTF8
-#define M2MCharacterEncoding_UTF8 (unsigned char *)"UTF-8"
-#endif /* M2MCharacterEncoding_UTF8 */
+static size_t this_getStringlength (const unsigned char *string)
+	{
+	//===== Check argument =====
+	if (string!=NULL)
+		{
+		return strlen(string);
+		}
+	//===== Argument error =====
+	else
+		{
+		return 0;
+		}
+	}
+
+
+
+/*******************************************************************************
+ * Public function
+ ******************************************************************************/
+/**
+ *
+ * @return
+ */
+int32_t M2MSystem_getThreadID ()
+	{
+	return syscall(SYS_gettid);
+	}
 
 
 /**
  *
+ * @param[in,out] buffer
+ * @param[in] bufferLength
+ * @return
  */
-#ifndef M2MCharacterEncoding_SJIS
-#define M2MCharacterEncoding_SJIS (unsigned char *)"SHIFT_JIS"
-#endif /* M2MCharacterEncoding_SJIS */
+unsigned char *M2MSystem_getThreadIDString (unsigned char *buffer, const size_t bufferLength)
+	{
+	//===== Check argument =====
+	if (buffer!=NULL && bufferLength>0)
+		{
+		//===== Initialize array =====
+		memset(buffer, 0, bufferLength);
+		//===== Convert from long to string =====
+		if (snprintf(buffer, bufferLength-1, "%d", M2MSystem_getThreadID())>=0
+				&& this_getStringlength(buffer)>0)
+			{
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
+		}
+	}
 
 
 /**
+ * Print out a line to the "standard" output stream.<br>
  *
+ * @param[in] data	Output data
  */
-#ifndef M2MCharacterEncoding_CP932
-#define M2MCharacterEncoding_CP932 (unsigned char *)"CP932"
-#endif /* M2MCharacterEncoding_CP932 */
+void M2MSystem_println (const unsigned char *data)
+	{
+	//===== Check argument =====
+	if (data!=NULL && this_getStringlength(data)>0)
+		{
+		//===== Print out message =====
+		fprintf(stderr, "%s\n", data);
+		}
+	//===== Argument error =====
+	else
+		{
+		}
+	return;
+	}
 
 
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-
-
-#endif /* M2M_LANG_CHARACTERENCODING_H_ */
+/* End Of File */

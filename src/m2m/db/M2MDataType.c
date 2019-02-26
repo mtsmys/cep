@@ -41,9 +41,6 @@
  */
 M2MString *M2MDataType_toString (const M2MDataType self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataType_toString()";
-
 	if (self==M2MDataType_BLOB)
 		{
 		return (M2MString *)"BLOB";
@@ -95,7 +92,6 @@ M2MString *M2MDataType_toString (const M2MDataType self)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataType\" value isn't defined", NULL);
 		return NULL;
 		}
 	}

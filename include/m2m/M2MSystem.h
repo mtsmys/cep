@@ -1,7 +1,5 @@
 /*******************************************************************************
- * M2MMemory.h
- *
- * Copyright © 2005-2013 Rich Felker
+ * M2MSystem.h
  *
  * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
@@ -31,9 +29,16 @@
 
 #pragma once
 
-#ifndef M2M_IO_M2MMEMORY_H_
-#define M2M_IO_M2MMEMORY_H_
+#ifndef M2M_M2MSYSTEM_H_
+#define M2M_M2MSYSTEM_H_
 
+
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 
 #ifdef __cplusplus
@@ -43,21 +48,51 @@ extern "C"
 
 
 
-#include <string.h>
-#include <stdint.h>
+/*******************************************************************************
+ * Definition
+ ******************************************************************************/
+/**
+ * This is a character encoding capable of encoding all possible characters in Unicode.
+ */
+#ifndef M2MSystem_UTF8
+#define M2MSystem_UTF8 (unsigned char *)"UTF-8"
+#endif /* M2MSystem_UTF8 */
+
+
+
+#ifndef M2MSystem_DIRECTORY
+#define M2MSystem_DIRECTORY (unsigned char *)".m2m"
+#endif /* M2MSystem_DIRECTORY */
+
 
 
 
 /*******************************************************************************
- * Public method
+ * Public function
  ******************************************************************************/
 /**
  *
- * @param dest
- * @param c
- * @param n
+ * @return
  */
-void *M2MMemory_set (void *dest, int c, size_t n);
+int32_t M2MSystem_getThreadID ();
+
+
+/**
+ *
+ * @param[in,out] buffer
+ * @param[in] bufferLength
+ * @return
+ */
+unsigned char *M2MSystem_getThreadIDString (unsigned char *buffer, const size_t bufferLength);
+
+
+/**
+ * Print out a line to the "standard" output stream.<br>
+ *
+ * @param[in] data	Output data
+ */
+void M2MSystem_println (const unsigned char *data);
+
 
 
 
@@ -67,4 +102,4 @@ void *M2MMemory_set (void *dest, int c, size_t n);
 
 
 
-#endif /* M2M_IO_M2MMEMORY_H_ */
+#endif /* M2M_M2MSYSTEM_H_ */

@@ -41,13 +41,14 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
+#include "m2m/io/M2MHeap.h"
 #include <sys/time.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+
 
 
 /*******************************************************************************
@@ -71,7 +72,7 @@ uint32_t M2MDate_getCurrentTimeMillis ();
  * @param[in] bufferLength	memory buffer length(max size)
  * @return					length of local time string or 0 (in case of error)
  */
-size_t M2MDate_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+size_t M2MDate_getLocalTimeString (unsigned char *buffer, const size_t bufferLength);
 
 
 

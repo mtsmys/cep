@@ -59,12 +59,6 @@ static M2MLogger *this_getSuper (const M2MFileAppender *self);
 
 
 /**
- * This method initializes "errno".<br>
- */
-static void this_initErrorNumber ();
-
-
-/**
  * This method translates max file size string to number.<br>
  *
  * @param[in] maxFileSizeString	max file size string
@@ -100,124 +94,6 @@ static int this_compareForQuickSort (const void *a, const void *b)
 
 
 /**
- * This method creates new log message string.<br>
- *
- * @param[in] level			log leve
- * @param[in] methodName	method name string
- * @param[in] lineNumber	the line for registering
- * @param[in] message		debug information string
- * @param[out] log			pointer for copying created log message
- * @return					created log message or NULL(means error)
- */
-static unsigned char *this_createLogMessage (const M2MLogLevel level, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message, M2MString **log)
-	{
-	//========== Variable ==========
-	M2MString *logLevel = NULL;
-	size_t logLevelLength = 0;
-	size_t methodNameLength = 0;
-	M2MString LINE_NUMBER[64];
-	size_t lineNumberLength = 0;
-	size_t messageLength = 0;
-	size_t logLength = 0;
-	M2MString TIME[128];
-	size_t timeLength = 0;
-	M2MString ERROR_MESSAGE[256];
-	size_t errorMessageLength = 0;
-
-	//===== Check argument =====
-	if ((logLevel=M2MLogLevel_toString(level))!=NULL && (logLevelLength=M2MString_length(logLevel))>0
-			&& methodName!=NULL && (methodNameLength=M2MString_length(methodName))>0
-			&& message!=NULL && (messageLength=M2MString_length(message))>0
-			&& log!=NULL)
-		{
-		//===== Initialize buffer =====
-		memset(TIME, 0, sizeof(TIME));
-		memset(ERROR_MESSAGE, 0, sizeof(ERROR_MESSAGE));
-		memset(LINE_NUMBER, 0, sizeof(LINE_NUMBER));
-		//===== Convert from double to string =====
-		if (M2MDate_getLocalTimeString(TIME, sizeof(TIME))>0
-				&& (timeLength=M2MString_length(TIME))>0
-				&& M2MString_format(LINE_NUMBER, sizeof(LINE_NUMBER)-1, "%d", lineNumber)>=0
-				&& (lineNumberLength=M2MString_length(LINE_NUMBER))>0)
-			{
-			//===== Check existence of system error message =====
-			if (errno!=0
-					&& strerror_r(errno, ERROR_MESSAGE, sizeof(ERROR_MESSAGE))==0
-					&& (errorMessageLength=M2MString_length(ERROR_MESSAGE))>0)
-				{
-				//===== Allocate new memory =====
-				if ((logLength=logLevelLength+timeLength+methodNameLength+lineNumberLength+messageLength+errorMessageLength+12)>0
-						&& ((*log)=(M2MString *)M2MHeap_malloc(logLength+1))!=NULL)
-					{
-					M2MString_format((*log), logLength, (M2MString *)"[%s]%s %s:%s[l]: %s: %s", logLevel, TIME, methodName, LINE_NUMBER, message, ERROR_MESSAGE);
-					//===== Initialize error number =====
-					this_initErrorNumber();
-					return (*log);
-					}
-				//===== Error handling =====
-				else
-					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Failed to allocate new memory for copying log message string");
-					//===== Initialize error number =====
-					this_initErrorNumber();
-					return NULL;
-					}
-				}
-			//===== In the case of not existing error number and message =====
-			else
-				{
-				//===== Allocate new memory =====
-				if ((logLength=logLevelLength+timeLength+methodNameLength+lineNumberLength+messageLength+errorMessageLength+10)>0
-						&& ((*log)=(M2MString *)M2MHeap_malloc(logLength+1))!=NULL)
-					{
-					M2MString_format((*log), logLength, (M2MString *)"[%s]%s %s:%s[l]: %s", logLevel, TIME, methodName, LINE_NUMBER, message);
-					return (*log);
-					}
-				//===== Error handling =====
-				else
-					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Failed to allocate new memory for copying log message string");
-					return NULL;
-					}
-				}
-			}
-		//===== Error handling =====
-		else if (timeLength<=0)
-			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Failed to get current time from local calendar");
-			return NULL;
-			}
-		else
-			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Failed to convert line number into string");
-			return NULL;
-			}
-		}
-	//===== Argument error =====
-	else if (logLevel==NULL || logLevelLength<=0)
-		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Argument \"level\" is invalid");
-		return NULL;
-		}
-	else if (methodName==NULL || methodNameLength<=0)
-		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Argument \"methodName\" is NULL or vacant");
-		return NULL;
-		}
-	else if (message==NULL || messageLength<=0)
-		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Argument \"message\" is NULL or vacant");
-		return NULL;
-		}
-	else
-		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_createLogMessage()", __LINE__, (M2MString *)"Argument \"log\" is NULL");
-		return NULL;
-		}
-	}
-
-
-/**
  *
  * @param self
  */
@@ -235,7 +111,6 @@ static void this_deleteEncoding (M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_deleteEncoding()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		}
 	return;
 	}
@@ -259,7 +134,6 @@ static void this_deleteLogFile (M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_deleteLogFile()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		}
 	return;
 	}
@@ -283,7 +157,6 @@ static void this_deleteLogFilePath (M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_deleteLogFilePath()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		}
 	return;
 	}
@@ -295,14 +168,18 @@ static void this_deleteLogFilePath (M2MFileAppender *self)
  */
 static bool this_getAppend (const M2MFileAppender *self)
 	{
+	//========== Variable ==========
+	const bool DEFAULT_APPEND_CONFIG = true;
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->append;
 		}
+	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getAppend()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
-		return false;
+		return DEFAULT_APPEND_CONFIG;
 		}
 	}
 
@@ -319,7 +196,6 @@ static unsigned char *this_getEncoding (const M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getEncoding()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	}
@@ -364,7 +240,6 @@ static M2MFile *this_getLogFile (M2MFileAppender *self)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFile()", __LINE__, (M2MString *)"Failed to open log file");
 					M2MFile_delete(&(self->logFile));
 					return NULL;
 					}
@@ -394,7 +269,6 @@ static M2MFile *this_getLogFile (M2MFileAppender *self)
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFile()", __LINE__, (M2MString *)"Failed to open log file");
 						M2MFile_delete(&(self->logFile));
 						return NULL;
 						}
@@ -411,7 +285,6 @@ static M2MFile *this_getLogFile (M2MFileAppender *self)
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFile()", __LINE__, (M2MString *)"Failed to open log file");
 						M2MFile_delete(&(self->logFile));
 						return NULL;
 						}
@@ -420,7 +293,6 @@ static M2MFile *this_getLogFile (M2MFileAppender *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFile()", __LINE__, (M2MString *)"Failed to create new \"File\" object(which isn't a file)");
 				return NULL;
 				}
 			}
@@ -428,7 +300,6 @@ static M2MFile *this_getLogFile (M2MFileAppender *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFile()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	}
@@ -450,7 +321,6 @@ static unsigned char *this_getLogFilePath (const M2MFileAppender *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getLogFilePath()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	}
@@ -528,19 +398,8 @@ static M2MLogger *this_getSuper (const M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_getSuper()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
-	}
-
-
-/**
- * This method initializes "errno".<br>
- */
-static void this_initErrorNumber ()
-	{
-	errno = 0;
-	return;
 	}
 
 
@@ -553,15 +412,8 @@ static void this_initErrorNumber ()
  */
 static bool this_isIncluding (const M2MString *one, const M2MString *another)
 	{
-	//========== Variable ==========
-	size_t oneLength = 0;
-	size_t anotherLength = 0;
-
 	//===== Check argument =====
-	if (one!=NULL && (oneLength=M2MString_length(one))>0
-			&& another!=NULL && (anotherLength=M2MString_length(another))>0
-			&& anotherLength<=oneLength
-			&& M2MString_compare(one, another, anotherLength)==0)
+	if (M2MString_compareTo(one, another)==0)
 		{
 		return true;
 		}
@@ -582,17 +434,15 @@ static bool this_needToEncoding (const M2MFileAppender *self)
 	{
 	//========== Variable ==========
 	M2MString *encoding = NULL;
-	size_t encodingLength = 0;
 
 	//===== Check argument =====
 	if (self!=NULL)
 		{
 		if ((encoding=this_getEncoding(self))!=NULL
-				&& (encodingLength=M2MString_length(encoding))>0
-				&& (M2MString_compare(M2MCharacterEncoding_UTF8, encoding, encodingLength)!=0
-						|| M2MString_compare((M2MString *)"UTF8", encoding, encodingLength)!=0
-						|| M2MString_compare((M2MString *)"utf-8", encoding, encodingLength)!=0
-						|| M2MString_compare((M2MString *)"utf8", encoding, encodingLength)!=0))
+				&& (M2MString_compareTo(M2MSystem_UTF8, encoding)!=0
+						|| M2MString_compareTo((M2MString *)"UTF8", encoding)!=0
+						|| M2MString_compareTo((M2MString *)"utf-8", encoding)!=0
+						|| M2MString_compareTo((M2MString *)"utf8", encoding)!=0))
 			{
 			return true;
 			}
@@ -613,7 +463,7 @@ static bool this_needToEncoding (const M2MFileAppender *self)
  * @param[in,out] self
  * @param[in] json
  * @return
- */
+ *
 static M2MFileAppender *this_parseJSON (M2MFileAppender *self, M2MJSON *json)
 	{
 	//========== Variable ==========
@@ -653,7 +503,7 @@ static M2MFileAppender *this_parseJSON (M2MFileAppender *self, M2MJSON *json)
 		return NULL;
 		}
 	}
-
+*/
 
 /**
  * @param[in] parentDirectoryPath
@@ -684,7 +534,6 @@ static void this_removeLogFile (const M2MString *parentDirectoryPath, const M2MS
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_removeLogFile()", __LINE__, (M2MString *)"Failed to create new \"File\" object for removing");
 				}
 			//===== Release allocated memory =====
 			M2MHeap_free(filePath);
@@ -692,17 +541,14 @@ static void this_removeLogFile (const M2MString *parentDirectoryPath, const M2MS
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_removeLogFile()", __LINE__, (M2MString *)"Failed to construct file pathname string for removing");
 			}
 		}
 	//===== Argument error =====
 	else if (parentDirectoryPath==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_removeLogFile()", __LINE__, (M2MString *)"Argument \"parentDirectoryPath\" is NULL");
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_removeLogFile()", __LINE__, (M2MString *)"Argument \"fileName\" is NULL");
 		}
 	return;
 	}
@@ -736,7 +582,6 @@ static void this_renameLogFile (const M2MString *parentDirectoryPath, const M2MS
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_renameLogFile()", __LINE__, (M2MString *)"Failed to rename \"File\" object");
 				}
 			//===== Release allocated memory =====
 			M2MHeap_free(oldFilePath);
@@ -744,21 +589,17 @@ static void this_renameLogFile (const M2MString *parentDirectoryPath, const M2MS
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_renameLogFile()", __LINE__, (M2MString *)"Failed to construct file pathname string for renaming");
 			}
 		}
 	//===== Argument error =====
 	else if (parentDirectoryPath==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_renameLogFile()", __LINE__, (M2MString *)"Argument \"parentDirectoryPath\" is NULL");
 		}
 	else if (oldFileName==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_renameLogFile()", __LINE__, (M2MString *)"Argument \"oldFileName\" is NULL");
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_renameLogFile()", __LINE__, (M2MString *)"Argument \"newFileName\" is NULL");
 		}
 	return;
 	}
@@ -853,12 +694,10 @@ static unsigned int this_translateMaxFileSize (const M2MString *maxFileSizeStrin
 	//===== Argument error =====
 	else if (maxFileSizeString==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_translateMaxFileSize()", __LINE__, (M2MString *)"Argument \"maxFileSizeString\" is NULL");
 		return MEGA;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_translateMaxFileSize()", __LINE__, (M2MString *)"Length of argument \"maxFileSizeString\" isn't positive");
 		return MEGA;
 		}
 	}
@@ -919,7 +758,7 @@ static void this_updateExistingLogFiles (M2MFileAppender *self)
 								numberOfArray++;
 								}
 							//===== In the case of existing only 1 backup file =====
-							else if (M2MString_compare(fileName, logFileName, logFileNameLength)==0)
+							else if (M2MString_compareTo(fileName, logFileName)==0)
 								{
 								//===== Get index number of backup file =====
 								backupIndexArray[numberOfArray] = 0;
@@ -929,7 +768,6 @@ static void this_updateExistingLogFiles (M2MFileAppender *self)
 							//===== In the case of failed to detect backup file =====
 							else
 								{
-								M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_updateExistingLogFiles()", __LINE__, (M2MString *)"Failed to detect backup file name");
 								}
 							}
 						//===== Error handling =====
@@ -951,7 +789,7 @@ static void this_updateExistingLogFiles (M2MFileAppender *self)
 							numberOfArray++;
 							}
 						//===== In the case of existing only 1 backup file =====
-						else if (M2MString_compare(fileName, logFileName, logFileNameLength)==0)
+						else if (M2MString_compareTo(fileName, logFileName)==0)
 							{
 							backupIndexArray[numberOfArray] = 0;
 							numberOfArray++;
@@ -959,7 +797,6 @@ static void this_updateExistingLogFiles (M2MFileAppender *self)
 						//===== In the case of failed to detect backup file =====
 						else
 							{
-							M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_updateExistingLogFiles()", __LINE__, (M2MString *)"Failed to detect backup file name");
 							}
 						}
 					//===== Error handling =====
@@ -1090,7 +927,7 @@ static void this_writeLog (M2MFileAppender *self, const M2MString *log)
 			//===== In the case of need encoding =====
 			if (this_needToEncoding(self)==true)
 				{
-				if (M2MString_convertCharacterSet(log, M2MCharacterEncoding_UTF8, this_getEncoding(self), &encodedMessage)!=NULL)
+				if (M2MString_convertCharacterSet(log, M2MSystem_UTF8, this_getEncoding(self), &encodedMessage)!=NULL)
 					{
 					//===== Write log message =====
 					if (M2MFile_write(logFile, encodedMessage, M2MString_length(encodedMessage))>0)
@@ -1144,51 +981,55 @@ static void this_writeLog (M2MFileAppender *self, const M2MString *log)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_writeLog()", __LINE__, (M2MString *)"Failed to open log file");
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_writeLog()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_writeLog()", __LINE__, (M2MString *)"Argument \"message\" is NULL or vacant");
 		}
 	return;
 	}
 
 
 /*******************************************************************************
- * Public method
+ * Public function
  ******************************************************************************/
 /**
  *
  * @param[in] self
- * @param[in] methodName
+ * @param[in] functionName
  * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_infoImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_infoImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_INFO)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_INFO, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_INFO)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_INFO, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
@@ -1200,28 +1041,38 @@ void M2MLogger_infoImpl (M2MFileAppender *self, const M2MString *methodName, con
 
 
 /**
+ *
  * @param[in] self
+ * @param[in] functionName
+ * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_debugImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_debugImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_DEBUG)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_DEBUG, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_DEBUG)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_DEBUG, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
@@ -1232,28 +1083,38 @@ void M2MLogger_debugImpl (M2MFileAppender *self, const M2MString *methodName, co
 
 
 /**
+ *
  * @param[in] self
+ * @param[in] functionName
+ * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_traceImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_traceImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_TRACE)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_TRACE, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_TRACE)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_TRACE, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
@@ -1264,28 +1125,38 @@ void M2MLogger_traceImpl (M2MFileAppender *self, const M2MString *methodName, co
 
 
 /**
+ *
  * @param[in] self
+ * @param[in] functionName
+ * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_warnImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_warnImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_WARN)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_WARN, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_WARN)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_WARN, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
@@ -1296,104 +1167,107 @@ void M2MLogger_warnImpl (M2MFileAppender *self, const M2MString *methodName, con
 
 
 /**
+ *
  * @param[in] self
+ * @param[in] functionName
+ * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_fatalImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_fatalImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_FATAL)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_FATAL, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_FATAL)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_FATAL, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
 	else
 		{
+		//===== Get log message =====
+		if (M2MLogger_createNewLogMessage(M2MLogLevel_FATAL, functionName, lineNumber, message, &log)!=NULL)
+			{
+			//===== Write log =====
+			M2MSystem_println(log);
+			M2MHeap_free(log);
+			}
+		//===== Error handling =====
+		else
+			{
+			}
 		}
 	}
 
 
 /**
+ *
  * @param[in] self
+ * @param[in] functionName
+ * @param[in] lineNumber
  * @param[in] message
  */
-void M2MLogger_errorImpl (M2MFileAppender *self, const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+void M2MLogger_errorImpl (M2MFileAppender *self, const M2MString *functionName, const unsigned int lineNumber, const M2MString *message)
 	{
 	//========== Variable ==========
 	M2MString *log = NULL;
 
 	//===== Check argument =====
-	if (self!=NULL && this_getLogLevel(self)<=M2MLogLevel_ERROR)
+	if (self!=NULL)
 		{
-		//===== Get log message =====
-		if (this_createLogMessage(M2MLogLevel_ERROR, methodName, lineNumber, message, &log)!=NULL)
+		//=====  =====
+		if (this_getLogLevel(self)<=M2MLogLevel_ERROR)
 			{
-			//===== Write log =====
-			this_writeLog(self, log);
-			M2MHeap_free(log);
+			//===== Get log message =====
+			if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &log)!=NULL)
+				{
+				//===== Write log =====
+				this_writeLog(self, log);
+				M2MHeap_free(log);
+				}
+			//===== Error handling =====
+			else
+				{
+				}
 			}
-		//===== Error handling =====
+		//=====  =====
 		else
 			{
-			this_writeLog(self, message);
 			}
 		}
 	//===== Don't need to write =====
 	else
 		{
-		}
-	}
-
-
-/**
- * @return	new logger object(caller must release this memory with "M2MHeap_free()") or NULL(means error)
- */
-M2MFileAppender *M2MFileAppender_createNewFileAppender ()
-	{
-	//========== Variable ==========
-	M2MFileAppender *self = NULL;
-
-	//===== Allocate new memory from fileAppender =====
-	if ((self=(M2MFileAppender *)M2MHeap_malloc(sizeof(M2MFileAppender)))!=NULL)
-		{
-		//===== Allocate new memory from super object =====
-		if ((self->super=M2MLogger_new())!=NULL
-				&& M2MFileAppender_setAppend(self, false)!=NULL
-				&& M2MFileAppender_setEncoding(self, M2MCharacterEncoding_UTF8)!=NULL
-				&& M2MFileAppender_setMaxFileSize(self, 0)!=NULL
-				&& M2MFileAppender_setMaxBackupIndex(self, 0)!=NULL)
+		//===== Get log message =====
+		if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &log)!=NULL)
 			{
-			self->logFile = NULL;
-			self->logFilePath = NULL;
-			return self;
+			//===== Write log =====
+			M2MSystem_println(log);
+			M2MHeap_free(log);
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_createNewM2MFileAppender()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"Logger\" structure object");
-			M2MFileAppender_delete(&self);
-			return NULL;
 			}
-		}
-	//===== Error handling =====
-	else
-		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_createNewM2MFileAppender()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" structure object");
-		return NULL;
 		}
 	}
 
@@ -1427,6 +1301,49 @@ void M2MFileAppender_delete (M2MFileAppender **self)
 
 
 /**
+ * Create new default log file pathname string and copy it into the argument buffer.<br>
+ *
+ * @param[out] buffer		Buffer for copying default log file pathname string
+ * @param[in] bufferLength	Length of prepared buffer
+ * @return					The pointer of buffer copied log file pathname string or NULL (in case of error)
+ */
+M2MString *M2MFileAppender_getDefaultLogFilePath (M2MString *buffer, const size_t bufferLength)
+	{
+	const M2MString *HOME_DIRECTORY = M2MDirectory_getHomeDirectoryPath();
+	const M2MString *LOG_DIRECTORY = (M2MString *)"log";
+	const size_t HOME_DIRECTORY_LENGTH = M2MString_length(HOME_DIRECTORY);
+	const size_t SYSTEM_DIRECTORY_LENGTH = M2MString_length(M2MSystem_DIRECTORY);
+	const size_t LOG_DIRECTORY_LENGTH = M2MString_length(LOG_DIRECTORY);
+	const size_t LOGGER_LENGTH = M2MString_length(M2MLogger_DEFAULT_LOGGER_NAME);
+	const size_t LOG_FILE_EXTENSION_LENGTH = M2MString_length(M2MLogger_LOG_FILE_EXTENTION);
+	const size_t SEPARATOR_LENGTH = M2MString_length(M2MString_SLASH);
+
+	//===== Check argument =====
+	if (buffer!=NULL
+			&& (HOME_DIRECTORY_LENGTH+SEPARATOR_LENGTH+SYSTEM_DIRECTORY_LENGTH+SEPARATOR_LENGTH+LOG_DIRECTORY_LENGTH+SEPARATOR_LENGTH+LOGGER_LENGTH+LOG_FILE_EXTENSION_LENGTH)<bufferLength)
+		{
+		//===== Initialize buffer =====
+		memset(buffer, 0, bufferLength);
+		//===== Copy pathname into buffer =====
+		if (snprintf(&(buffer[0]), bufferLength-1, "%s%s%s%s%s%s%s%s", HOME_DIRECTORY, M2MString_SLASH, M2MSystem_DIRECTORY, M2MString_SLASH, LOG_DIRECTORY, M2MString_SLASH, M2MLogger_DEFAULT_LOGGER_NAME, M2MLogger_LOG_FILE_EXTENTION)>0)
+			{
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
+		}
+	}
+
+
+/**
  * This method copies log file pathname string into indicated buffer.<br>
  * The pathname independent with backbeat library, so if caller won't<br>
  * use the pathname, it isn't suitable for calling this method.<br>
@@ -1451,12 +1368,10 @@ M2MString *M2MFileAppender_getLogFilePath (const M2MString *loggerName, M2MStrin
 	//===== Argument error =====
 	else if (loggerName==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_getLogFilePath()", __LINE__, (M2MString *)"Argument \"loggerName\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_getLogFilePath()", __LINE__, (M2MString *)"Argument \"bufferLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -1474,7 +1389,6 @@ M2MLogLevel M2MFileAppender_getLogLevel (const M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_getLogLevel()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return M2MLogLevel_INFO;
 		}
 	}
@@ -1492,7 +1406,43 @@ M2MString *M2MFileAppender_getLoggerName (const M2MFileAppender *self)
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_getLoggerName()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * @return	new logger object(caller must release this memory with "M2MHeap_free()") or NULL(means error)
+ */
+M2MFileAppender *M2MFileAppender_new ()
+	{
+	//========== Variable ==========
+	M2MFileAppender *self = NULL;
+
+	//===== Allocate new memory from fileAppender =====
+	if ((self=(M2MFileAppender *)M2MHeap_malloc(sizeof(M2MFileAppender)))!=NULL)
+		{
+		//===== Allocate new memory from super object =====
+		if ((self->super=M2MLogger_new())!=NULL
+				&& M2MFileAppender_setAppend(self, true)!=NULL
+				&& M2MFileAppender_setEncoding(self, M2MSystem_UTF8)!=NULL
+				&& M2MFileAppender_setMaxFileSize(self, 0)!=NULL
+				&& M2MFileAppender_setMaxBackupIndex(self, 0)!=NULL)
+			{
+			self->logFile = NULL;
+			self->logFilePath = NULL;
+			return self;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MFileAppender_delete(&self);
+			return NULL;
+			}
+		}
+	//===== Error handling =====
+	else
+		{
 		return NULL;
 		}
 	}
@@ -1501,7 +1451,7 @@ M2MString *M2MFileAppender_getLoggerName (const M2MFileAppender *self)
 /**
  * @param[in] jsonFilePath	configuration file path
  * @return					logging object or NULL(error happened)
- */
+ *
 M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 	{
 	//========== Variable ==========
@@ -1554,14 +1504,14 @@ M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 		return NULL;
 		}
 	}
-
+*/
 
 /**
  * This method parses JSON format string for constructing FileAppendar object.<br>
  *
  * @param[in] jsonString	JSON format configuration string
  * @return					new created logging object or NULL(means error)
- */
+ *
 M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 	{
 	//========== Variable ==========
@@ -1614,7 +1564,7 @@ M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 		return NULL;
 		}
 	}
-
+*/
 
 /**
  * @param[in] appender
@@ -1631,7 +1581,6 @@ M2MFileAppender *M2MFileAppender_setAppend (M2MFileAppender *self, const bool fl
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setAppend()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	}
@@ -1661,24 +1610,20 @@ M2MString *M2MFileAppender_setEncoding (M2MFileAppender *self, const M2MString *
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setEncoding()", __LINE__, (M2MString *)"Failed to allocate new memory for copying encoding character set string");
 			return NULL;
 			}
 		}
 	//===== Error handling =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setEncoding()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	else if (encoding==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setEncoding()", __LINE__, (M2MString *)"Argument \"encoding\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setEncoding()", __LINE__, (M2MString *)"Length of argument \"encoding\" isn't positive");
 		return NULL;
 		}
 	}
@@ -1714,17 +1659,14 @@ unsigned char *M2MFileAppender_setLogFilePath (M2MFileAppender *self, const M2MS
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setLogFilePath()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	else if (logFilePath==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setLogFilePath()", __LINE__, (M2MString *)"Argument \"logFilePath\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setLogFilePath()", __LINE__, (M2MString *)"Length of argument \"logFilePath\" isn't positive");
 		return NULL;
 		}
 	}
@@ -1747,14 +1689,12 @@ M2MFileAppender *M2MFileAppender_setLogLevel (M2MFileAppender *self, const M2MLo
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setLevel()", __LINE__, (M2MString *)"Failed to set log level into \"Logger\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setLevel()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	}
@@ -1774,19 +1714,26 @@ unsigned char *M2MFileAppender_setLoggerName (const M2MFileAppender *self, const
  * @param[in] self
  * @param[in] maxBackupIndex
  */
-M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const unsigned int maxBackupIndex)
+M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const uint32_t maxBackupIndex)
 	{
+	//========== Variable ==========
+	const uint32_t DEFAULT_MAX_BUCKUP_INDEX = 3;
+
 	//===== Check argument =====
-	if (self!=NULL)
+	if (self!=NULL && maxBackupIndex>0)
 		{
 		self->maxBackupIndex = maxBackupIndex;
 		return self;
 		}
 	//===== Error handling =====
+	else if (self==NULL)
+		{
+		return NULL;
+		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setMaxBackupIndex()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
-		return NULL;
+		self->maxBackupIndex = DEFAULT_MAX_BUCKUP_INDEX;
+		return self;
 		}
 	}
 
@@ -1795,10 +1742,10 @@ M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const
  * @param[in] self
  * @param[in] maxFileSize
  */
-M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, unsigned int maxFileSize)
+M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, uint32_t maxFileSize)
 	{
 	//========== Variable ==========
-	const unsigned int DEFAULT_MAX_FILE_SIZE = 1048576;
+	const uint32_t DEFAULT_MAX_FILE_SIZE = 1048576;
 
 	//===== Check argument =====
 	if (self!=NULL && maxFileSize>0)
@@ -1809,7 +1756,6 @@ M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, unsigned
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_setMaxFileSize()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	else

@@ -248,9 +248,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 	//========== Variable ==========
 	int excess = 0;
 	M2MString *sql = NULL;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
 	const unsigned int MAX_RECORD = this_getMaxRecord(self);
 	const M2MDataFrame *RECORD = M2MDataFrame_begin(this_getDataFrame(self));
 	const M2MList *OLD_RECORD_LIST = M2MList_begin(M2MDataFrame_getOldRecordList(RECORD));
@@ -269,11 +267,9 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 			//===== When the number of records exceeds the upper limit =====
 			if ((excess=OLD_RECORD_LIST_LENGTH-MAX_RECORD)>0)
 				{
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The number of records in the \"%s\" table of the SQLite 3 database in memory exceeds the upper limit by \"%d\"", tableName, excess);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, MESSAGE);
 				//===== Get SQLite 3 database on memory =====
 				if ((sql=(M2MString *)M2MHeap_malloc(DELETE_SQL_LENGTH+1))!=NULL)
 					{
@@ -282,11 +278,9 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 					//===== Execute DELETE statement =====
 					if (M2MSQLRunner_executeUpdate(M2MCEP_getMemoryDatabase(self), sql)==true)
 						{
-#ifdef DEBUG
 						memset(MESSAGE, 0, sizeof(MESSAGE));
-						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Deleted \"%d\" of records in \"%s\" table of SQLite3 database in memory", tableName, excess);
-						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
+						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Deleted \"%s\" of records in \"%d\" table of SQLite3 database in memory", tableName, excess);
+						M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, MESSAGE);
 						//===== Release heap memory area of SQL string =====
 						M2MHeap_free(sql);
 						return;
@@ -294,7 +288,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to delete excess records of SQLite 3 database in memory", NULL);
+						M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to delete excess records of SQLite 3 database in memory");
 						//===== Release heap memory area of SQL string =====
 						M2MHeap_free(sql);
 						return;
@@ -303,52 +297,50 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for creating the DELETE statement for deleting the excess record", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for creating the DELETE statement for deleting the excess record");
 					return;
 					}
 				}
 			//===== When the number of records is within the upper limit value =====
 			else
 				{
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The current number of records in the \"%s\" table of the SQLite 3 database in memory is \"%u\"", tableName, OLD_RECORD_LIST_LENGTH);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			}
 		//===== Error handling =====
 		else if (MAX_RECORD<=0)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The upper limit value of the number of records in the SQLite 3 database on the memory set by the CEP execution object specified by the argument is 0", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The upper limit value of the number of records in the SQLite 3 database on the memory set by the CEP execution object specified by the argument is 0");
 			return;
 			}
 		else if (OLD_RECORD_LIST==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The past record information object possessed by the CEP execution object specified by the argument is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The past record information object possessed by the CEP execution object specified by the argument is NULL");
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The number of past record information objects possessed by the CEP execution object specified by the argument is 0", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The number of past record information objects possessed by the CEP execution object specified by the argument is 0");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CEP execution object specified by argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CEP execution object specified by argument is NULL");
 		return;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The number of character strings in the character string indicating the table name specified by the argument is 0", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! The number of character strings in the character string indicating the table name specified by the argument is 0");
 		return;
 		}
 	}
@@ -377,25 +369,17 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 			//===== Vacuum processing is performed, when the number of records of regulations is reached =====
 			if (vacuumRecord<this_getRecordCounter(self))
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database in memory");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database in memory");
 				//===== Vacuum the SQLite 3 database on memory =====
 				M2MSQLiteConfig_vacuum(M2MCEP_getMemoryDatabase(self));
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database in memory");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database in memory");
 				//===== In the case of record persistence =====
 				if (this_getPersistence(self)==true)
 					{
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database file");
-#endif // DEBUG
+					M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Start to vacuum processing on the SQLite3 database file");
 					//===== Vacuum the SQLite3 database on the file =====
 					M2MSQLiteConfig_vacuum(M2MCEP_getFileDatabase(self));
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database file");
-#endif // DEBUG
+					M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing was executed on the SQLite3 database file");
 					}
 				//===== In case of record non-persistence =====
 				else
@@ -421,7 +405,7 @@ static void this_checkRecordCounterForVacuum (M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return;
 		}
 	}
@@ -442,14 +426,12 @@ static void this_closeFileDatabase (M2MCEP *self)
 	if (self!=NULL)
 		{
 		M2MSQLiteConfig_closeDatabase(M2MCEP_getFileDatabase(self));
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 file database");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 file database");
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL");
 		}
 	return;
 	}
@@ -470,14 +452,12 @@ static void this_closeMemoryDatabase (M2MCEP *self)
 	if (self!=NULL)
 		{
 		M2MSQLiteConfig_closeDatabase(M2MCEP_getMemoryDatabase(self));
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 memory database");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Closed SQLite3 memory database");
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL");
 		}
 	return;
 	}
@@ -498,9 +478,6 @@ static M2MString *this_createInsertSQL (const M2MString *tableName, const M2MStr
 	unsigned int i = 0;
 	unsigned int index = 0;
 	size_t sqlLength = 0;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
 	const M2MString *INSERT_SQL = (M2MString *)"INSERT INTO %s (%s) VALUES (%s) ";
 	const size_t QUESTION_MARK_LENGTH = M2MString_length((M2MString *)M2MString_QUESTION_MARK);
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
@@ -541,18 +518,13 @@ static M2MString *this_createInsertSQL (const M2MString *tableName, const M2MStr
 			//===== Create a new INSERT statement =====
 			if (snprintf((*sql), sqlLength, INSERT_SQL, tableName, columnNameCSV, PARAMETER)>0)
 				{
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Created new INSERT statement (=\"%s\")", (*sql));
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 				//===== Return INSERT string =====
 				return (*sql);
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new INSERT statement", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new INSERT statement");
 				//===== When the heap memory area of the INSERT statement still remains =====
 				if ((*sql)!=NULL)
 					{
@@ -570,29 +542,29 @@ static M2MString *this_createInsertSQL (const M2MString *tableName, const M2MStr
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory area to create new INSERT statement", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory area to create new INSERT statement");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL");
 		return NULL;
 		}
 	else if (columnNameCSV==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CSV format string indicating the column name specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CSV format string indicating the column name specified by the argument is NULL");
 		return NULL;
 		}
 	else if (columnListLength<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! An integer indicating the number of columns specified by the argument is 0 or less", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! An integer indicating the number of columns specified by the argument is 0 or less");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The pointer to copy the INSERT statement specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The pointer to copy the INSERT statement specified by the argument is NULL");
 		return NULL;
 		}
 	}
@@ -612,20 +584,42 @@ static void this_deleteDatabaseName (M2MCEP *self)
 	if (self!=NULL && M2MCEP_getDatabaseName(self)!=NULL)
 		{
 		M2MHeap_free(self->databaseName);
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Deleted string indicating SQLite3 database file name");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Deleted string indicating SQLite3 database file name");
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		}
 	else
 		{
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3 database file name hasn't been set yet");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"SQLite3 database file name hasn't been set yet");
+		}
+	return;
+	}
+
+
+/**
+ * Releases the heap memory area of the logging object held by the argument CEP.<br>
+ *
+ * @param[in,out] self	CEP structure object
+ */
+static void this_deleteLogger (M2MCEP *self)
+	{
+	//========== Variable ==========
+	M2MFileAppender *logger = NULL;
+
+	//===== Check argument =====
+	if (self!=NULL && (logger=M2MCEP_getLogger(self))!=NULL)
+		{
+		M2MFileAppender_delete(&logger);
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		}
+	else
+		{
 		}
 	return;
 	}
@@ -653,7 +647,7 @@ static void this_deleteTableManager (M2MCEP *self)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		}
 	else
 		{
@@ -687,9 +681,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 			if ((persistence=this_getPersistence(self))==true
 					&& (fileDatabase=M2MCEP_getFileDatabase(self))!=NULL)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Initiates transaction processing to bulk insert record information into SQLite database on file");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Initiates transaction processing to bulk insert record information into SQLite database on file");
 				//===== Start Transaction =====
 				M2MSQLRunner_beginTransaction(fileDatabase);
 				//===== Repeat until record management object reaches the end =====
@@ -704,9 +696,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 				this_insertRecordList(fileDatabase, dataFrame, tableManager, M2MDataFrame_getOldRecordList(dataFrame));
 				//===== End Transaction =====
 				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finished transaction processing to bulk insert records not inserted into SQLite database on file");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Finished transaction processing to bulk insert records not inserted into SQLite database on file");
 				}
 			//===== In case of record non-persistence =====
 			else
@@ -718,19 +708,19 @@ static void this_flushCEPRecord (M2MCEP *self)
 		//===== Error handling =====
 		else if (tableManager==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table construction object obtained from the CEP execution object specified by the argument is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The table construction object obtained from the CEP execution object specified by the argument is NULL");
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record management object obtained from the CEP execution object specified by the argument is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The record management object obtained from the CEP execution object specified by the argument is NULL");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return;
 		}
 	}
@@ -755,7 +745,7 @@ static M2MDataFrame *this_getDataFrame (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -772,9 +762,6 @@ static M2MDataFrame *this_getDataFrame (const M2MCEP *self)
 static M2MString *this_getDatabaseDirectoryPath (M2MString **directoryPath)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
-	M2MString MESSAGE[512];
-#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseDirectoryPath()";
 
 	//===== Check argument =====
@@ -785,25 +772,20 @@ static M2MString *this_getDatabaseDirectoryPath (M2MString **directoryPath)
 				&& M2MString_append(directoryPath, M2MDirectory_SEPARATOR)!=NULL
 				&& M2MString_append(directoryPath, M2MCEP_DIRECTORY)!=NULL)
 			{
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Get string indicating SQLite3 working directory pathname(=\"%s\")", (*directoryPath));
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 			return (*directoryPath);
 			}
 		//===== Error handling =====
 		else
 			{
 			M2MHeap_free((*directoryPath))
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to copy the string indicating the home directory path", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to copy the string indicating the home directory path");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"directoryPath\" pointer is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"directoryPath\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -821,9 +803,6 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 	{
 	//========== Variable ==========
 	M2MString *directoryPath = NULL;
-#ifdef DEBUG
-	M2MString MESSAGE[512];
-#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_getDatabaseFilePath()";
 
 	//===== Check argument =====
@@ -839,11 +818,6 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 			{
 			//===== Release heap memory of directory path string =====
 			M2MHeap_free(directoryPath);
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Get string indicating SQLite3 database file pathname(=\"%s\")", (*databaseFilePath));
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 			//=====  =====
 			return (*databaseFilePath);
 			}
@@ -865,12 +839,12 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
 	//===== Argument error =====
 	else if (databaseName==NULL || M2MString_length(databaseName)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseFilePath\" is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseFilePath\" is NULL");
 		return NULL;
 		}
 	}
@@ -995,7 +969,7 @@ static unsigned int this_getMaxRecord (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return DEFAULT_MAX_RECORD;
 		}
 	}
@@ -1021,7 +995,7 @@ static bool this_getPersistence (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return PERSISTENCE;
 		}
 	}
@@ -1046,7 +1020,7 @@ static unsigned int this_getRecordCounter (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return 0;
 		}
 	}
@@ -1071,7 +1045,7 @@ static M2MTableManager *this_getTableManager (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -1096,7 +1070,7 @@ static unsigned int this_getVacuumRecord (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return 0;
 		}
 	}
@@ -1156,6 +1130,7 @@ static bool this_includesData (const M2MString *csv)
 static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2MTableManager *tableManager)
 	{
 	//========== Variable ==========
+	M2MFileAppender *logger = NULL;
 	const unsigned int MAX_RECORD = 50;
 	const bool PERSISTENCE = true;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_init()";
@@ -1170,7 +1145,10 @@ static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2M
 				&& M2MCEP_setMaxRecord(self, MAX_RECORD)!=NULL
 				&& this_setDataFrame(self, M2MDataFrame_new())!=NULL
 				&& this_setTableManager(self, tableManager)!=NULL
-				&& M2MCEP_setPersistence(self, PERSISTENCE)!=NULL)
+				&& M2MCEP_setPersistence(self, PERSISTENCE)!=NULL
+				&& (logger=M2MFileAppender_new())!=NULL
+				&& M2MCEP_setLogger(self, logger)!=NULL
+				)
 			{
 			return self;
 			}
@@ -1178,24 +1156,24 @@ static M2MCEP *this_init (M2MCEP *self, const M2MString *databaseName, const M2M
 		else
 			{
 			M2MCEP_delete(&self);
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize \"M2MCEP\" object", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize \"M2MCEP\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else if (databaseName==NULL || M2MString_length(databaseName)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -1227,9 +1205,6 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 	int resultCode = 0;
 	int rest = 0;
 	unsigned int i = 0;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_insertOldRecordList()";
 
@@ -1252,36 +1227,31 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 						&& this_createInsertSQL(tableName, columnNameCSV, M2MColumnList_length(columnList), &insertSQL)!=NULL
 						&& (statement=M2MSQLiteConfig_getPreparedStatement(fileDatabase, insertSQL))!=NULL)
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"\"%s\" Start SQLite3 database insert processing on table oriented file", tableName);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 					}
 				//===== Error handling =====
 				else if (columnNameCSV==NULL)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The CSV format string indicating the column name obtained from the table record management object is NULL", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The CSV format string indicating the column name obtained from the table record management object is NULL");
 					return;
 					}
 				else if (columnList==NULL)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The column structure object of the table obtained from the table building object is NULL", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The column structure object of the table obtained from the table building object is NULL");
 					return;
 					}
 				else if (dataTypeArrayLength<=0)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Column data type array obtained from table building object is NULL", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Column data type array obtained from table building object is NULL");
 					return;
 					}
 				else if (insertSQL==NULL)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An attempt to create an INSERT statement to insert a record into the SQLite 3 database on the file failed", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"An attempt to create an INSERT statement to insert a record into the SQLite 3 database on the file failed");
 					return;
 					}
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase), NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase));
 					return;
 					}
 				}
@@ -1326,14 +1296,11 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 							//===== When INSERT succeeds =====
 							if (resultCode==SQLITE_DONE)
 								{
-#ifdef DEBUG
-								M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Record inserted into SQLite3 database on file");
-#endif // DEBUG
 								}
 							//===== Error handling =====
 							else
 								{
-								M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, sqlite3_errmsg(fileDatabase), NULL);
+								M2MLogger_error(METHOD_NAME, __LINE__, sqlite3_errmsg(fileDatabase), NULL);
 								}
 							}
 						//===== Reset parameters of INSERT statement =====
@@ -1342,7 +1309,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 					//===== Error creating INSERT statement =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting record into SQLite 3 database on file", NULL);
+						M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting record into SQLite 3 database on file");
 						}
 					}
 				//===== When not to perpetuate =====
@@ -1363,7 +1330,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase), NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase));
 					}
 				}
 			//===== When not to perpetuate =====
@@ -1375,43 +1342,33 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 			tableRecord->oldRecordList = oldRecordList;
 			//===== Release heap memory area of INSERT statement =====
 			M2MHeap_free(insertSQL);
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"End processing of inserting records into \"%s\" table of SQLite3 database on file", tableName);
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 			return;
 			}
 		//===== When the number of records in which SQLite 3 database has been inserted in memory is within the specified maximum number of records =====
 		else
 			{
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Records are not deleted because the number of inserted records(=\"%u\") in the \"%s\" table on SQLite 3 database in memory is within the maximum value(=\"%u\").", oldRecordListLength, tableName, maxRecord);
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 			return;
 			}
 		}
 	//===== Error handling =====
 	else if (tableRecord==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record management object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The record management object specified by the argument is NULL");
 		return;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"String indicating table name obtained from table record management object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"String indicating table name obtained from table record management object is NULL");
 		return;
 		}
 	else if (oldRecordList==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Inserted record information object obtained from table record management object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Inserted record information object obtained from table record management object is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Number of non-inserted records acquired from table record management object is 0 or less", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Number of non-inserted records acquired from table record management object is 0 or less");
 		return;
 		}
 	}
@@ -1491,14 +1448,11 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 						//===== When INSERT succeeds =====
 						if (resultCode==SQLITE_DONE)
 							{
-#ifdef DEBUG
-							M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to insert record into SQLite3 database");
-#endif // DEBUG
 							}
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred in INSERT processing of SQLite3 database", NULL);
+							M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"An error occurred in INSERT processing of SQLite3 database");
 							}
 						}
 					//===== Reset parameters of INSERT statement =====
@@ -1509,7 +1463,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 				//===== Error creating INSERT statement =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting records into SQLite 3 database", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting records into SQLite 3 database");
 					}
 				//===== Proceed to next uninserted record =====
 				recordList = M2MList_next(recordList);
@@ -1540,14 +1494,11 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 				//===== When INSERT succeeds =====
 				if (resultCode==SQLITE_DONE)
 					{
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to insert record into SQLite3 database");
-#endif // DEBUG
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred in INSERT processing of SQLite3 database", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"An error occurred in INSERT processing of SQLite3 database");
 					}
 				//===== Reset parameters of INSERT statement =====
 				sqlite3_reset(statement);
@@ -1557,7 +1508,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 			//===== Error creating INSERT statement =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting records into SQLite 3 database", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed in preparing INSERT statement for inserting records into SQLite 3 database");
 				}
 			//===== Finalize SQL execution (releasing heap memory area) =====
 			if (sqlite3_finalize(statement)==SQLITE_OK)
@@ -1566,7 +1517,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database));
 				}
 			//===== Release heap memory area of INSERT statement =====
 			M2MHeap_free(insertSQL);
@@ -1576,49 +1527,49 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 		//===== Error handling =====
 		else if (tableName==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"String indicating table name obtained from record management object is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"String indicating table name obtained from record management object is NULL");
 			return -1;
 			}
 		else if (columnNameCSV==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The CSV format string indicating the column name obtained from the record management object is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The CSV format string indicating the column name obtained from the record management object is NULL");
 			return -1;
 			}
 		else if (columnList==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The column structure object of the table obtained from the table building object is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The column structure object of the table obtained from the table building object is NULL");
 			return -1;
 			}
 		else if (statement==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The prepared statement object obtained from the SQLite3 database management object specified by the argument is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The prepared statement object obtained from the SQLite3 database management object specified by the argument is NULL");
 			return -1;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Column data type array obtained from table building object is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Column data type array obtained from table building object is NULL");
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else if (database==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The SQLite3 database management object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The SQLite3 database management object specified by the argument is NULL");
 		return -1;
 		}
 	else if (tableManager==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL");
 		return -1;
 		}
 	else if (record==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record management object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The record management object specified by the argument is NULL");
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The uninserted record information object obtained from the record management object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The uninserted record information object obtained from the record management object is NULL");
 		return -1;
 		}
 	}
@@ -1653,9 +1604,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 			//===== In the case of record persistence =====
 			if ((persistence=this_getPersistence(self))==true)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start transaction processing to insert records into SQLite database on file");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Start transaction processing to insert records into SQLite database on file");
 				//===== Start Transaction =====
 				M2MSQLRunner_beginTransaction(M2MCEP_getFileDatabase(self));
 				}
@@ -1679,9 +1628,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 				{
 				//===== End transaction =====
 				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Transaction processing for inserting records into SQLite database on file has ended");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Transaction processing for inserting records into SQLite database on file has ended");
 				}
 			//===== In case of record non-persistence =====
 			else
@@ -1694,24 +1641,24 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 		//===== Error handling =====
 		else if (tableManager==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table building object obtained from argument \"CEP\" object is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The table building object obtained from argument \"CEP\" object is NULL");
 			return NULL;
 			}
 		else if (tableRecord==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Table record management object obtained from argument \"CEP\" object is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Table record management object obtained from argument \"CEP\" object is NULL");
 			return NULL;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The upper limit of the number of CEP records per table obtained from argument \"CEP\" object is less than or equal to 0", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The upper limit of the number of CEP records per table obtained from argument \"CEP\" object is less than or equal to 0");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -1742,9 +1689,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 				&& (tableManager=this_getTableManager(self))!=NULL
 				&& (record=M2MDataFrame_begin(this_getDataFrame(self)))!=NULL)
 			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Insert records into SQLite database in memory");
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Insert records into SQLite database in memory");
 			//===== Start Transaction =====
 			M2MSQLRunner_beginTransaction(memoryDatabase);
 			//===== Repeat until record management object reaches the end =====
@@ -1761,7 +1706,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite database in memory", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite database in memory");
 					}
 				//===== Proceed to the next record information object =====
 				record = M2MDataFrame_next(record);
@@ -1777,37 +1722,35 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite database in memory", NULL);
+				M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite database in memory");
 				}
 			//===== Commit =====
 			M2MSQLRunner_commitTransaction(memoryDatabase);
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finished inserting records into SQLite database in memory");
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Finished inserting records into SQLite database in memory");
 			//===== Returns the number of inserted records =====
 			return numberOfRecord;
 			}
 		//===== Error handling =====
 		else if (memoryDatabase==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The SQLite3 memory object obtained from the argument CEP object is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The SQLite3 memory object obtained from the argument CEP object is NULL");
 			return -1;
 			}
 		else if (tableManager==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table construction object obtained from the argument CEP object is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The table construction object obtained from the argument CEP object is NULL");
 			return -1;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record management object obtained from the argument CEP object is NULL", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The record management object obtained from the argument CEP object is NULL");
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return -1;
 		}
 	}
@@ -1828,9 +1771,6 @@ static sqlite3 *this_openFileDatabase (const M2MString *databaseName, const M2MT
 	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
 	M2MString *databaseFilePath = NULL;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_openFileDatabase()";
 
 	//===== Check argument =====
@@ -1842,48 +1782,31 @@ static sqlite3 *this_openFileDatabase (const M2MString *databaseName, const M2MT
 			//===== Open SQLite3 file database =====
 			if ((fileDatabase=M2MSQLiteConfig_openDatabase(databaseFilePath))!=NULL)
 				{
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Opened the SQLite database (=\"%s\") on the file", databaseFilePath);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 				//===== Release memory space of database file path string =====
 				M2MHeap_free(databaseFilePath);
 				//===== Set character code to UTF-8 =====
 				M2MSQLiteConfig_setUTF8(fileDatabase);
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"The character code of the SQLite database on the file has been set to UTF-8");
-#endif // DEBUG
 				//===== When automatic vacuum OFF =====
 				if (vacuumRecord>0)
 					{
 					M2MSQLiteConfig_setAutoVacuum(fileDatabase, false);
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Automatic vacuum function of SQLite database on memory is set to OFF");
-#endif // DEBUG
 					}
 				//===== When automatic vacuum ON =====
 				else
 					{
 					M2MSQLiteConfig_setAutoVacuum(fileDatabase, true);
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Automatic vacuum function of SQLite database on memory is set to ON");
-#endif // DEBUG
 					}
 				//===== Set synchronous mode =====
 				M2MSQLiteConfig_setSynchronous (fileDatabase, synchronous);
 				//===== Construct a table =====
 				M2MTableManager_createTable((M2MTableManager *)tableManager, fileDatabase);
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Built CEP table in SQLite database on file");
-#endif // DEBUG
 				//===== Return SQLite3 database object =====
 				return fileDatabase;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to open SQLite3 file database", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to open SQLite3 file database");
 				//===== Release memory space of database file path string =====
 				M2MHeap_free(databaseFilePath);
 				return NULL;
@@ -1892,19 +1815,19 @@ static sqlite3 *this_openFileDatabase (const M2MString *databaseName, const M2MT
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get string indicating the file path of the SQLite database", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to get string indicating the file path of the SQLite database");
 			return NULL;
 			}
 		}
 	//===== Error handling =====
 	else if (databaseName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The string indicating the SQLite database name on the file is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The string indicating the SQLite database name on the file is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL");
 		return NULL;
 		}
 	}
@@ -1929,46 +1852,31 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 	//===== Open SQLite3 memory database =====
 	if ((memoryDatabase=M2MSQLiteConfig_openDatabase(MEMORY_DATABASE))!=NULL)
 		{
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Opened the SQLite database in memory");
-#endif // DEBUG
 		//===== Set character code to UTF-8 =====
 		M2MSQLiteConfig_setUTF8(memoryDatabase);
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"The character code of the SQLite database in memory has been set to UTF-8");
-#endif // DEBUG
 		//===== When automatic vacuum OFF =====
 		if (vacuumRecord>0)
 			{
 			//===== Set the vacuum setting =====
 			M2MSQLiteConfig_setAutoVacuum(memoryDatabase, false);
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Automatic vacuum function of SQLite database on memory is set to OFF");
-#endif // DEBUG
 			}
 		//===== When automatic vacuum ON =====
 		else
 			{
 			//===== Set the vacuum setting =====
 			M2MSQLiteConfig_setAutoVacuum(memoryDatabase, true);
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Automatic vacuum function of SQLite database on memory is set to ON");
-#endif // DEBUG
 			}
 		//===== Set synchronous mode =====
 		M2MSQLiteConfig_setSynchronous (memoryDatabase, synchronous);
 		//===== Construct a table =====
 		M2MTableManager_createTable((M2MTableManager *)tableManager, memoryDatabase);
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Built CEP table in SQLite database on memory");
-#endif // DEBUG
 		//===== Return SQLite3 database object in memory =====
 		return memoryDatabase;
 		}
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to open SQLite database on memory", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to open SQLite database on memory");
 		return NULL;
 		}
 	}
@@ -1984,9 +1892,7 @@ static sqlite3 *this_openMemoryDatabase (const M2MTableManager *tableManager, co
 static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_setDatabaseName()";
 
 	//===== Check argument =====
@@ -2010,7 +1916,7 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
 				else
 					{
 					this_deleteDatabaseName(self);
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set the SQLite3 database name in the CEP structure object", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to set the SQLite3 database name in the CEP structure object");
 					return NULL;
 					}
 				}
@@ -2019,34 +1925,32 @@ static M2MCEP *this_setDatabaseName (M2MCEP *self, const M2MString *databaseName
 				{
 				// do nothing
 				}
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set the SQLite3 database file name (=\"%s\") in the CEP structure object", M2MCEP_getDatabaseName(self));
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, MESSAGE);
 			return self;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying SQLite3 database name", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying SQLite3 database name");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else if (databaseName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is vacant", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is vacant");
 		return NULL;
 		}
 	}
@@ -2068,20 +1972,18 @@ static M2MCEP *this_setDataFrame (M2MCEP *self, M2MDataFrame *dataFrame)
 	if (self!=NULL && dataFrame!=NULL)
 		{
 		self->dataFrame = dataFrame;
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set M2MDataFrame object into CEP object");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set M2MDataFrame object into CEP object");
 		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -2104,20 +2006,18 @@ static M2MCEP *this_setFileDatabase (M2MCEP *self, sqlite3 *fileDatabase)
 	if (self!=NULL && fileDatabase!=NULL)
 		{
 		self->fileDatabase=fileDatabase;
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set SQLite3 database management object on file to CEP execution object");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set SQLite3 database management object on file to CEP execution object");
 		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3 execution object specified by argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"SQLite3 execution object specified by argument is NULL");
 		return NULL;
 		}
 	}
@@ -2140,20 +2040,18 @@ static M2MCEP *this_setMemoryDatabase (M2MCEP *self, sqlite3 *memoryDatabase)
 	if (self!=NULL && memoryDatabase!=NULL)
 		{
 		self->memoryDatabase = memoryDatabase;
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set SQLite3 database management object on memory in CEP object");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set SQLite3 database management object on memory in CEP object");
 		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite3 execution object specified by argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"SQLite3 execution object specified by argument is NULL");
 		return NULL;
 		}
 	}
@@ -2178,20 +2076,18 @@ static M2MCEP *this_setTableManager (M2MCEP *self, const M2MTableManager *tableM
 		this_deleteTableManager(self);
 		//===== Set table construction object =====
 		self->tableManager = (M2MTableManager *)tableManager;
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set a table construction object in the CEP object");
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set a table construction object in the CEP object");
 		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL");
 		return NULL;
 		}
 	}
@@ -2220,14 +2116,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"BLOB\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"BLOB\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"BLOB\" type data");
 				}
 			}
 		//===== In case of BOOL type data =====
@@ -2240,30 +2133,24 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"BOOL\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"CHAR\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"CHAR\" type data");
 				}
 			}
 		//===== In case of DATETIME type data =====
 		else if (dataType==M2MDataType_DATETIME)
 			{
 			//===== Set the value =====
-			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToLong(value, valueLength))==SQLITE_OK)
+			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToSignedLong(value, valueLength))==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"DATETIME\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DATETIME\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DATETIME\" type data");
 				}
 			}
 		//===== In case of DOUBLE type data =====
@@ -2272,14 +2159,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"DOUBLE\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DOUBLE\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DOUBLE\" type data");
 				}
 			}
 		//===== In case of ERROR type data =====
@@ -2292,14 +2176,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"FLOAT\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"FLOAT\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"FLOAT\" type data");
 				}
 			}
 		//===== In case of INTEGER type data =====
@@ -2308,14 +2189,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//=====  =====
 			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToSignedInteger(value, valueLength))==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"INTEGER\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"INTEGER\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"INTEGER\" type data");
 				}
 			}
 		//===== In case of NULL type data =====
@@ -2324,14 +2202,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_null(statement, index)==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"NULL\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"NULL\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"NULL\" type data");
 				}
 			}
 		//===== In case of NUMERIC type data =====
@@ -2344,14 +2219,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"REAL\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"REAL\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"REAL\" type data");
 				}
 			}
 		//===== In case of TEXT type data =====
@@ -2360,14 +2232,11 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"TEXT\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"TEXT\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"TEXT\" type data");
 				}
 			}
 		//===== In case of VARCHAR type data =====
@@ -2376,38 +2245,35 @@ static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsi
 			//===== Set the value =====
 			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to set \"VARCHAR\" type data");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"VARCHAR\" type data", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"VARCHAR\" type data");
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to find A data type matching the data type specified in the argument", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to find A data type matching the data type specified in the argument");
 			}
 		}
 	//===== Argument error =====
 	else if (index<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The index indicating the position of the data value specified by the argument is 0 or less", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The index indicating the position of the data value specified by the argument is 0 or less");
 		}
 	else if (value==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data value specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data value specified by the argument is NULL");
 		}
 	else if (valueLength>M2MString_length(value))
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The length [Byte] of the string indicating the data value specified by the argument is the actual size or more", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The length [Byte] of the string indicating the data value specified by the argument is the actual size or more");
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The prepared statement object specified by the argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The prepared statement object specified by the argument is NULL");
 		}
 	return;
 	}
@@ -2440,9 +2306,7 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 				{
 				//===== Add counter =====
 				self->recordCounter = self->recordCounter + count;
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Update record counters for vacuum processing");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Update record counters for vacuum processing");
 				return;
 				}
 			//===== When the counter is 0 =====
@@ -2450,9 +2314,7 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 				{
 				//===== Initialize counter =====
 				self->recordCounter = 0;
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing record counter has been initialized");
-#endif // DEBUG
+				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Vacuum processing record counter has been initialized");
 				return;
 				}
 			}
@@ -2460,7 +2322,7 @@ static void this_updateRecordCounter (M2MCEP *self, const unsigned int count)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return;
 		}
 	}
@@ -2480,7 +2342,7 @@ void M2MCEP_delete (M2MCEP **self)
 	{
 	//========== Variable ==========
 	M2MDataFrame *record = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_delete()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
@@ -2493,6 +2355,8 @@ void M2MCEP_delete (M2MCEP **self)
 		this_flushCEPRecord((*self));
 		//===== Close file database =====
 		this_closeFileDatabase((*self));
+		//=====  =====
+		this_deleteLogger((*self));
 		//===== Release the heap memory area of the CEP record information object =====
 		if ((record=this_getDataFrame((*self)))!=NULL)
 			{
@@ -2505,18 +2369,12 @@ void M2MCEP_delete (M2MCEP **self)
 		this_deleteTableManager((*self));
 		//===== Release CEP object's heap memory area =====
 		M2MHeap_free((*self));
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Released the heap memory of CEP structure object");
-#endif // DEBUG
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" object is NULL");
 		}
-#ifdef DEBUG
-	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** Shutdown CEP library **********");
-#endif // DEBUG
 	return;
 	}
 
@@ -2530,7 +2388,7 @@ void M2MCEP_delete (M2MCEP **self)
 M2MString *M2MCEP_getDatabaseName (const M2MCEP *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getDatabaseName()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_getDatabaseName()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2540,7 +2398,7 @@ M2MString *M2MCEP_getDatabaseName (const M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -2562,7 +2420,7 @@ sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self)
 	M2MTableManager *tableManager = NULL;
 	sqlite3 *fileDatabase = NULL;
 	const bool SYNCHRONOUS_MODE = false;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getFileDatabase()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_getFileDatabase()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2591,19 +2449,19 @@ sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self)
 				//===== Error handling =====
 				else if (databaseName==NULL)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get database file name necessary for creating SQLite 3 database management object on file", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get database file name necessary for creating SQLite 3 database management object on file");
 					return NULL;
 					}
 				//===== Error handling =====
 				else if (tableManager==NULL)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the table construction object necessary for creating the SQLite 3 database management object on the file", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the table construction object necessary for creating the SQLite 3 database management object on the file");
 					return NULL;
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create SQLite3 database management object on file", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create SQLite3 database management object on file");
 					return NULL;
 					}
 				}
@@ -2611,16 +2469,39 @@ sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self)
 		//===== When the record persistence flag is not set =====
 		else
 			{
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Because record persistence is invalid, we don't get the SQLite3 database object on the file");
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Because record persistence is invalid, we don't get the SQLite3 database object on the file");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * Return the logging object owned by the argument CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			Logging object
+ */
+M2MFileAppender *M2MCEP_getLogger (const M2MCEP *self)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_getLogger()";
+
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		return self->logger;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -2637,7 +2518,7 @@ sqlite3 *M2MCEP_getMemoryDatabase (M2MCEP *self)
 	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	const bool SYNCHRONOUS_MODE = false;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_getMemoryDatabase()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_getMemoryDatabase()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2661,7 +2542,7 @@ sqlite3 *M2MCEP_getMemoryDatabase (M2MCEP *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create SQLite3 database object in memory", NULL);
+				M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create SQLite3 database object in memory");
 				return NULL;
 				}
 			}
@@ -2669,7 +2550,7 @@ sqlite3 *M2MCEP_getMemoryDatabase (M2MCEP *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -2709,7 +2590,7 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 	{
 	//========== Variable ==========
 	int numberOfRecord = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_insertCSV()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_insertCSV()";
 
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && csv!=NULL)
@@ -2735,38 +2616,38 @@ int M2MCEP_insertCSV (M2MCEP *self, const M2MString *tableName, const M2MString 
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite3 database on file", NULL);
+					M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite3 database on file");
 					return -1;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite 3 database in memory", NULL);
+				M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite 3 database in memory");
 				return -1;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set CSV format string to record management object", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set CSV format string to record management object");
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return -1;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name specified by the argument is NULL");
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the CSV format record specified by the argument is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the CSV format record specified by the argument is NULL");
 		return -1;
 		}
 	}
@@ -2786,33 +2667,24 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
 	{
 	//========== Variable ==========
 	M2MCEP *self = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_new()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_new()";
 
-#ifdef DEBUG
-	M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"********** Startup CEP library **********");
-#endif // DEBUG
 	//===== Check argument =====
 	if (databaseName!=NULL && tableManager!=NULL)
 		{
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Create a new CEP object");
-#endif // DEBUG
 		//===== Get heap memory of CEP execution object =====
 		if ((self=(M2MCEP *)M2MHeap_malloc(sizeof(M2MCEP)))!=NULL)
 			{
 			//===== Initialize member variable of CEP object =====
 			if (this_init(self, databaseName, tableManager)!=NULL)
 				{
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Creation process of CEP object has ended");
-#endif // DEBUG
 				//===== Return new created CEP object =====
 				return self;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to initialize CEP object", NULL);
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to initialize CEP object");
 				//===== Release heap memory area for CEP object =====
 				M2MCEP_delete(&self);
 				return NULL;
@@ -2821,19 +2693,19 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for creating a new CEP object", NULL);
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for creating a new CEP object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (databaseName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableManager\" object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableManager\" object is NULL");
 		return NULL;
 		}
 	}
@@ -2874,7 +2746,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 	M2MString *data = NULL;
 	size_t dataLength = 0;
 	int sqliteColumnType = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_select()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_select()";
 
 	//===== Check argument =====
 	if (self!=NULL && sql!=NULL && result!=NULL)
@@ -2926,7 +2798,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get character string indicating column name from SELECT result", NULL);
+							M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get character string indicating column name from SELECT result");
 							}
 						}
 					//===== Add line feed code =====
@@ -2966,7 +2838,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert Integer data of SELECT result to character string", NULL);
+							M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to convert Integer data of SELECT result to character string");
 							}
 						}
 					//===== When the data type of the SELECT result column is a floating point number =====
@@ -2982,7 +2854,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert Floating point number data of SELECT result to character string", NULL);
+							M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to convert Floating point number data of SELECT result to character string");
 							}
 						}
 					//===== When the data type of the SELECT result column is a character string =====
@@ -2996,7 +2868,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get character string data of SELECT result", NULL);
+							M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get character string data of SELECT result");
 							}
 						}
 					//===== When the data type of the SELECT result column is byte data =====
@@ -3013,11 +2885,11 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else if (dataLength<=0)
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+							M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
 							}
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+							M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
 							}
 						}
 					//===== When the data type of the SELECT result column is NULL =====
@@ -3028,7 +2900,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 					//===== In other cases =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"SQLite internal error! (The data type of the SELECT result differs from the value of the rule)", NULL);
+						M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"SQLite internal error! (The data type of the SELECT result differs from the value of the rule)");
 						}
 					}
 				//===== Add line feed code =====
@@ -3052,24 +2924,69 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+			M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else if (sql==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"result\" pointer is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"result\" pointer is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * Set logging structure object in column information object.<br>
+ *
+ * @param[in,out] self	Column information object
+ * @param[in] logger	Logging structure object
+ * @return				Column information object with logger set or NULL (in case of error)
+ */
+M2MCEP *M2MCEP_setLogger (M2MCEP *self, const M2MFileAppender *logger)
+	{
+	//========== Variable ==========
+	M2MFileAppender *oldLogger = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_setLogger()";
+
+	//===== Check argument =====
+	if (self!=NULL && logger!=NULL)
+		{
+		//===== In case of existing logger object yet =====
+		if ((oldLogger=self->logger)!=NULL)
+			{
+			//===== Release allocated memory =====
+			M2MFileAppender_delete(&oldLogger);
+			}
+		//===== In case of no existing logger object =====
+		else
+			{
+			}
+		//===== Set logger object =====
+		self->logger = (M2MFileAppender *)logger;
+		//=====  =====
+		return self;
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL");
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_error(M2MCEP_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MFileAppender\" object is NULL");
 		return NULL;
 		}
 	}
@@ -3089,9 +3006,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
 	const unsigned int MAX_RECORD_MAX = 500;
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_setMaxRecord()";
 
@@ -3100,27 +3015,25 @@ M2MCEP *M2MCEP_setMaxRecord (M2MCEP *self, const unsigned int maxRecord)
 		{
 		//===== Set number of records upper limit =====
 		self->maxRecord = maxRecord;
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The upper limit number of records (=\"%u\") in the SQLite database in memory has been set in the CEP object", self->maxRecord);
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, MESSAGE);
 		return self;
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	else if (maxRecord<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The upper limit of the number of records specified by argument is an integer less than or equal to 0 which is the minimum setting value.", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! The upper limit of the number of records specified by argument is an integer less than or equal to 0 which is the minimum setting value.");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The number of records specified by the argument The upper limit value is an integer of 500 or more which is the maximum setting value.", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! The number of records specified by the argument The upper limit value is an integer of 500 or more which is the maximum setting value.");
 		return NULL;
 		}
 	}
@@ -3149,31 +3062,27 @@ M2MCEP *M2MCEP_setPersistence (M2MCEP *self, const bool persistence)
 		if (persistence==true)
 			{
 			self->persistence = true;
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set flag for insert record persistence to \"ON\"");
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set flag for insert record persistence to \"ON\"");
 			return self;
 			}
 		//===== In case of non-persistence =====
 		else if (persistence==false)
 			{
 			self->persistence = false;
-#ifdef DEBUG
-			M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Set flag for insert record persistence to \"OFF\"");
-#endif // DEBUG
+			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Set flag for insert record persistence to \"OFF\"");
 			return self;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The permanence flag indicated by argument is neither \"true\" nor \"false\"", NULL);
+			M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The permanence flag indicated by argument is neither \"true\" nor \"false\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -3190,6 +3099,7 @@ void M2MCEP_setSignalHandler (const M2MCEP *self)
 	//========== Variable ==========
 	struct sigaction newAction;
 	struct sigaction oldAction;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_setSignalHandler()";
 
 	//=====  =====
 //	newAction.sa_handler = termination_handler;
@@ -3241,7 +3151,7 @@ void M2MCEP_setSignalHandler (const M2MCEP *self)
 M2MCEP *M2MCEP_setVacuumRecord (M2MCEP *self, const unsigned int vacuumRecord)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP_setVacuumRecord()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_setVacuumRecord()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -3252,7 +3162,7 @@ M2MCEP *M2MCEP_setVacuumRecord (M2MCEP *self, const unsigned int vacuumRecord)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL", NULL);
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MCEP\" structure object is NULL");
 		return NULL;
 		}
 	}

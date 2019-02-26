@@ -1,7 +1,7 @@
 /*******************************************************************************
- * NGFileDescriptor.c
+ * M2MFileDescriptor.c
  *
- * Copyright (c) 2015, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "ng/io/NGFileDescriptor.h"
+#include "m2m/io/M2MFileDescriptor.h"
 
 
 /*******************************************************************************
@@ -38,7 +38,7 @@
  *
  * @param[in,out] socket	opened socket
  */
-void NGFileDescriptor_closeSocket (int socket)
+void M2MFileDescriptor_closeSocket (int socket)
 	{
 	//===== Check argument =====
 	if (socket>0)
@@ -46,16 +46,10 @@ void NGFileDescriptor_closeSocket (int socket)
 		//===== Close socket =====
 		if (close(socket)==0)
 			{
-#ifdef DEBUG
-			NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_closeSocket()", __LINE__, (NGString *)"Closed socket");
-#endif // DEBUG
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_closeSocket()", __LINE__, (NGString *)"Failed to close socket");
-#endif // DEBUG
 			}
 		}
 	//===== Argument error =====
@@ -72,46 +66,32 @@ void NGFileDescriptor_closeSocket (int socket)
  * @param[in] address	IP address information object
  * @return				opened socket or -1(means error)
  */
-int NGFileDescriptor_getSocket (const NGIPAddress *address)
+int M2MFileDescriptor_getSocket (const M2MIPAddress *address)
 	{
 	//========== Variable ==========
 	int fileDescriptor = 0;
 	int optval = 1;
-#ifdef DEBUG
-	NGString MESSAGE[64];
-#endif // DEBUG
 
 	//===== Check argument =====
 	if (address!=NULL)
 		{
 		//===== Get socket =====
-		if ((fileDescriptor=socket(NGIPAddress_getProtocolFamily(address), NGIPAddress_getSocketType(address), NGIPAddress_getProtocol(address)))>0
+		if ((fileDescriptor=socket(M2MIPAddress_getProtocolFamily(address), M2MIPAddress_getSocketType(address), M2MIPAddress_getProtocol(address)))>0
 				//===== Disable Nagle's algorithm =====
 				&& setsockopt(fileDescriptor, IPPROTO_TCP, TCP_NODELAY, (char *)&optval, sizeof(optval))==0
 				)
 			{
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			NGString_format(MESSAGE, sizeof(MESSAGE)-1, (NGString *)"Opened socket(= \"%d\")", fileDescriptor);
-			NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_getSocket()", __LINE__, MESSAGE);
-#endif // DEBUG
 			return fileDescriptor;
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_getSocket()", __LINE__, (NGString *)"Failed to get socket");
-#endif // DEBUG
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_getSocket()", __LINE__, (NGString *)"Argument \"IPAddress\" is NULL");
-#endif // DEBUG
 		return -1;
 		}
 	}
@@ -127,7 +107,7 @@ int NGFileDescriptor_getSocket (const NGIPAddress *address)
  * @param[in] readTimeout	read timeout[usec]
  * @return					read data size[Byte] or 0(error happened)
  */
-unsigned int NGFileDescriptor_read (int socket, const NGIPAddress *address, unsigned char *buffer, const unsigned int bufferLength, const unsigned long readTimeout)
+unsigned int M2MFileDescriptor_read (int socket, const M2MIPAddress *address, unsigned char *buffer, const unsigned int bufferLength, const unsigned long readTimeout)
 	{
 	//========== Variable ==========/
 	int readLength = 0;
@@ -137,23 +117,15 @@ unsigned int NGFileDescriptor_read (int socket, const NGIPAddress *address, unsi
 	int result = 0;
 	struct sockaddr *src_addr = NULL;
 	socklen_t addrlen = 0;
-#ifdef DEBUG
-	NGString MESSAGE[64];
-#endif // DEBUG
 
 	//===== Check argument =====
 	if (socket>0 && address!=NULL && buffer!=NULL && bufferLength>0)
 		{
 		//===== Receive message and check succeed(returns 0) =====/
-		if ((src_addr=NGIPAddress_getSocketAddress(address))!=NULL
-				&& (addrlen=NGIPAddress_getSocketAddressLength(address))>=0
+		if ((src_addr=M2MIPAddress_getSocketAddress(address))!=NULL
+				&& (addrlen=M2MIPAddress_getSocketAddressLength(address))>=0
 				&& (readLength=recvfrom(socket, buffer, bufferLength, FLAGS, src_addr, &addrlen))>=0)
 			{
-#ifdef DEBUG
-			memset(MESSAGE, 0, sizeof(MESSAGE));
-			NGString_format(MESSAGE, sizeof(MESSAGE)-1, (NGString *)"Received message(= %d [Byte])", readLength);
-			NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_read()", __LINE__, MESSAGE);
-#endif // DEBUG
 			return readLength;
 			}
 		//===== In progress sequence of Non-Blocking I/O =====
@@ -172,75 +144,46 @@ unsigned int NGFileDescriptor_read (int socket, const NGIPAddress *address, unsi
 				//===== Receive message(this procedure will succeed) =====
 				if ((readLength=recvfrom(socket, buffer, bufferLength, FLAGS, src_addr, &addrlen))>0)
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					NGString_format(MESSAGE, sizeof(MESSAGE)-1, (NGString *)"Received message(= %d [Byte])", readLength);
-					NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_read()", __LINE__, MESSAGE);
-#endif // DEBUG
 					return readLength;
 					}
 				//===== Error handling =====
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Failed to read data");
-#endif // DEBUG
 					return 0;
 					}
 				}
 			//===== In the case of read timeout =====
 			else if (result==0)
 				{
-#ifdef DEBUG
-				NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Read timeout error");
-#endif // DEBUG
 				return 0;
 				}
 			//===== Error handling =====
 			else
 				{
-#ifdef DEBUG
-				NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Failed to read data because of unknown error");
-#endif // DEBUG
 				return 0;
 				}
 			}
 		//===== Error handling =====/
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Failed to read data from socket because of unknown error");
-#endif // DEBUG
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else if (socket<=0)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Argument \"socket\" isn't positive");
-#endif // DEBUG
 		return 0;
 		}
 	else if (address==NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Argument \"address\" is NULL");
-#endif // DEBUG
 		return 0;
 		}
 	else if (buffer==NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Argument \"buffer\" is NULL");
-#endif // DEBUG
 		return 0;
 		}
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_read()", __LINE__, (NGString *)"Argument \"bufferLength\" isn't positive number");
-#endif // DEBUG
 		return 0;
 		}
 	}
@@ -257,7 +200,7 @@ unsigned int NGFileDescriptor_read (int socket, const NGIPAddress *address, unsi
  * @param[in] dataLength	length of send message
  * @return					length of sent message or 0(means error)
  */
-unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, const unsigned char *data, const unsigned long dataLength)
+unsigned long M2MFileDescriptor_write (int socket, const M2MIPAddress *address, const unsigned char *data, const unsigned long dataLength)
 	{
 	//========== Variable ==========
 	int result = 0L;
@@ -270,19 +213,16 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 	const int FLAGS = 0;
 	const unsigned int REPEAT_MAX = 1000;
 	const unsigned int UNSIGNED_INT_MAX = 65535;
-#ifdef DEBUG
-	NGString MESSAGE[64];
-#endif // DEBUG
 
 	//===== Check argument =====
 	if (socket>0
 			&& address!=NULL
-			&& (src_addr=NGIPAddress_getSocketAddress(address))!=NULL
+			&& (src_addr=M2MIPAddress_getSocketAddress(address))!=NULL
 			&& data!=NULL
 			&& dataLength>0)
 		{
 		//=====  =====
-		addrlen = NGIPAddress_getSocketAddressLength(address);
+		addrlen = M2MIPAddress_getSocketAddressLength(address);
 		//===== In the case of send message length overs max integer size =====
 		if (UNSIGNED_INT_MAX<=dataLength)
 			{
@@ -302,20 +242,12 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 				//===== Send message(max size : 65,535[Byte]) =====
 				if ((result=sendto(socket, &data[sendLength], size, FLAGS, src_addr, addrlen))>0)
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					NGString_format(MESSAGE, sizeof(MESSAGE)-1, (NGString *)"Sent data(= %d [Byte])", result);
-					NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_write()", __LINE__, MESSAGE);
-#endif // DEBUG
 					//===== Append sent message length =====
 					sendLength += (unsigned long)result;
 					}
 				//===== Error handling =====
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_write()", __LINE__, (NGString *)"Failed to send data");
-#endif // DEBUG
 					}
 				//===== Count repeat time =====
 				repeatTime++;
@@ -326,9 +258,6 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 					}
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printInfoMessage((NGString *)"NGFileDescriptor_write()", __LINE__, (NGString *)"Reached the maximum size of the transmission");
-#endif // DEBUG
 					break;
 					}
 				}
@@ -343,11 +272,6 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 				//===== Send message(max size : 65,535[Byte]) =====
 				if ((result=sendto(socket, &data[sendLength], dataLength-sendLength, FLAGS, src_addr, addrlen))>0)
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					NGString_format(MESSAGE, sizeof(MESSAGE)-1, (NGString *)"Sent data(= %d [Byte])", result);
-					NGLogger_printDebugMessage((NGString *)"NGFileDescriptor_write()", __LINE__, MESSAGE);
-#endif // DEBUG
 					//===== Append send message length =====
 					sendLength += (unsigned long)result;
 					//===== Check sent message length =====
@@ -364,9 +288,6 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 				//===== Error handling =====
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_write()", __LINE__, (NGString *)"Failed to send data");
-#endif // DEBUG
 					}
 				}
 			return sendLength;
@@ -375,16 +296,10 @@ unsigned long NGFileDescriptor_write (int socket, const NGIPAddress *address, co
 	//===== Argument error =====
 	else if (socket<=0)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_write()", __LINE__, (NGString *)"Argument \"socket\" isn't positive");
-#endif // DEBUG
 		return 0;
 		}
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((NGString *)"NGFileDescriptor_write()", __LINE__, (NGString *)"Argument \"data\" is NULL");
-#endif // DEBUG
 		return 0;
 		}
 	}

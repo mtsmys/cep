@@ -34,42 +34,336 @@
  * Private function
  ******************************************************************************/
 /**
- * Print out error message to standard error output.<br>
+ * This method copies local time string into indicated "buffer" memory.<br>
+ * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
+ * This method doesn't allocation, so caller needs to prepare memory<br>
+ * before call this method.<br>
  *
- * @param[in] methodName	String indicating function name
- * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
- * @param[in] message		Message string indicating error content
+ * @param[out] buffer		memory buffer for copying local time string
+ * @param[in] bufferLength	memory buffer length(max size)
+ * @return					length of local time string or 0(means error)
  */
-static void this_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+
+
+/**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ();
+
+
+
+/*******************************************************************************
+ * Private function
+ ******************************************************************************/
+/**
+ * Copy the log message to the argument "buffer" pointer.<br>
+ * Buffering of array for copying is executed inside the function.<br>
+ * Therefore, it is necessary for caller to call the "M2MHeap_free()" function <br>
+ * in order to prevent memory leak after using the variable.<br>
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ * @param[out] buffer			Buffer to copy the created log message
+ * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
+ */
+M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
 	{
 	//========== Variable ==========
-	const size_t TIME_LENGTH = 128;
-	M2MString TIME[TIME_LENGTH];
-	const size_t ERROR_MESSAGE_LENGTH = 256;
-	M2MString errorMessage[ERROR_MESSAGE_LENGTH];
+	M2MString *logLevelString = (M2MString *)"ERROR";
+	M2MString time[64];
+	M2MString lineNumberString[16];
+	M2MString errnoMessage[256];
+	M2MString threadID[128];
+	size_t functionNameLength = 0;
+	size_t messageLength = 0;
 
 	//===== Check argument =====
-	if (methodName!=NULL && M2MString_length(methodName)>0
-			&& message!=NULL && M2MString_length(message)>0)
+	if (functionName!=NULL && (functionNameLength=M2MString_length(functionName))>0
+			&& message!=NULL && (messageLength=M2MString_length(message))>0
+			&& buffer!=NULL)
 		{
-		//===== Initialize buffer =====
-		memset(TIME, 0, TIME_LENGTH);
-		memset(errorMessage, 0, ERROR_MESSAGE_LENGTH);
-		//===== Get local time string =====
-		if (M2MString_getLocalTime(TIME, TIME_LENGTH)>0)
+		//===== Get line number string =====
+		memset(lineNumberString, 0, sizeof(lineNumberString));
+		snprintf(lineNumberString, sizeof(lineNumberString)-1, (M2MString *)"%d", lineNumber);
+		//===== Initialize array =====
+		memset(time, 0, sizeof(time));
+		//===== Get current time string from local calendar ======
+		if (this_getLocalTimeString(time, sizeof(time))>0
+				&& M2MSystem_getThreadIDString(threadID, sizeof(threadID))!=NULL)
 			{
-			fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s\n", TIME, methodName, lineNumber, message);
+			//===== In the case of existing error number =====
+			if (errno!=0 && strerror_r(errno, errnoMessage, sizeof(errnoMessage))==0)
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, errnoMessage)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, M2MString_SPACE)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
+			//===== In the case of not existing error number =====
+			else
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
 			}
 		//===== Error handling =====
 		else
 			{
-			// do nothing
+			//===== Initialize error number =====
+			this_initErrorNumber();
+			return NULL;
 			}
 		}
 	//===== Argument error =====
+	else if (logLevelString==NULL)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (functionName==NULL || functionNameLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (message==NULL || messageLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
 	else
 		{
-		// do nothing
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	}
+
+
+/**
+ * This method copies local time string into indicated "buffer" memory.<br>
+ * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
+ * This method doesn't allocation, so caller needs to prepare memory<br>
+ * before call this method.<br>
+ *
+ * @param[out] buffer		memory buffer for copying local time string
+ * @param[in] bufferLength	memory buffer length(max size)
+ * @return					length of local time string or 0(means error)
+ */
+static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	struct timeval currentTime;
+	struct tm *localCalendar = NULL;
+	size_t miliSecondLength = 0;
+	M2MString *miliSecond = NULL;
+	M2MString second[8];
+	const M2MString *FORMAT = (M2MString *)"%Y-%m-%d %H:%M:%S.";
+
+	//===== Check argument =====
+	if (buffer!=NULL && bufferLength>0)
+		{
+		//===== Initialize buffer =====
+		memset(buffer, 0, bufferLength);
+		//===== Get current time =====
+		if (gettimeofday(&currentTime, NULL)==0
+				&& (localCalendar=localtime(&(currentTime.tv_sec)))!=NULL)
+			{
+			//===== Convert time to string =====
+			strftime(buffer, bufferLength-1, FORMAT, localCalendar);
+			//===== Convert millisecond to string =====
+			if (M2MString_convertFromSignedLongToString((signed long)(currentTime.tv_usec/1000UL), &miliSecond)!=NULL
+					&& (miliSecondLength=M2MString_length(miliSecond))>0)
+				{
+				//===== In the case of digit number of millisecond is 1 =====
+				if (miliSecondLength==1)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"00%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== In the case of digit number of millisecond is 2 =====
+				else if (miliSecondLength==2)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"0%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== In the case of digit number of millisecond is 3 =====
+				else if (miliSecondLength==3)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== Error handling =====
+				else
+					{
+					//===== Initialize buffer =====
+					memset(buffer, 0, bufferLength);
+					M2MHeap_free(miliSecond);
+					return 0;
+					}
+				//===== Check buffer length for copying millisecond string =====
+				if (M2MString_length(second)<(bufferLength-M2MString_length(buffer)-1))
+					{
+					//===== Copy millisecond string =====
+					memcpy(&(buffer[M2MString_length(buffer)]), second, M2MString_length(second));
+					//===== Release allocated memory =====
+					M2MHeap_free(miliSecond);
+					return M2MString_length(buffer);
+					}
+				//===== Error handling =====
+				else
+					{
+					//===== Initialize buffer =====
+					M2MHeap_free(miliSecond);
+					memset(buffer, 0, bufferLength);
+					return 0;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				//===== Initialize buffer =====
+				M2MHeap_free(miliSecond);
+				memset(buffer, 0, bufferLength);
+				return 0;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			return 0;
+			}
+		}
+	//===== Error handling =====
+	else
+		{
+		return 0;
+		}
+	}
+
+
+/**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ()
+	{
+	errno = 0;
+	return;
+	}
+
+
+/**
+ * Print out error message to standard error output.<br>
+ *
+ * @param[in] functionName	String indicating function name
+ * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message		Message string indicating error content
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (this_createNewLogMessage(functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_println(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
 		}
 	return;
 	}
@@ -94,7 +388,6 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	M2MString *tmp = NULL;
 	size_t selfLength = 0;
 	size_t stringLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_append()";
 
 	//===== Check argument =====
 	if (self!=NULL
@@ -126,14 +419,14 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 				else
 					{
 					M2MHeap_free(tmp);
-					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+					this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
 				return NULL;
 				}
 			}
@@ -151,7 +444,7 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
@@ -159,12 +452,12 @@ M2MString *M2MString_append (M2MString **self, const M2MString *string)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -184,7 +477,6 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	//========== Variable ==========
 	M2MString *tmp = NULL;
 	size_t thisLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_appendLength()";
 
 	//===== Check argument =====
 	if (self!=NULL && string!=NULL && 0<stringLength && stringLength<=M2MString_length(string))
@@ -215,14 +507,14 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 				else
 					{
 					M2MHeap_free(tmp);
-					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+					this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string temporary");
 				return NULL;
 				}
 			}
@@ -240,7 +532,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
@@ -248,12 +540,12 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" pointer is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or \"stringLength\" is invalid");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or \"stringLength\" is invalid");
 		return NULL;
 		}
 	}
@@ -266,11 +558,10 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
  * @param[in] string	Another string to be compared
  * @return				0: two are equal, negative: In case of self < string, positive: In case of self > string
  */
-signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
+int32_t M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
 	//========== Variable ==========
 	size_t selfLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_compareTo()";
 
 	//===== Check argument =====
 	if (self!=NULL && (selfLength=M2MString_length(self))>0
@@ -281,12 +572,12 @@ signed int M2MString_compareTo (const M2MString *self, const M2MString *string)
 	//===== Argument error =====
 	else if (self==NULL || selfLength<=0)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
 		return -1;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or vacant");
 		return -1;
 		}
 	}
@@ -378,6 +669,44 @@ M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2M
 
 
 /**
+ * @param[in] boolean
+ * @param[out] buffer
+ * @param[in] bufferLength
+ */
+M2MString *M2MString_convertFromBooleanToString (const bool boolean, M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	const M2MString *TRUE = (M2MString *)"true";
+	const M2MString *FALSE = (M2MString *)"false";
+
+	//===== Check argument =====
+	if (bufferLength>=M2MString_length(FALSE))
+		{
+		//===== In the case of "true" =====
+		if (boolean==true)
+			{
+			//===== Copy "true" string into buffer =====
+			memset(buffer, 0, bufferLength);
+			M2MString_format(buffer, bufferLength-1, TRUE);
+			return buffer;
+			}
+		//===== In the case of "false" =====
+		else
+			{
+			//===== Copy "false" string into buffer =====
+			memset(buffer, 0, bufferLength);
+			M2MString_format(buffer, bufferLength-1, FALSE);
+			return buffer;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
+		}
+	}
+
+/**
  * Convert double value into a string and copies it to the pointer. <br>
  * Since buffering of arrays is executed inside this function, so call <br>
  * "M2MHeap_free()" function on the caller side in order to prevent memory <br>
@@ -392,7 +721,6 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromDoubleToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -412,21 +740,21 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert double number into string");
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert double number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -495,7 +823,6 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 	size_t lineLength = 0;
 	const size_t LF_LENGTH = M2MString_length(M2MString_LF);
 	const size_t CRLF_LENGTH = M2MString_length(M2MString_CRLF);
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromLFToCRLF()";
 
 	//===== Check argument =====
 	if (self!=NULL && M2MString_length(self)>0
@@ -512,7 +839,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to append string");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to append string");
 				return NULL;
 				}
 			}
@@ -560,12 +887,12 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
 	//===== Argument error =====
 	else if (self==NULL || M2MString_length(self)<=0)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -581,12 +908,11 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
  * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
  * @return				Copied string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, M2MString **string)
+M2MString *M2MString_convertFromSignedIntegerToString (const int32_t number, M2MString **string)
 	{
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromSignedIntegerToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -606,21 +932,21 @@ M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, 
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert integer number into string");
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert integer number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -641,7 +967,6 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 	//========== Variable ==========
 	M2MString tmpBuffer[128];
 	size_t stringLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromSignedLongToString()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -661,21 +986,21 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 			//===== Error handling =====
 			else
 				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
+				this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for copying string into pointer");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert long integer number into string");
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert long integer number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -692,7 +1017,6 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToDouble()";
 
 	//===== Check argument =====
 	if (string!=NULL && stringLength<=M2MString_length(string))
@@ -707,7 +1031,7 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
 		return (double)-1;
 		}
 	}
@@ -720,12 +1044,11 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
  * @param[in] stringLength	Size of string[Byte]
  * @return					Signed long integer converted from string
  */
-long M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength)
+int32_t M2MString_convertFromStringToSignedLong (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString STRING_ARRAY[stringLength+1];
 	M2MString MESSAGE[1024];
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToLong()";
 
 	//===== Check argument =====
 	if (string!=NULL && stringLength<=M2MString_length(string))
@@ -740,14 +1063,14 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
 		return (int)-1;
 		}
 	else
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument error! Length of indicated \"string\" string (=\"%s\") is shorter than stringLength(=\"%zu\")", string, stringLength);
-		this_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE);
+		this_printErrorMessage(__func__, __LINE__, MESSAGE);
 		return (int)-1;
 		}
 	}
@@ -760,11 +1083,10 @@ long M2MString_convertFromStringToLong (const M2MString *string, const size_t st
  * @param[in] stringLength	Size of string[Byte]
  * @return					Signed integer converted from string
  */
-signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength)
+int32_t M2MString_convertFromStringToSignedInteger (const M2MString *string, const size_t stringLength)
 	{
 	//========== Variable ==========
 	M2MString buffer[stringLength+1];
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToSignedInteger()";
 
 	//===== Check argument =====
 	if (string!=NULL && stringLength<=M2MString_length(string))
@@ -779,7 +1101,7 @@ signed int M2MString_convertFromStringToSignedInteger (const M2MString *string, 
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL or stringLength is invalid");
 		return (signed int)0;
 		}
 	}
@@ -797,7 +1119,6 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
 	//========== Variable ==========
 	M2MString buffer[stringLength+1];
 	const uint32_t BASE = 10;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromStringToSignedLongLong()";
 
 	//===== Check argument =====
 	if (string!=NULL && M2MString_length(string)>=stringLength)
@@ -811,13 +1132,103 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
 		return (int64_t)0L;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"stringLength\" is bigger than length of \"string\"");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"stringLength\" is bigger than length of \"string\"");
 		return (int64_t)0L;
+		}
+	}
+
+
+
+/**
+ * This method convert from string to 32bit unsigned integer number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					Unsigned 32bit integer number converted from string
+ */
+uint32_t M2MString_convertFromStringToUnsignedInteger (const M2MString *string, const size_t stringLength)
+	{
+	//========== Variable ==========
+	const uint32_t NUMBER = M2MString_convertFromStringToUnsignedLong(string, stringLength);
+
+	//===== Check size of number =====
+	if (NUMBER<=UINT_MAX)
+		{
+		return (uint32_t)NUMBER;
+		}
+	//===== Error handling =====
+	else
+		{
+		return (uint32_t)0;
+		}
+	}
+
+
+/**
+ * This method convert from string to 32bit unsigned long number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					32bit unsigned long number converted from string
+ */
+uint32_t M2MString_convertFromStringToUnsignedLong (const M2MString *string, const size_t stringLength)
+	{
+	//========== Variable ==========
+	M2MString STRING_ARRAY[stringLength+1];
+	const uint32_t BASE = (uint32_t)10;
+
+	//===== Check argument =====
+	if (string!=NULL && 0<stringLength)
+		{
+		//===== Copy string into buffer =====
+		memset(STRING_ARRAY, 0, sizeof(STRING_ARRAY));
+		memcpy(STRING_ARRAY, string, stringLength);
+		//===== Convert string into integer =====
+		return strtoul(STRING_ARRAY, NULL, BASE);
+		}
+	//===== Argument error =====
+	else
+		{
+		return (uint32_t)0L;
+		}
+	}
+
+
+/**
+ * This method converts from 32bit unsigned integer to string.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
+ *
+ * @param[in] number		conversion target number
+ * @param[out] buffer		Buffer for copying unsigned integer string
+ * @param[in] bufferLength	Length of Buffer[Byte]
+ */
+M2MString *M2MString_convertFromUnsignedIntegerToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
+	{
+	//===== Check argument =====
+	if (bufferLength>0)
+		{
+		//===== Initialize temporary buffer =====
+		memset(buffer, 0, bufferLength);
+		//===== Convert from unsigned integer to string =====
+		if (M2MString_format(buffer, bufferLength-1, "%u", number)>0)
+			{
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
 		}
 	}
 
@@ -833,9 +1244,6 @@ int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, co
  */
 M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromUnsignedLongToHexadecimalString()";
-
 	//===== Check argument =====
 	if (buffer!=NULL && bufferLength>0)
 		{
@@ -849,19 +1257,19 @@ M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t 
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert unsigned long to hexadecimal number");
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert unsigned long to hexadecimal number");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (buffer==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -877,9 +1285,6 @@ M2MString *M2MString_convertFromUnsignedLongToHexadecimalString (const uint32_t 
  */
 M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_convertFromUnsignedLongToString()";
-
 	//===== Check argument =====
 	if (bufferLength>0)
 		{
@@ -893,16 +1298,82 @@ M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2M
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert \"uint32_t\" number into string");
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert \"uint32_t\" number into string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
 		return NULL;
 		}
+	}
+
+
+/**
+ * Converts a UTF-16 string to UTF-8. Returns a new string that must be freed<br>
+ * or NULL if no conversion was needed.<br>
+ *
+ * @param[in,out] string
+ * @param[in] stringLength
+ * @return
+ */
+M2MString *M2MString_convertFromUTF16ToUTF8 (M2MString **string, size_t *stringLength)
+	{
+	//========== Variable ==========
+	M2MString *u = NULL;
+	size_t l = 0;
+	size_t sl = 0;
+	size_t max = *stringLength;
+	int32_t c = 0L;
+	int32_t d = 0L;
+	int32_t b = 0;
+	int32_t be = (**string==(M2MString)'\xFE') ? 1 : (**string==(M2MString)'\xFF') ? 0 : -1;
+	const uint32_t XMLParser_BUFSIZE = 1024;
+
+	//=====  =====
+	if (be == -1)
+		{
+		return NULL; // not UTF-16
+		}
+	//=====  =====
+	u = (M2MString *)M2MHeap_malloc((*stringLength));
+	//=====  =====
+	for (sl=2; sl<*stringLength-1; sl+=2)
+		{
+		c = (be) ? (((*string)[sl] & 0xFF) << 8) | ((*string)[sl + 1] & 0xFF) // UTF-16BE
+				: (((*string)[sl + 1] & 0xFF) << 8) | ((*string)[sl] & 0xFF); // UTF-16LE
+		if (c>=0xD800 && c<=0xDFFF && (sl+=2)<*stringLength-1)
+			{ // high-half
+			d = (be) ? (((*string)[sl] & 0xFF) << 8) | ((*string)[sl + 1] & 0xFF) : (((*string)[sl + 1] & 0xFF) << 8) | ((*string)[sl] & 0xFF);
+			c = (((c & 0x3FF) << 10) | (d & 0x3FF)) + 0x10000;
+			}
+
+		while (l + 6 > max)
+			{
+			u = (M2MString *)M2MHeap_realloc(u, max += XMLParser_BUFSIZE);
+			}
+		if (c < 0x80)
+			{
+			u[l++] = c; // US-ASCII subset
+			}
+		//===== multi-byte UTF-8 sequence =====
+		else
+			{
+			for (b=0, d=c; d; d/=2)
+				{
+				b++; // bits in c
+				}
+			b = (b - 2) / 5; // bytes in payload
+			u[l++] = (0xFF << (7 - b)) | (c >> (6 * b)); // head
+			while (b)
+				{
+				u[l++] = 0x80 | ((c >> (6 * --b)) & 0x3F); // payload
+				}
+			}
+		}
+	return ((*string)=(M2MString *)M2MHeap_realloc(u, (*stringLength)=l));
 	}
 
 
@@ -916,9 +1387,6 @@ M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2M
  */
 bool M2MString_equals (const M2MString *one, const M2MString *another, const size_t length)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_equals()";
-
 	//===== Check argument =====
 	if (one!=NULL && another!=NULL && length>0)
 		{
@@ -936,17 +1404,17 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
 	//===== Argument error =====
 	else if (one==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"one\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"one\" string is NULL");
 		return false;
 		}
 	else if (another==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"another\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"another\" string is NULL");
 		return false;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"length\" is invalid");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"length\" is invalid");
 		return false;
 		}
 	}
@@ -965,7 +1433,6 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
 	//========== Variable ==========
 	va_list variableList;
 	int result = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_format()";
 
 	//===== Check argument =====
 	if (buffer!=NULL && bufferLength>0
@@ -979,97 +1446,18 @@ int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MStr
 	//===== Argument error =====
 	else if (buffer==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" is NULL");
 		return -1;
 		}
 	else if (bufferLength<=0)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
 		return -1;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"format\" string is NULL or vacant");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"format\" string is NULL or vacant");
 		return -1;
-		}
-	}
-
-
-/**
- * Copy string indicating the local calendar time to the "buffer" array. <br>
- * Since buffering is not performed inside this function, so the memory <br>
- * area must be reserved on the caller side. <br>
- *
- * @param[out] buffer		A buffer for copying string indicating the time of the local calendar
- * @param[in] bufferLength	Size of the buffer [byte]
- * @return					Integer indicating the size of the local time character string copied to the buffer [bytes]
- */
-unsigned int M2MString_getLocalTime (M2MString *buffer, const size_t bufferLength)
-	{
-	//========== Variable ==========
-	struct timeval currentTime;
-	struct tm *localCalendar = NULL;
-	M2MString *miliSecond = NULL;
-	unsigned int miliSecondLength = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_getLocalTime()";
-
-	//===== Check argument =====
-	if (buffer!=NULL && bufferLength>0)
-		{
-		//===== Initialize array =====
-		memset(buffer, 0, bufferLength);
-		//===== Get local calendar time =====
-		if (gettimeofday(&currentTime, NULL)==0
-				&& (localCalendar=localtime(&(currentTime.tv_sec)))!=NULL)
-			{
-			//===== Convert date to string =====
-			strftime(buffer, bufferLength-1, "%Y/%m/%d %H:%M:%S:", localCalendar);
-			//===== Convert microsecond structure to string =====
-			if (M2MString_convertFromSignedLongToString((currentTime.tv_usec/1000), &miliSecond)!=NULL)
-				{
-				//===== Confirm the length of the converted string =====
-				if ((miliSecondLength=M2MString_length(miliSecond))>0
-						&& miliSecondLength<(bufferLength-M2MString_length(buffer)-1))
-					{
-					//===== Copy converted string into buffer =====
-					memcpy(&(buffer[M2MString_length(buffer)]), miliSecond, miliSecondLength);
-					//===== Release heap memory =====
-					M2MHeap_free(miliSecond);
-					return M2MString_length(buffer);
-					}
-				//===== Error handling =====
-				else
-					{
-					//===== Release heap memory =====
-					M2MHeap_free(miliSecond);
-					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to copy milliseconds string because buffer size is short");
-					return 0;
-					}
-				}
-			//===== Error handling =====
-			else
-				{
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to convert from milliseconds to string");
-				return 0;
-				}
-			}
-		//===== Error handling =====
-		else
-			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get local calendar time");
-			return 0;
-			}
-		}
-	//===== Argument error =====
-	else if (buffer==NULL)
-		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\"is NULL");
-		return 0;
-		}
-	else
-		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"bufferLength\" isn't positive");
-		return 0;
 		}
 	}
 
@@ -1084,9 +1472,6 @@ unsigned int M2MString_getLocalTime (M2MString *buffer, const size_t bufferLengt
  */
 M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_indexOf()";
-
 	//===== Check argument =====
 	if (string!=NULL && keyword!=NULL)
 		{
@@ -1096,13 +1481,96 @@ M2MString *M2MString_indexOf (const M2MString *string, const M2MString *keyword)
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"keyword\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"keyword\" string is NULL");
 		return NULL;
+		}
+	}
+
+
+/**
+ * @param character A character of number
+ * @return			true : argument is number, false : argument isn't number
+ */
+bool M2MString_isNumber (const M2MString character)
+	{
+	if (isdigit(character)!=0)
+		{
+		return true;
+		}
+	else
+		{
+		return false;
+		}
+	}
+
+
+/**
+ * @param[in] self
+ * @return
+ */
+bool M2MString_isSpace (const M2MString *self)
+	{
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== Check head of string is space =====
+		if ((M2MString_compareTo(M2MString_SPACE, self)==0
+				|| M2MString_compareTo(M2MString_ZENKAKU_SPACE, self)==0))
+			{
+			return true;
+			}
+		//===== In the case of not space =====
+		else
+			{
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return false;
+		}
+	}
+
+
+/**
+ * @param[in] self
+ * @return
+ */
+bool M2MString_isUTF (const M2MString *self)
+	{
+	//===== Check argument =====
+	if (self!=NULL)
+		{
+		//===== Check length of string =====
+		if (M2MString_length(self)>=4)
+			{
+			//===== In the case of UTF =====
+			if ((isxdigit(self[0]) && isxdigit(self[1]) && isxdigit(self[2]) && isxdigit(self[3]))!=0)
+				{
+				return true;
+				}
+			//===== In the case of not UTF =====
+			else
+				{
+				return false;
+				}
+			}
+		//===== In the case of short of length =====
+		else
+			{
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return false;
 		}
 	}
 
@@ -1120,7 +1588,6 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *keyw
 	//========== Variable ==========
 	M2MString *lastIndex = NULL;
 	M2MString *index = (M2MString *)string;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_lastIndexOf()";
 
 	//===== Check argument =====
 	if (string!=NULL && keyword!=NULL)
@@ -1137,12 +1604,12 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *keyw
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"fromIndex\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"fromIndex\" string is NULL");
 		return NULL;
 		}
 	}
@@ -1156,9 +1623,6 @@ M2MString *M2MString_lastIndexOf (const M2MString *string, const M2MString *keyw
  */
 size_t M2MString_length (const M2MString *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MString_length()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1167,8 +1631,222 @@ size_t M2MString_length (const M2MString *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL");
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL");
 		return 0;
+		}
+	}
+
+
+/**
+ * This method replaces each substring of this string.<br>
+ * It matches the literal target sequence with the specified literal <br>
+ * replacement sequence.<br>
+ *
+ * @param[in] self			original string
+ * @param[in] target		sequence of character values to be replaced
+ * @param[in] replacement	replacement sequence of character values
+ * @param[out] buffer		buffer for copying replaced string
+ * @param[in] bufferLength	length of buffer[Byte]
+ * @return					replaced string or NULL(means error)
+ */
+M2MString *M2MString_replace (const M2MString *self, const M2MString *target, const M2MString *replacement, M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	M2MString *rest = NULL;
+	M2MString *index = NULL;
+	size_t currentLength = 0;
+	size_t copyM2MStringLength = 0;
+	const size_t TARGET_LENGTH = M2MString_length(target);
+	const size_t REPLACEMENT_LENGTH = M2MString_length(replacement);
+
+	//===== Check argument =====
+	if (self!=NULL && M2MString_length(self)>0
+			&& target!=NULL && M2MString_length(target)>0
+			&& replacement!=NULL
+			&& bufferLength>0)
+		{
+		//===== Initialize buffer =====
+		memset(buffer, 0, bufferLength);
+		rest = (M2MString *)self;
+		//===== Detect position of target string =====
+		while ((index=M2MString_indexOf(rest, target))!=NULL)
+			{
+			//===== Check buffer length =====
+			if ((copyM2MStringLength=M2MString_length(rest)-M2MString_length(index))<(bufferLength-currentLength))
+				{
+				//===== Copy string into buffer =====
+				memcpy(&(buffer[currentLength]), rest, copyM2MStringLength);
+				//===== Update string length =====
+				currentLength += copyM2MStringLength;
+				//===== Check buffer length =====
+				if (REPLACEMENT_LENGTH<(bufferLength-currentLength))
+					{
+					//===== Replace string =====
+					memcpy(&(buffer[currentLength]), replacement, REPLACEMENT_LENGTH);
+					//===== Update string length =====
+					currentLength += REPLACEMENT_LENGTH;
+					//===== Proceed pointer =====
+					index += TARGET_LENGTH;
+					rest = index;
+					}
+				//===== Error handling =====
+				else
+					{
+					memset(buffer, 0, bufferLength);
+					return NULL;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				memset(buffer, 0, bufferLength);
+				return NULL;
+				}
+			}
+		//===== Check buffer length =====
+		if (M2MString_length(rest)<(bufferLength-currentLength))
+			{
+			//===== Copy rest string into buffer =====
+			memcpy(&(buffer[currentLength]), rest, M2MString_length(rest));
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			memset(buffer, 0, bufferLength);
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return NULL;
+		}
+	}
+
+
+/**
+ * If you want to repeat splitting same word, must use same savePoint<br>
+ * variable.<br>
+ *
+ * @param self
+ * @param delimiter
+ * @param savePoint
+ * @return
+ */
+M2MString *M2MString_split (M2MString *self, const M2MString *delimiter, M2MString **savePoint)
+	{
+	//===== Check argument =====
+	if (delimiter!=NULL)
+		{
+		//===== Reentrant tokenization =====
+		return (M2MString *)strtok_r(self, delimiter, (char **)savePoint);
+		}
+	//===== Argument error =====
+	else
+		{
+		return self;
+		}
+	}
+
+
+/**
+ * @param self
+ * @param buffer
+ * @param bufferLength
+ * @return
+ */
+M2MString *M2MString_toLowerCase (const M2MString *self, M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	size_t i = 0;
+	size_t selfLength = 0;
+	const unsigned int CHARACTER_LENGTH = 4;
+	M2MString character[CHARACTER_LENGTH];
+
+	//===== Check argument =====
+	if (self!=NULL && bufferLength>0)
+		{
+		//===== Get length of string =====
+		if ((selfLength=M2MString_length(self))>0 && selfLength<bufferLength)
+			{
+			//===== Initialize buffer =====
+			memset(character, 0, CHARACTER_LENGTH);
+			//===== Repeat transfer =====
+			for (i=0; i<selfLength; i++)
+				{
+				//===== Transfer a character =====
+				character[0] = tolower(self[i]);
+				memcpy(&(buffer[i]), character, 1);
+				//===== Initialize buffer =====
+				memset(character, 0, CHARACTER_LENGTH);
+				}
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		return NULL;
+		}
+	else
+		{
+		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in] self
+ * @param[out] upperCaseM2MString	buffer for upper case string(caller muse release this allocated memory)
+ * @return
+ */
+M2MString *M2MString_toUpperCase (const M2MString *self, M2MString *buffer, const size_t bufferLength)
+	{
+	//========== Variable ==========
+	size_t i = 0;
+	size_t selfLength = 0;
+	const unsigned int CHARACTER_LENGTH = 2;
+	M2MString character[CHARACTER_LENGTH];
+
+	//===== Check argument =====
+	if (self!=NULL && bufferLength>0)
+		{
+		//===== Get length of string =====
+		if ((selfLength=M2MString_length(self))>0 && selfLength<bufferLength)
+			{
+			//===== Initialize buffer =====
+			memset(character, 0, CHARACTER_LENGTH);
+			//===== Repeat transfer =====
+			for (i=0; i<selfLength; i++)
+				{
+				//===== Transfer a character =====
+				character[0] = toupper(self[i]);
+				memcpy(&(buffer[i]), character, 1);
+				//===== Initialize buffer =====
+				memset(character, 0, CHARACTER_LENGTH);
+				}
+			return buffer;
+			}
+		//===== Error handling =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		return NULL;
+		}
+	else
+		{
+		return NULL;
 		}
 	}
 

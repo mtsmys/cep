@@ -44,6 +44,15 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self);
 
 
 /**
+ * Get logger object owned by the argument "M2MTableManager" object.<br>
+ *
+ * @param[in] self	Table construction object
+ * @return			Logger object
+ */
+static M2MFileAppender *this_getLogger (const M2MTableManager *self);
+
+
+/**
  * Get the table name string held by the table construction object.<br>
  *
  * @param[in] self	Table construction object
@@ -73,9 +82,6 @@ static M2MTableManager *this_previous (const M2MTableManager *self);
  */
 static M2MTableManager *this_begin (M2MTableManager *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager.this_begin()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -88,7 +94,6 @@ static M2MTableManager *this_begin (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		return NULL;
 		}
 	}
@@ -121,7 +126,7 @@ static void this_deleteColumnList (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		}
 	return;
 	}
@@ -154,7 +159,7 @@ static void this_deleteTableName (M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		}
 	return;
 	}
@@ -238,29 +243,29 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 		//===== Error handling =====
 		else if (column==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL", NULL);
+			M2MLogger_error(M2MColumnList_getLogger(columnList), METHOD_NAME, __LINE__, (M2MString *)"\"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL");
 			return NULL;
 			}
 		else if (columnName==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Column name which is a member variable of \"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL", NULL);
+			M2MLogger_error(M2MColumnList_getLogger(columnList), METHOD_NAME, __LINE__, (M2MString *)"Column name which is a member variable of \"M2 MColumn *\" obtained from \"M2 MColumnList *\" specified as argument is NULL");
 			return NULL;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data type of \"M2MColumn *\" obtained from \"M2MColumnList *\" specified by argument is NULL", NULL);
+			M2MLogger_error(M2MColumnList_getLogger(columnList), METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data type of \"M2MColumn *\" obtained from \"M2MColumnList *\" specified by argument is NULL");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (columnList==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2MColumnList *\" specified as argument is NULL", NULL);
+		M2MLogger_error(M2MColumnList_getLogger(columnList), METHOD_NAME, __LINE__, (M2MString *)"\"M2MColumnList *\" specified as argument is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"ColumnDefinition\" specified as argument is NULL", NULL);
+		M2MLogger_error(M2MColumnList_getLogger(columnList), METHOD_NAME, __LINE__, (M2MString *)"\"ColumnDefinition\" specified as argument is NULL");
 		return NULL;
 		}
 	}
@@ -285,7 +290,32 @@ static M2MColumnList *this_getColumnList (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * Get logger object owned by the argument "M2MTableManager" object.<br>
+ *
+ * @param[in] self	Table construction object
+ * @return			Logger object
+ */
+static M2MFileAppender *this_getLogger (const M2MTableManager *self)
+	{
+	//========== Variable ==========
+	M2MColumnList *columnList = NULL;
+
+	//===== Check argument =====
+	if (self!=NULL
+			&& (columnList=this_getColumnList(this_begin((M2MTableManager *)self)))!=NULL)
+		{
+		return M2MColumnList_getLogger(columnList);
+		}
+	//===== Argument error =====
+	else
+		{
 		return NULL;
 		}
 	}
@@ -344,7 +374,7 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 				//===== When acquisition of column definition character string failed =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An attempt to create a column definition character string has failed", NULL);
+					M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"An attempt to create a column definition character string has failed");
 					//===== Free heap memory area =====
 					M2MHeap_free(columnDefinition);
 					M2MHeap_free((*sql));
@@ -367,12 +397,12 @@ static M2MString *this_getTableCreateSQL (const M2MTableManager *self, M2MString
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" pointer is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" pointer is NULL");
 		return NULL;
 		}
 	}
@@ -397,7 +427,7 @@ static M2MString *this_getTableName (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	}
@@ -422,7 +452,7 @@ static M2MTableManager *this_next (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	}
@@ -447,7 +477,7 @@ static M2MTableManager *this_previous (const M2MTableManager *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	}
@@ -474,12 +504,12 @@ static M2MTableManager *this_setColumnList (M2MTableManager *self, M2MColumnList
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -506,7 +536,7 @@ static M2MTableManager *this_setNext (M2MTableManager *self, M2MTableManager *ne
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	}
@@ -534,12 +564,12 @@ static M2MTableManager *this_setPrevious (M2MTableManager *self, M2MTableManager
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"previous\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"previous\" object is NULL");
 		return NULL;
 		}
 	}
@@ -576,26 +606,26 @@ static M2MTableManager *this_setTableName (M2MTableManager *self, const M2MStrin
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for copying the character string indicating the table name", NULL);
+				M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to get the heap memory area for copying the character string indicating the table name");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The length of the string of \"tableName\" specified by argument is 0 or less", NULL);
+			M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The length of the string of \"tableName\" specified by argument is 0 or less");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL");
 		return NULL;
 		}
 	}
@@ -618,7 +648,6 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 	bool executeUpdate = false;
 	M2MString *sql = NULL;
 	M2MString MESSAGE[256];
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_createTable()";
 
 	//===== Check argument =====
 	if (self!=NULL && database!=NULL)
@@ -645,9 +674,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					//===== When the SQL statement for table construction has not been executed yet =====
 					else
 						{
-#ifdef DEBUG
-						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
-#endif // DEBUG
+						M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"Start the construction process of CEP table");
 						//===== Start transaction =====
 						M2MSQLRunner_beginTransaction(database);
 						//===== Set a flag =====
@@ -659,14 +686,12 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 						//===== Execute SQL =====
 						if (M2MSQLRunner_executeUpdate(database, sql)==true)
 							{
-#ifdef DEBUG
-							M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
-#endif // DEBUG
+							M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 							}
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database), NULL);
+							M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)sqlite3_errmsg(database));
 							}
 						//===== Free heap memory area of SQL statement =====
 						M2MHeap_free(sql);
@@ -676,7 +701,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 						{
 						memset(MESSAGE, 0, sizeof(MESSAGE));
 						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to retrieve SQL statement for building table(= \"%s\")", this_getTableName(self));
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
+						M2MLogger_error(this_getLogger(self), __func__, __LINE__, MESSAGE);
 						}
 					}
 				//===== Proceed to the next node =====
@@ -698,9 +723,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				//===== When the SQL statement for table construction has not been executed yet =====
 				else
 					{
-#ifdef DEBUG
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
-#endif // DEBUG
+					M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"Start the construction process of CEP table");
 					//===== Start transaction =====
 					M2MSQLRunner_beginTransaction(database);
 					//===== Set a flag =====
@@ -712,14 +735,12 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					//===== Execute SQL =====
 					if (M2MSQLRunner_executeUpdate(database, sql)==true)
 						{
-#ifdef DEBUG
-						M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
-#endif // DEBUG
+						M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, sqlite3_errmsg(database), NULL);
+						M2MLogger_error(this_getLogger(self), __func__, __LINE__, sqlite3_errmsg(database));
 						}
 					//===== Free heap memory area of SQL statement =====
 					M2MHeap_free(sql);
@@ -729,7 +750,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					{
 					memset(MESSAGE, 0, sizeof(MESSAGE));
 					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to retrieve SQL statement for building table(=\"%s\")", this_getTableName(self));
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
+					M2MLogger_error(this_getLogger(self), __func__, __LINE__, MESSAGE);
 					}
 				}
 			//===== When executing SQL statement for table construction =====
@@ -737,9 +758,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				{
 				//===== End transaction =====
 				M2MSQLRunner_commitTransaction(database);
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish CEP table construction processing");
-#endif // DEBUG
+				M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"Finish CEP table construction processing");
 				}
 			//===== When the SQL statement for table construction has not been executed yet =====
 			else
@@ -752,19 +771,19 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node from \"M2MTableManager *\" specified by argument", NULL);
+			M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get the first node from \"M2MTableManager *\" specified by argument");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"database\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"database\" object is NULL");
 		return;
 		}
 	}
@@ -781,7 +800,6 @@ void M2MTableManager_delete (M2MTableManager **self)
 	{
 	//========== Variable ==========
 	M2MTableManager *next = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
@@ -806,26 +824,20 @@ void M2MTableManager_delete (M2MTableManager **self)
 				this_deleteTableName((*self));
 				this_deleteColumnList((*self));
 				M2MHeap_free((*self));
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Free memory area of CEP table construction object");
-#endif // DEBUG
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Since the end node of the CEP table construction object is NULL, the memory area can not be released", NULL);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Acquisition of the first node failed in the process of releasing the memory area of the CEP table construction object", NULL);
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
 		}
 	return;
 	}
@@ -840,9 +852,6 @@ void M2MTableManager_delete (M2MTableManager **self)
  */
 M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MString *tableName)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_getColumnList()";
-
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
@@ -881,19 +890,19 @@ M2MColumnList *M2MTableManager_getColumnList (M2MTableManager *self, const M2MSt
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get begin node from indicated \"M2MTableManager\" object", NULL);
+			M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get begin node from indicated \"M2MTableManager\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL");
 		return NULL;
 		}
 	}
@@ -908,7 +917,6 @@ M2MTableManager *M2MTableManager_new ()
 	{
 	//========== Variable ==========
 	M2MTableManager *self = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_new()";
 
 	//===== Get heap memory =====
 	if ((self=(M2MTableManager *)M2MHeap_malloc(sizeof(M2MTableManager)))!=NULL)
@@ -916,15 +924,11 @@ M2MTableManager *M2MTableManager_new ()
 		//===== Set member variables =====
 		this_setPrevious(self, self);
 		this_setNext(self, NULL);
-#ifdef DEBUG
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Created new table construction object");
-#endif // DEBUG
 		return self;
 		}
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for creating \"M2MTableManager\" object", NULL);
 		return NULL;
 		}
 	}
@@ -940,9 +944,6 @@ M2MTableManager *M2MTableManager_new ()
  */
 M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MString *tableName, M2MColumnList *columnList)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MTableManager_setConfig()";
-
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL && columnList!=NULL)
 		{
@@ -955,24 +956,24 @@ M2MTableManager *M2MTableManager_setConfig (M2MTableManager *self, const M2MStri
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set table name or column structure object in \"M2MTableManager\" object", NULL);
+			M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to set table name or column structure object in \"M2MTableManager\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MTableManager\" object is NULL");
 		return NULL;
 		}
 	else if (tableName==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL", NULL);
+		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}

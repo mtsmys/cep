@@ -124,6 +124,15 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self);
 
 
 /**
+ * Return Logger object held by column information object.<br>
+ *
+ * @param[in] self	Column information list object
+ * @return			Logger object owned by argument or NULL (in case of error)
+ */
+M2MFileAppender *M2MColumnList_getLogger (const M2MColumnList *self);
+
+
+/**
  * Check whether or not the column structure object has one or more values.<br>
  *
  * @param[in] self	Column information list object

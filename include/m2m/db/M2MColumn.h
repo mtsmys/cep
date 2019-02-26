@@ -38,6 +38,7 @@
 #include "m2m/io/M2MHeap.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"
+#include "m2m/log/M2MFileAppender.h"
 #include <stdbool.h>
 
 
@@ -61,6 +62,7 @@ extern "C"
  * @param autoIncrement		Flag for auto increment enable
  * @param allowNULL			Flag for NULL activation
  * @param unique			Flag of uniqueness validation
+ * @param logger			Logger object
  */
 #ifndef M2MColumn
 typedef struct
@@ -71,6 +73,7 @@ typedef struct
 	bool autoIncrement;
 	bool allowNULL;
 	bool unique;
+	M2MFileAppender *logger;
 	} M2MColumn;
 #endif /* M2MColumn */
 
@@ -130,6 +133,15 @@ bool M2MColumn_getAllowNULL (const M2MColumn *self);
 
 
 /**
+ * Return Logger object held by column information object.<br>
+ *
+ * @param[in] self	Column information object
+ * @return			Logger object owned by argument or NULL (in case of error)
+ */
+M2MFileAppender *M2MColumn_getLogger (const M2MColumn *self);
+
+
+/**
  * Return flag of uniqueness validation held by column information object.<br>
  *
  * @param[in] self	Column information object
@@ -174,6 +186,16 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL);
  * @return				Column information object with enumerator indicating data type or NULL (in case of error)
  */
 M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType);
+
+
+/**
+ * Set logging structure object in column information object.<br>
+ *
+ * @param[in,out] self	Column information object
+ * @param[in] logger	Logging structure object
+ * @return				Column information object with logger set or NULL (in case of error)
+ */
+M2MColumn *M2MColumn_setLogger (M2MColumn *self, const M2MFileAppender *logger);
 
 
 /**

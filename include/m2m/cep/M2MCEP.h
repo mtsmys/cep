@@ -39,7 +39,7 @@
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/io/M2MDirectory.h"
 #include "m2m/lang/M2MString.h"
-#include "m2m/log/M2MLogger.h"
+#include "m2m/log/M2MFileAppender.h"
 #include "m2m/util/M2MBase64.h"
 #include <signal.h>
 #include <sqlite3.h>
@@ -83,6 +83,7 @@ extern "C"
  * @param vacuumRecord		Number of records to execute database vacuum processing (auto vacuum setting in case of 0)
  * @param recordCounter		Record number counter for executing vacuum process of database
  * @param persistence		Flag indicating permanence of SQLite3 database on file
+ * @param logger			File logging object
  */
 #ifndef M2MCEP
 typedef struct
@@ -96,6 +97,7 @@ typedef struct
 	unsigned int vacuumRecord;
 	unsigned int recordCounter;
 	bool persistence;
+	M2MFileAppender *logger;
 	} M2MCEP;
 #endif /* M2MCEP */
 
@@ -133,6 +135,15 @@ M2MString *M2MCEP_getDatabaseName (const M2MCEP *self);
  * @return			SQLite3 database object on file or NULL (in case of error)
  */
 sqlite3 *M2MCEP_getFileDatabase (M2MCEP *self);
+
+
+/**
+ * Return the logging object owned by the argument CEP object.<br>
+ *
+ * @param[in] self	CEP structure object
+ * @return			Logging object
+ */
+M2MFileAppender *M2MCEP_getLogger (const M2MCEP *self);
 
 
 /**
@@ -209,6 +220,16 @@ M2MCEP *M2MCEP_new (const M2MString *databaseName, const M2MTableManager *tableM
  * @return
  */
 unsigned char *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result);
+
+
+/**
+ * Set logging structure object in column information object.<br>
+ *
+ * @param[in,out] self	Column information object
+ * @param[in] logger	Logging structure object
+ * @return				Column information object with logger set or NULL (in case of error)
+ */
+M2MCEP *M2MCEP_setLogger (M2MCEP *self, const M2MFileAppender *logger);
 
 
 /**

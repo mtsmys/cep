@@ -1,7 +1,7 @@
 /*******************************************************************************
- * NGByteOrder.c
+ * M2MByteOrder.c
  *
- * Copyright (c) 2015, Akihisa Yasuda
+ * Copyright (c) 2019, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "ng/io/NGByteOrder.h"
+#include "m2m/io/M2MByteOrder.h"
 
 
 /*******************************************************************************
@@ -101,9 +101,9 @@ static uint16_t this_ntohs (const uint16_t netshort)
  * @param[in] targetEndian
  * @return
  */
-uint32_t NGByteOrder_convertInteger (const uint32_t intNumber, const NGByteOrder_Endian targetEndian)
+uint32_t M2MByteOrder_convertInteger (const uint32_t intNumber, const M2MByteOrder_Endian targetEndian)
 	{
-	if (targetEndian==NGByteOrder_BIG_ENDIAN)
+	if (targetEndian==M2MByteOrder_BIG_ENDIAN)
 		{
 		return this_htonl(intNumber);
 		}
@@ -119,9 +119,9 @@ uint32_t NGByteOrder_convertInteger (const uint32_t intNumber, const NGByteOrder
  * @param[in] targetEndian
  * @return
  */
-uint32_t NGByteOrder_convertShort (const uint16_t shortNumber, const NGByteOrder_Endian targetEndian)
+uint32_t M2MByteOrder_convertShort (const uint16_t shortNumber, const M2MByteOrder_Endian targetEndian)
 	{
-	if (targetEndian==NGByteOrder_BIG_ENDIAN)
+	if (targetEndian==M2MByteOrder_BIG_ENDIAN)
 		{
 		return this_htons(shortNumber);
 		}

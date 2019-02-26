@@ -31,6 +31,16 @@
 
 
 /*******************************************************************************
+ * Declaration of private function
+ ******************************************************************************/
+/**
+ * @param[in,out] self
+ * @return
+ */
+static M2MFile *this_setName (M2MFile *self);
+
+
+/*******************************************************************************
  * Private function
  ******************************************************************************/
 /**
@@ -492,26 +502,6 @@ M2MFile *M2MFile_createNewFile (M2MFile *self, const M2MString *permission)
 
 
 /**
- * Close the file specified by the argument.<br>
- *
- * @param[in,out] file	FILE structure object
- */
-void M2MFile_close (FILE *file)
-	{
-	//===== Check argument =====
-	if (file!=NULL)
-		{
-		fclose(file);
-		}
-	//===== Argument error =====
-	else
-		{
-		}
-	return;
-	}
-
-
-/**
  * Destructor.
  *
  * @param[in,out] self	File structure object
@@ -965,53 +955,6 @@ M2MFile *M2MFile_new (const M2MString *filePath)
 	}
 
 
-
-
-
-/**
- * Open the file with the argument pathname in readable & writable type.<br>
- *
- * @param[in] filePath	Absolute pathname of the file to open
- * @param[in] append	Flag indicating presence or absence of additional mode
- * @return				FILE structure object or NULL (in case of error)
- */
-FILE *M2MFile_open (const unsigned char *filePath, const bool append)
-	{
-	//===== Check argument =====
-	if (filePath!=NULL)
-		{
-		//===== In case of additional writable permission =====
-		if (append==true)
-			{
-			//===== Open the file in additional writing mode =====
-			return this_openFileInAppendType(filePath);
-			}
-		//===== In the case of no additional mode =====
-		else
-			{
-			//===== Confirm existence of existing file =====
-			if (M2MFile_exists(filePath)==true)
-				{
-				//===== Delete the file because prohibited additional writing =====
-				M2MFile_remove(filePath);
-				}
-			//===== When there is no existing file =====
-			else
-				{
-				// do nothing
-				}
-			//===== Open the file in additional writing mode =====
-			return this_openFileInAppendType(filePath);
-			}
-		}
-	//===== Argument error =====
-	else
-		{
-		return NULL;
-		}
-	}
-
-
 /**
  * This method opens file which is indicated path string as argument.<br>
  *
@@ -1022,6 +965,7 @@ M2MFile *M2MFile_open (M2MFile *self)
 	{
 	//========== Variable ==========
 	FILE *file = NULL;
+	M2MString *filePath = NULL;
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -1035,12 +979,17 @@ M2MFile *M2MFile_open (M2MFile *self)
 		else
 			{
 			//===== Open file =====
-			if ((file=fopen(M2MFile_getFilePath(self), "a+b"))!=NULL)
+			if ((filePath=M2MFile_getFilePath(self))!=NULL
+					&& (file=this_openFileInAppendType(filePath))!=NULL)
 				{
 				//===== Set opened file into File object =====
 				return this_setFile(self, file);
 				}
 			//===== Error handling =====
+			else if (filePath==NULL)
+				{
+				return NULL;
+				}
 			else
 				{
 				return NULL;

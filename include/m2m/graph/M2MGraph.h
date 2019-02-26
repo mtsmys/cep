@@ -36,6 +36,7 @@
 
 #include "m2m/graph/M2MNode.h"
 #include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MFileAppender.h"
 #include "m2m/io/M2MHeap.h"
 #include <sqlite3.h>
 
@@ -54,6 +55,7 @@ extern "C"
 /**
  * @param databaseName		String indicating SQLite3 database file name
  * @param fileDatabase		Handler of SQLite3 file database connection
+ * @param logger			Logger object
  * @param memoryDatabase	Handler of SQLite3 memory database connection
  */
 #ifndef M2MGraph
@@ -61,6 +63,7 @@ typedef struct
 	{
 	M2MString *databaseName;
 	sqlite3 *fileDatabase;
+	M2MFileAppender *logger;
 	sqlite3 *memoryDatabase;
 	} M2MGraph;
 #endif /* M2MGraph */

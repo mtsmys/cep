@@ -52,7 +52,7 @@ static void this_deleteColumnName (M2MDataFrame *self)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no column name", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no column name");
 		}
 	return;
 	}
@@ -77,7 +77,7 @@ static void this_deleteNewRecordList (M2MDataFrame *self)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"newRecordList\" object", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"newRecordList\" object");
 		}
 	return;
 	}
@@ -102,7 +102,7 @@ static void this_deleteOldRecordList (M2MDataFrame *self)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"oldRecordList\" object", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has no \"oldRecordList\" object");
 		}
 	return;
 	}
@@ -127,7 +127,7 @@ static void this_deleteTableName (M2MDataFrame *self)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has not table name string", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object has not table name string");
 		}
 	return;
 	}
@@ -144,19 +144,11 @@ static void this_deleteTableName (M2MDataFrame *self)
 static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MString *tableName)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_detectM2MDataFrame()";
 
 	//===== Check argument =====
 	if (self!=NULL && tableName!=NULL)
 		{
-#ifdef DEBUG
-		memset(MESSAGE, 0, sizeof(MESSAGE));
-		snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"It searches whether there is a node matching the table name (=\"%s\") specified in the argument in the record management object", tableName);
-		M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 		//===== Get the begin node of record management object =====
 		if ((self=M2MDataFrame_begin(self))!=NULL)
 			{
@@ -166,22 +158,11 @@ static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MStrin
 				//===== When it matches the table name held by the node =====
 				if (M2MString_compareTo(M2MDataFrame_getTableName(self), tableName)==0)
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name specified by the argument (=\"%s\") matched", M2MDataFrame_getTableName(self), tableName);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish the search process");
-#endif // DEBUG
 					return self;
 					}
 				//===== When table names are different =====
 				else
 					{
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE));
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name (=\"%s\") specified by the argument are different", M2MDataFrame_getTableName(self), tableName);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 					//===== Go to next node =====
 					self = M2MDataFrame_next(self);
 					}
@@ -189,41 +170,30 @@ static M2MDataFrame *this_detectM2MDataFrame (M2MDataFrame *self, const M2MStrin
 			//===== When matches the table name possessed by the terminal node =====
 			if (M2MString_compareTo(M2MDataFrame_getTableName(self), tableName)==0)
 				{
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name specified by the argument (=\"%s\") matched", M2MDataFrame_getTableName(self), tableName);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Finish the search process");
-#endif // DEBUG
 				return self;
 				}
 			//===== When the table name owned by the terminal node is different =====
 			else
 				{
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"The table name (=\"%s\") of the record management object and the table name (=\"%s\") specified by the argument are different", M2MDataFrame_getTableName(self), tableName);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The first node obtained from \"M2MDataFrame *\" argument object is NULL", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The first node obtained from \"M2MDataFrame *\" argument object is NULL");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -253,7 +223,7 @@ static M2MDataFrame *this_end (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -291,12 +261,12 @@ static void this_init (M2MDataFrame *self)
 		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object to store newly inserted record information", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object to store newly inserted record information");
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object for storing record information inserted in the past", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to create a list structure object for storing record information inserted in the past");
 			this_deleteNewRecordList(self);
 			return;
 			}
@@ -304,7 +274,7 @@ static void this_init (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return;
 		}
 	}
@@ -342,11 +312,11 @@ static unsigned int this_length (M2MDataFrame *self)
 			//===== Error handling =====
 			else if (tableName==NULL || M2MString_length(tableName)<=0)
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant");
 				}
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant");
 				}
 			//=====  =====
 			while (M2MDataFrame_next(self)!=NULL)
@@ -362,11 +332,11 @@ static unsigned int this_length (M2MDataFrame *self)
 				//===== Error handling =====
 				else if (tableName==NULL || M2MString_length(tableName)<=0)
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"\"tableName\" string owned by argument is NULL or vacant");
 					}
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"\"columnName\" CSV string owned by argument is NULL or vacant");
 					}
 				}
 			//===== Return the number of record management object =====
@@ -375,14 +345,14 @@ static unsigned int this_length (M2MDataFrame *self)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node from the argument object", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node from the argument object");
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return 0;
 		}
 	}
@@ -415,29 +385,29 @@ static M2MDataFrame *this_setColumnName (M2MDataFrame *self, const M2MString *cs
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get of the heap memory area to copy the string indicating the column name in CSV format", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to get of the heap memory area to copy the string indicating the column name in CSV format");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	else if (csv==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"csv\" string is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"csv\" string is NULL");
 		return NULL;
 		}
 	else if (lineLength<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is less than or equal to 0", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is less than or equal to 0");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is larger than the number of \"csv\" string", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! \"lineLength\" number is larger than the number of \"csv\" string");
 		return NULL;
 		}
 	}
@@ -457,9 +427,6 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 	M2MString *lineHead = NULL;
 	M2MString *lineEnd = NULL;
 	size_t lineLength = 0;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
 	const unsigned int CRLF_LENGTH = M2MString_length(M2MString_CRLF);
 	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame.this_setCSVIntoNewRecordList()";
 
@@ -488,13 +455,13 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to store record in CSV format to record information object. . . Continue processing", NULL);
+						M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to store record in CSV format to record information object. . . Continue processing");
 						}
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in the CSV format character string is 0 [Byte] or less. . . Continue processing", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in the CSV format character string is 0 [Byte] or less. . . Continue processing");
 					}
 				//===== Move to the beginning of the next line =====
 				lineEnd += CRLF_LENGTH;
@@ -508,17 +475,12 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 					{
 					//===== Increment the number of copied record lines =====
 					numberOfRecord++;
-#ifdef DEBUG
-					memset(MESSAGE, 0, sizeof(MESSAGE)-1l);
-					snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"We retrieved \"%u\" records information from the CSV format string specified by argument", numberOfRecord);
-					M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 					return numberOfRecord;
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to store CSV format character string in record information object", NULL);
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to store CSV format character string in record information object");
 					//===== When the number of records set is 1 or more =====
 					if (numberOfRecord>=1)
 						{
@@ -534,7 +496,7 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in CSV format string is 0 [Byte] or less", NULL);
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The number of character strings in CSV format string is 0 [Byte] or less");
 				//===== When the number of records set is 1 or more =====
 				if (numberOfRecord>=1)
 					{
@@ -550,19 +512,19 @@ static int this_setCSVIntoNewRecordList (M2MList *newRecordList, const M2MString
 		//===== When there is no data row =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The CSV format character string specified by argument is illegal data with only the header line of the first line", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The CSV format character string specified by argument is illegal data with only the header line of the first line");
 			return -1;
 			}
 		}
 	//===== Argument error =====
 	else if (newRecordList==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The record information object for new insertion specified by argument is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The record information object for new insertion specified by argument is NULL");
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CSV format string specified by argument is NULL or blank", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! The CSV format string specified by argument is NULL or blank");
 		return -1;
 		}
 	}
@@ -597,19 +559,19 @@ static M2MDataFrame *this_setTableName (M2MDataFrame *self, const M2MString *tab
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory area for copying \"tableName\" string", NULL);
+			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory area for copying \"tableName\" string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
+		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -665,7 +627,6 @@ void M2MDataFrame_delete (M2MDataFrame **self)
 	{
 	//========== Variable ==========
 	M2MDataFrame *next = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL && (*self)!=NULL)
@@ -699,19 +660,19 @@ void M2MDataFrame_delete (M2MDataFrame **self)
 				}
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Internal error! NULL is included in the node of \"M2MDataFrame *\" specified by argument", NULL);
+				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Internal error! NULL is included in the node of \"M2MDataFrame *\" specified by argument");
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the first node of \"M2MDataFrame *\" specified by argument", NULL);
+			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to get the first node of \"M2MDataFrame *\" specified by argument");
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"M2MDataFrame *\" specified by argument is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"\"M2MDataFrame *\" specified by argument is NULL");
 		}
 	return;
 	}
@@ -726,9 +687,6 @@ void M2MDataFrame_delete (M2MDataFrame **self)
  */
 M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getColumnName()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -737,7 +695,7 @@ M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -751,9 +709,6 @@ M2MString *M2MDataFrame_getColumnName (const M2MDataFrame *self)
  */
 M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getNewRecordList()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -762,7 +717,7 @@ M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -776,9 +731,6 @@ M2MList *M2MDataFrame_getNewRecordList (const M2MDataFrame *self)
  */
 M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getOldRecordList()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -787,7 +739,7 @@ M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -801,9 +753,6 @@ M2MList *M2MDataFrame_getOldRecordList (const M2MDataFrame *self)
  */
 M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_getTableName()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -812,7 +761,7 @@ M2MString *M2MDataFrame_getTableName (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -835,10 +784,6 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 	void *value = NULL;
 	size_t valueLength = 0;
 	unsigned int counter = 0;
-#ifdef DEBUG
-	M2MString MESSAGE[256];
-#endif // DEBUG
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_moveFromNewRecordListToOldRecordList()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -865,13 +810,13 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object", NULL);
+							M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object");
 							}
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less", NULL);
+						M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less");
 						}
 					//===== Delete the moved record from the new record information object and move to the next node =====
 					newRecordList = M2MList_remove(newRecordList);
@@ -888,46 +833,41 @@ void M2MDataFrame_moveFromNewRecordListToOldRecordList (M2MDataFrame *self)
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object", NULL);
+						M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"An error occurred during the process of copying the new record information object to the past record information object");
 						}
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less", NULL);
+					M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"The record value of the new record information object is NULL or the record size is 0 [byte] or less");
 					}
 				//===== Delete moved record from new record information object =====
 				self->newRecordList = M2MList_remove(newRecordList);
-#ifdef DEBUG
-				memset(MESSAGE, 0, sizeof(MESSAGE));
-				snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"\"%u\" records were moved from the new record information object in the \"%s\" table to the past record information object", M2MDataFrame_getTableName(self), counter);
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
-#endif // DEBUG
 				return;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The first node of \"newRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
+				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"The first node of \"newRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL");
 				return;
 				}
 			}
 		//===== Error handling =====
 		else if (newRecordList==NULL)
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"NewRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
+			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"\"NewRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL");
 			return;
 			}
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"\"OldRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL", NULL);
+			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"\"OldRecordList\" obtained from \"M2MDataFrame *\" specified by argument is NULL");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return;
 		}
 	}
@@ -944,7 +884,6 @@ M2MDataFrame *M2MDataFrame_new ()
 	{
 	//========== Variable ==========
 	M2MDataFrame *self = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_new()";
 
 	//===== Get the heap memory area =====
 	if ((self=(M2MDataFrame *)M2MHeap_malloc(sizeof(M2MDataFrame)))!=NULL)
@@ -956,15 +895,12 @@ M2MDataFrame *M2MDataFrame_new ()
 				//===== Initialization of member variables =====
 				M2MDataFrame_setPreviousRecord(self, self);
 				M2MDataFrame_setNextRecord(self, NULL);
-#ifdef DEBUG
-				M2MLogger_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Created a new CEP record management object");
-#endif // DEBUG
 				return self;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create an object to manage inserted record information", NULL);
+				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to create an object to manage inserted record information");
 				this_deleteNewRecordList(self);
 				this_deleteColumnName(self);
 				M2MHeap_free(self);
@@ -974,7 +910,7 @@ M2MDataFrame *M2MDataFrame_new ()
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create an object to manage new record information", NULL);
+			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to create an object to manage new record information");
 			this_deleteColumnName(self);
 			M2MHeap_free(self);
 			return NULL;
@@ -983,7 +919,7 @@ M2MDataFrame *M2MDataFrame_new ()
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create a record management object", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to create a record management object");
 		return NULL;
 		}
 	}
@@ -997,9 +933,6 @@ M2MDataFrame *M2MDataFrame_new ()
  */
 M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_next()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1008,7 +941,7 @@ M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -1023,9 +956,6 @@ M2MDataFrame *M2MDataFrame_next (const M2MDataFrame *self)
  */
 M2MDataFrame *M2MDataFrame_previous (const M2MDataFrame *self)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_previous()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1034,7 +964,7 @@ M2MDataFrame *M2MDataFrame_previous (const M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return NULL;
 		}
 	}
@@ -1055,7 +985,6 @@ void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName)
 	M2MDataFrame *previous = NULL;
 	M2MDataFrame *next = NULL;
 	M2MString MESSAGE[256];
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_remove()";
 
 	//===== Check argument =====
 	if (self!=NULL
@@ -1113,19 +1042,19 @@ void M2MDataFrame_remove (M2MDataFrame *self, const M2MString *tableName)
 			{
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"There is not a table matched the name(=\"%s\")", tableName);
-			M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE, NULL);
+			M2MLogger_error(NULL, __func__, __LINE__, MESSAGE);
 			return;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return;
 		}
 	}
@@ -1163,7 +1092,6 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 	M2MString *lineEnd = NULL;
 	size_t lineLength = 0;
 	int numberOfRecord = -1;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_setCSV()";
 
 	//===== Check argument =====
 	if (self!=NULL
@@ -1182,7 +1110,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"A new record information list can not be acquired from the record management object specified by the argument", NULL);
+				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"A new record information list can not be acquired from the record management object specified by the argument");
 				return -1;
 				}
 			}
@@ -1209,7 +1137,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set record information object in CSV format record", NULL);
+							M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set record information object in CSV format record");
 							//===== Initialize node of record management object (delete table name and new record information object) =====
 							this_init(self);
 							return -1;
@@ -1218,7 +1146,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the header line of the first line of the CSV format character string specified by the argument", NULL);
+						M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to get the header line of the first line of the CSV format character string specified by the argument");
 						//===== Delete generated record management object =====
 						this_init(self);
 						return -1;
@@ -1227,7 +1155,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new record information object", NULL);
+					M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to create new record information object");
 					//===== Delete generated record management object =====
 					this_init(self);
 					return -1;
@@ -1259,7 +1187,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set record in CSV format to record management object", NULL);
+							M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set record in CSV format to record management object");
 							//===== Delete generated record management object =====
 							M2MDataFrame_delete(&record);
 							return -1;
@@ -1268,7 +1196,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set column name in record management object", NULL);
+						M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set column name in record management object");
 						//===== Delete generated record management object =====
 						M2MDataFrame_delete(&record);
 						return -1;
@@ -1277,7 +1205,7 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new record information list", NULL);
+					M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to create new record information list");
 					//===== Delete generated record management object =====
 					M2MDataFrame_delete(&record);
 					return -1;
@@ -1288,17 +1216,17 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return -1;
 		}
 	else if (tableName==NULL || M2MString_length(tableName)<=0)
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the table name is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! The string indicating the table name is NULL");
 		return -1;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! The string indicating the CSV format record is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! The string indicating the CSV format record is NULL");
 		return -1;
 		}
 	}
@@ -1312,9 +1240,6 @@ int M2MDataFrame_setCSV (M2MDataFrame *self, const M2MString *tableName, const M
  */
 void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_setNextRecord()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1323,7 +1248,7 @@ void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		}
 	return;
 	}
@@ -1337,9 +1262,6 @@ void M2MDataFrame_setNextRecord (M2MDataFrame *self, M2MDataFrame *nextRecord)
  */
 void M2MDataFrame_setPreviousRecord (M2MDataFrame *self, M2MDataFrame *previousRecord)
 	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_setPreviousRecord()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1348,7 +1270,7 @@ void M2MDataFrame_setPreviousRecord (M2MDataFrame *self, M2MDataFrame *previousR
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		}
 	return;
 	}
@@ -1364,7 +1286,6 @@ unsigned int M2MDataFrame_size (M2MDataFrame *self)
 	{
 	//========== Variable ==========
 	unsigned int size = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MDataFrame_size()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -1390,7 +1311,7 @@ unsigned int M2MDataFrame_size (M2MDataFrame *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL", NULL);
+		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MDataFrame *\" object is NULL");
 		return 0;
 		}
 	}

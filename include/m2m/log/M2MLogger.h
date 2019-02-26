@@ -41,14 +41,14 @@ extern "C"
 
 
 
-#include "m2m/io/M2MDirectory.h"
-#include "m2m/io/M2MFile.h"
+#include "m2m/M2MSystem.h"
 #include "m2m/io/M2MHeap.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogLevel.h"
 #include "m2m/time/M2MDate.h"
 #include <errno.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -58,11 +58,19 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * String indicating default log file name(="m2m.log")
+ * String indicating logger name.<br>
  */
-#ifndef M2MLogger_DEFAULT_LOG_FILE_NAME
-#define M2MLogger_DEFAULT_LOG_FILE_NAME (M2MString *)"m2m.log"
-#endif /* M2MLogger_DEFAULT_LOG_FILE_NAME */
+#ifndef M2MLogger_DEFAULT_LOGGER_NAME
+#define M2MLogger_DEFAULT_LOGGER_NAME (M2MString *)"m2m"
+#endif /* M2MLogger_DEFAULT_LOGGER_NAME */
+
+
+/**
+ * String indicating log file extension.<br>
+ */
+#ifndef M2MLogger_LOG_FILE_EXTENTION
+#define M2MLogger_LOG_FILE_EXTENTION (M2MString *)".log"
+#endif /* M2MLogger_LOG_FILE_EXTENTION */
 
 
 /**
@@ -101,9 +109,25 @@ typedef struct
  * public method
  ******************************************************************************/
 /**
+ * Copy the log message to the argument "buffer" pointer.<br>
+ * Buffering of array for copying is executed inside the function.<br>
+ * Therefore, it is necessary for caller to call the "M2MHeap_free()" function <br>
+ * in order to prevent memory leak after using the variable.<br>
+ *
+ * @param[in] logLevel			Log level
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ * @param[out] buffer			Buffer to copy the created log message
+ * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
+ */
+M2MString *M2MLogger_createNewLogMessage (const M2MLogLevel logLevel, const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer);
+
+
+/**
  * This method outputs debug level log.<br>
  */
-#define M2MLogger_debug( self, functionName, lineNumber, message ) M2MLogger_debugImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_debug( self, functionName, lineNumber, message ) M2MLogger_debugImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 /**
@@ -116,13 +140,13 @@ void M2MLogger_delete (M2MLogger **self);
 /**
  * This method outputs error level log.<br>
  */
-#define M2MLogger_error( self, functionName, lineNumber, message ) M2MLogger_errorImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_error( self, functionName, lineNumber, message ) M2MLogger_errorImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 /**
  * This method outputs fatal level log.<br>
  */
-#define M2MLogger_fatal( self, functionName, lineNumber, message ) M2MLogger_fatalImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_fatal( self, functionName, lineNumber, message ) M2MLogger_fatalImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 /**
@@ -142,7 +166,7 @@ M2MString *M2MLogger_getLoggerName (const M2MLogger *self);
 /**
  * This method outputs info level log.<br>
  */
-#define M2MLogger_info( self, functionName, lineNumber, message ) M2MLogger_infoImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_info( self, functionName, lineNumber, message ) M2MLogger_infoImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 /**
@@ -152,41 +176,6 @@ M2MString *M2MLogger_getLoggerName (const M2MLogger *self);
  * @return	created new M2MLogger object
  */
 M2MLogger *M2MLogger_new ();
-
-
-/**
- * This method prints out debug level message if "DEBUG" symbol is set.<br>
- *
- * @param[in] functionName	method name string
- * @param[in] lineNumber	the line detected error
- * @param[in] message		error information string
- */
-void M2MLogger_printDebugMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message);
-
-
-/**
- * This method print out error level message and if the variable "errorMessage"<br>
- * isn't NULL, copy the message into it.<br>
- * If "errorMessage" isn't NULL, caller must release the memory out of<br>
- * this method.<br>
- * <br>
- * if defined "NOERROR" symbol, doesn't output message.<br>
- *
- * @param[in] functionName	method name string
- * @param[in] lineNumber	the line detected error
- * @param[in] message		error information string
- */
-void M2MLogger_printErrorMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message);
-
-
-/**
- * This method prints out info level message if "DEBUG" symbol is set.<br>
- *
- * @param[in] functionName	method name string
- * @param[in] lineNumber	the line detected error
- * @param[in] message		error information string
- */
-void M2MLogger_printInfoMessage (const M2MString *functionName, const unsigned int lineNumber, const M2MString *message);
 
 
 /**
@@ -208,13 +197,13 @@ unsigned char *M2MLogger_setLoggerName (M2MLogger *self, const M2MString *logger
 /**
  * This method outputs trace level log.<br>
  */
-#define M2MLogger_trace( self, functionName, lineNumber, message ) M2MLogger_traceImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_trace( self, functionName, lineNumber, message ) M2MLogger_traceImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 /**
  * This method outputs warn level log.<br>
  */
-#define M2MLogger_warn( self, functionName, lineNumber, message ) M2MLogger_warnImpl( (M2MLogger *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
+#define M2MLogger_warn( self, functionName, lineNumber, message ) M2MLogger_warnImpl( (void *)(self), (const M2MString *)(functionName), (const unsigned int)(lineNumber), (const M2MString *)(message) )
 
 
 

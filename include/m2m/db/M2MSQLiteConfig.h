@@ -44,7 +44,7 @@ extern "C"
 #include "m2m/db/M2MDataType.h"
 #include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
-#include "m2m/log/M2MLogger.h"
+#include "m2m/log/M2MFileAppender.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <sqlite3.h>

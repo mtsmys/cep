@@ -77,7 +77,7 @@ M2MString *M2MLogLevel_toString (const M2MLogLevel level)
 M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString)
 	{
 	//========== Variable ==========
-	const unsigned int UPPER_CASE_VALUE_LENGTH = 16;
+	const size_t UPPER_CASE_VALUE_LENGTH = 16;
 	M2MString upperCaseValue[UPPER_CASE_VALUE_LENGTH];
 	const M2MLogLevel DEFAULT_LOGGER_LEVEL = M2MLogLevel_INFO;
 
@@ -89,32 +89,32 @@ M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString)
 		if (M2MString_toUpperCase(logLevelString, upperCaseValue, UPPER_CASE_VALUE_LENGTH)!=NULL)
 			{
 			//===== In the case of "TRACE" level =====
-			if (M2MString_compare(upperCaseValue, (M2MString *)"TRACE", M2MString_length((M2MString *)"TRACE"))==0)
+			if (M2MString_compareTo((M2MString *)"TRACE", upperCaseValue)==0)
 				{
 				return M2MLogLevel_TRACE;
 				}
 			//===== In the case of "DEBUG" level =====
-			else if (M2MString_compare(upperCaseValue, (M2MString *)"DEBUG", M2MString_length((M2MString *)"DEBUG"))==0)
+			else if (M2MString_compareTo((M2MString *)"DEBUG", upperCaseValue)==0)
 				{
 				return M2MLogLevel_DEBUG;
 				}
 			//===== In the case of "INFO" level =====
-			else if (M2MString_compare(upperCaseValue, (M2MString *)"INFO", M2MString_length((M2MString *)"INFO"))==0)
+			else if (M2MString_compareTo((M2MString *)"INFO", upperCaseValue)==0)
 				{
 				return M2MLogLevel_INFO;
 				}
 			//===== In the case of "WARN" level =====
-			else if (M2MString_compare(upperCaseValue, (M2MString *)"WARN", M2MString_length((M2MString *)"WARN"))==0)
+			else if (M2MString_compareTo((M2MString *)"WARN", upperCaseValue)==0)
 				{
 				return M2MLogLevel_WARN;
 				}
 			//===== In the case of "ERROR" level =====
-			else if (M2MString_compare(upperCaseValue, (M2MString *)"ERROR", M2MString_length((M2MString *)"ERROR"))==0)
+			else if (M2MString_compareTo((M2MString *)"ERROR", upperCaseValue)==0)
 				{
 				return M2MLogLevel_ERROR;
 				}
 			//===== In the case of "FATAL" level =====
-			else if (M2MString_compare(upperCaseValue, (M2MString *)"FATAL", M2MString_length((M2MString *)"FATAL"))==0)
+			else if (M2MString_compareTo((M2MString *)"FATAL", upperCaseValue)==0)
 				{
 				return M2MLogLevel_FATAL;
 				}

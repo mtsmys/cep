@@ -33,8 +33,8 @@
 #define M2M_LANG_M2MSTRING_H_
 
 
+#include "m2m/M2MSystem.h"
 #include "m2m/io/M2MHeap.h"
-#include "m2m/lang/M2MCharacterEncoding.h"
 #include <ctype.h>
 #include <errno.h>
 #include <iconv.h>
@@ -262,7 +262,7 @@ typedef unsigned char M2MString;
 
 
 /*******************************************************************************
- * Public method
+ * Public function
  ******************************************************************************/
 /**
  * This function adds "string" into after the "self" string.<br>
@@ -295,7 +295,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
  * @param[in] string	Another string to be compared
  * @return				0: two are equal, negative: In case of self < string, positive: In case of self > string
  */
-signed int M2MString_compareTo (const M2MString *self, const M2MString *string);
+int32_t M2MString_compareTo (const M2MString *self, const M2MString *string);
 
 
 /**
@@ -361,7 +361,7 @@ M2MString *M2MString_convertFromLFToCRLF (const M2MString *self, M2MString **str
  * @param[out] string	Pointer for copying the converted string (buffering is executed inside the function)
  * @return				Copied string or NULL (in case of error)
  */
-M2MString *M2MString_convertFromSignedIntegerToString (const signed int number, M2MString **string);
+M2MString *M2MString_convertFromSignedIntegerToString (const int32_t number, M2MString **string);
 
 
 /**
@@ -394,7 +394,7 @@ double M2MString_convertFromStringToDouble (const M2MString *string, const size_
  * @param[in] stringLength	Size of string[Byte]
  * @return					Signed long integer converted from string
  */
-int32_t M2MString_convertFromStringToLong (const M2MString *string, const size_t stringLength);
+int32_t M2MString_convertFromStringToSignedLong (const M2MString *string, const size_t stringLength);
 
 
 /**
@@ -417,7 +417,6 @@ int32_t M2MString_convertFromStringToSignedInteger (const M2MString *string, con
 int64_t M2MString_convertFromStringToSignedLongLong (const M2MString *string, const size_t stringLength);
 
 
-
 /**
  * This method convert from string to 32bit unsigned integer number.<br>
  *
@@ -429,12 +428,22 @@ uint32_t M2MString_convertFromStringToUnsignedInteger (const M2MString *string, 
 
 
 /**
- * This method converts from unsigned integer to string.<br>
- * Generated string is allocated in this method, so caller must free it.<br>
+ * This method convert from string to 32bit unsigned long number.<br>
+ *
+ * @param[in] string		String indicating signed long
+ * @param[in] stringLength	Size of string[Byte]
+ * @return					32bit unsigned long number converted from string
+ */
+uint32_t M2MString_convertFromStringToUnsignedLong (const M2MString *string, const size_t stringLength);
+
+
+/**
+ * This method converts from 32bit unsigned integer to string.<br>
+ * Caller must provide enough buffers as "buffer" argument.<br>
  *
  * @param[in] number		conversion target number
- * @param[out] buffer		array for copying integer string
- * @param[in] bufferLength	length of array[Byte]
+ * @param[out] buffer		Buffer for copying unsigned integer string
+ * @param[in] bufferLength	Length of Buffer[Byte]
  */
 M2MString *M2MString_convertFromUnsignedIntegerToString (const uint32_t number, M2MString *buffer, const size_t bufferLength);
 
@@ -466,8 +475,8 @@ M2MString *M2MString_convertFromUnsignedLongToString (const uint32_t number, M2M
  * Converts a UTF-16 string to UTF-8. Returns a new string that must be freed<br>
  * or NULL if no conversion was needed.<br>
  *
- * @param[in,out]
- * @param[in] length
+ * @param[in,out] string
+ * @param[in] stringLength
  * @return
  */
 M2MString *M2MString_convertFromUTF16ToUTF8 (M2MString **string, size_t *stringLenngth);
@@ -492,19 +501,7 @@ bool M2MString_equals (const M2MString *one, const M2MString *another, const siz
  * @param format		Format for translation into string
  * @return				Length of converted strings[Byte] or -1(means error)
  */
-int M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MString *format, ...);
-
-
-/**
- * Copy string indicating the local calendar time to the "buffer" array. <br>
- * Since buffering is not performed inside this function, so the memory <br>
- * area must be reserved on the caller side. <br>
- *
- * @param[out] buffer		A buffer for copying string indicating the time of the local calendar
- * @param[in] bufferLength	Size of the buffer [byte]
- * @return					Integer indicating the size of the local time character string copied to the buffer [bytes]
- */
-unsigned int M2MString_getLocalTime (M2MString *buffer, const size_t bufferLength);
+int32_t M2MString_format (M2MString *buffer, const size_t bufferLength, const M2MString *format, ...);
 
 
 /**

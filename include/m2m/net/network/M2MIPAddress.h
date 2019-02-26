@@ -41,7 +41,6 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -128,7 +127,7 @@ int M2MIPAddress_getSocketType (const M2MIPAddress *address);
  * @param[in] socketType	defined socket type number
  * @return					IP address information object
  */
-M2MIPAddress *M2MIPAddress_new (const M2MString *hostName, const M2MString *port, const unsigned int protocol, const unsigned int socketType);
+M2MIPAddress *M2MIPAddress_new (const unsigned char *hostName, const unsigned char *port, const unsigned int protocol, const unsigned int socketType);
 
 
 /**
