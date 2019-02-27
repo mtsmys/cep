@@ -36,6 +36,8 @@
 
 #include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/lang/M2MString.h"
+#include "m2m/log/M2MFileAppender.h"
+#include "m2m/log/M2MLogger.h"
 #include "m2m/time/M2MDate.h"
 #include <inttypes.h>
 #include <sqlite3.h>

@@ -42,7 +42,7 @@ static void this_deleteColumn (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	M2MColumn *column = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_deleteColumn()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList.this_deleteColumn()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -62,7 +62,7 @@ static void this_deleteColumn (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		}
 	return;
 	}
@@ -80,7 +80,7 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 	{
 	//========== Variable ==========
 	M2MColumn *column = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_detect()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList.this_detect()";
 
 	//===== Check argument =====
 	if (self!=NULL
@@ -102,7 +102,7 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 				//===== Error handling =====
 				else if (column==NULL)
 					{
-					M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The medium node of \"M2MColumnList\" object is NULL");
+					M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"The medium node of \"M2MColumnList\" object is NULL");
 					return NULL;
 					}
 				//===== Move to next node =====
@@ -120,7 +120,7 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 			//===== Error handling =====
 			else if (column==NULL)
 				{
-				M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The end node of \"M2MColumnList\" object is NULL");
+				M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"The end node of \"M2MColumnList\" object is NULL");
 				return NULL;
 				}
 			//===== In case of not existing a node matching the name =====
@@ -132,24 +132,24 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The begin node of \"M2MColumnList\" object is NULL");
+			M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"The begin node of \"M2MColumnList\" object is NULL");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	else if (columnName==NULL)
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string");
 		return NULL;
 		}
 	}
@@ -164,7 +164,7 @@ static M2MColumnList *this_detect (M2MColumnList *self, const M2MString *columnN
 static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setColumn()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList.this_setColumn()";
 
 	//===== Check argument =====
 	if (self!=NULL && column!=NULL)
@@ -176,7 +176,7 @@ static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -190,7 +190,7 @@ static M2MColumnList *this_setColumn (M2MColumnList *self, M2MColumn *column)
 static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setNext()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList.this_setNext()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -201,7 +201,7 @@ static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -215,7 +215,7 @@ static M2MColumnList *this_setNext (M2MColumnList *self, M2MColumnList *next)
 static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *previous)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MColumnList.this_setPrevious()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList.this_setPrevious()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -226,7 +226,7 @@ static M2MColumnList *this_setPrevious (M2MColumnList *self, M2MColumnList *prev
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -253,6 +253,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 	M2MColumnList *detectedNode = NULL;
 	M2MColumnList *newNode = NULL;
 	M2MColumn *column = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_add()";
 
 	//===== Check argument =====
 	if (self!=NULL && columnName!=NULL && M2MString_length(columnName)>0)
@@ -279,13 +280,14 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 							&& M2MColumn_setAllowNULL(column, allowNULL)!=NULL
 							&& M2MColumn_setUnique(column, unique)!=NULL)
 						{
+						//=====  =====
 						this_setColumn(self, column);
 						return self;
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object");
+						M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object");
 						M2MColumn_delete(&column);
 						return NULL;
 						}
@@ -293,7 +295,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object");
+					M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object");
 					return NULL;
 					}
 				}
@@ -321,7 +323,7 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object");
+						M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the column information specified in the argument to the column information list object");
 						M2MColumn_delete(&column);
 						M2MColumnList_delete(newNode);
 						return NULL;
@@ -330,17 +332,17 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 				//===== Error handling =====
 				else if (self==NULL)
 					{
-					M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get end node from \"M2 MColumnList\" object specified by argument");
+					M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get end node from \"M2 MColumnList\" object specified by argument");
 					return NULL;
 					}
 				else if (newNode==NULL)
 					{
-					M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get heap memory to create a new column list object");
+					M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column list object");
 					return NULL;
 					}
 				else
 					{
-					M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object");
+					M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory to create a new column information object");
 					M2MColumnList_delete(newNode);
 					return NULL;
 					}
@@ -350,12 +352,12 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL or vacant");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -369,6 +371,9 @@ M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnNa
  */
 M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_begin()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -381,7 +386,7 @@ M2MColumnList *M2MColumnList_begin (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -396,6 +401,7 @@ void M2MColumnList_delete (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	M2MColumnList *next = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -439,7 +445,7 @@ void M2MColumnList_delete (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		}
 	return;
 	}
@@ -453,6 +459,9 @@ void M2MColumnList_delete (M2MColumnList *self)
  */
 M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_end()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -465,7 +474,7 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -479,6 +488,9 @@ M2MColumnList *M2MColumnList_end (M2MColumnList *self)
  */
 M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_getColumn()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -487,7 +499,7 @@ M2MColumn *M2MColumnList_getColumn (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -503,6 +515,7 @@ M2MFileAppender *M2MColumnList_getLogger (const M2MColumnList *self)
 	{
 	//========== Variable ==========
 	M2MColumn *column = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_getLogger()";
 
 	//===== Check argument =====
 	if (self!=NULL && (column=M2MColumnList_getColumn(self))!=NULL)
@@ -510,8 +523,14 @@ M2MFileAppender *M2MColumnList_getLogger (const M2MColumnList *self)
 		return M2MColumn_getLogger(column);
 		}
 	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		return NULL;
+		}
 	else
 		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" hasn't column object as member variable");
 		return NULL;
 		}
 	}
@@ -548,6 +567,7 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
 	{
 	//========== Variable ==========
 	unsigned int length = 0;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_length()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -583,7 +603,7 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return 0;
 		}
 	}
@@ -597,6 +617,9 @@ unsigned int M2MColumnList_length (M2MColumnList *self)
  */
 M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_next()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -605,7 +628,7 @@ M2MColumnList *M2MColumnList_next (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -620,6 +643,7 @@ M2MColumnList *M2MColumnList_new ()
 	{
 	//========== Variable ==========
 	M2MColumnList *self = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_new()";
 
 	//===== Get heap memory for creating new object =====
 	if ((self=(M2MColumnList *)M2MHeap_malloc(sizeof(M2MColumnList)))!=NULL)
@@ -634,14 +658,14 @@ M2MColumnList *M2MColumnList_new ()
 		else
 			{
 			M2MColumnList_delete(self);
-			M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to initialize \"M2MColumnList\" object");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to initialize \"M2MColumnList\" object");
 			return NULL;
 			}
 		}
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get heap memory for creating a new \"M2MColumnList\" object");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to allocate new heap memory for creating a new \"M2MColumnList\" object");
 		return NULL;
 		}
 	}
@@ -657,6 +681,9 @@ M2MColumnList *M2MColumnList_new ()
  */
 M2MColumnList *M2MColumnList_previous (const M2MColumnList *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_previous()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -665,7 +692,7 @@ M2MColumnList *M2MColumnList_previous (const M2MColumnList *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	}
@@ -681,6 +708,9 @@ M2MColumnList *M2MColumnList_previous (const M2MColumnList *self)
  */
 M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnName, const size_t columnNameLength)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumnList_search()";
+
 	//===== Check argument =====
 	if (self!=NULL
 			&& columnName!=NULL
@@ -700,17 +730,17 @@ M2MColumn *M2MColumnList_search (M2MColumnList *self, const M2MString *columnNam
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumnList\" object is NULL");
 		return NULL;
 		}
 	else if (columnName==NULL)
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnName\" string is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(M2MColumnList_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string");
+		M2MLogger_error(M2MColumnList_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"columnNameLength\" is longer than the length of \"columnName\" string");
 		return NULL;
 		}
 	}

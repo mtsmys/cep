@@ -1315,7 +1315,7 @@ M2MString *M2MFileAppender_getDefaultLogFilePath (M2MString *buffer, const size_
 	const size_t SYSTEM_DIRECTORY_LENGTH = M2MString_length(M2MSystem_DIRECTORY);
 	const size_t LOG_DIRECTORY_LENGTH = M2MString_length(LOG_DIRECTORY);
 	const size_t LOGGER_LENGTH = M2MString_length(M2MLogger_DEFAULT_LOGGER_NAME);
-	const size_t LOG_FILE_EXTENSION_LENGTH = M2MString_length(M2MLogger_LOG_FILE_EXTENTION);
+	const size_t LOG_FILE_EXTENSION_LENGTH = M2MString_length(M2MFileAppender_LOG_FILE_EXTENTION);
 	const size_t SEPARATOR_LENGTH = M2MString_length(M2MString_SLASH);
 
 	//===== Check argument =====
@@ -1325,7 +1325,7 @@ M2MString *M2MFileAppender_getDefaultLogFilePath (M2MString *buffer, const size_
 		//===== Initialize buffer =====
 		memset(buffer, 0, bufferLength);
 		//===== Copy pathname into buffer =====
-		if (snprintf(&(buffer[0]), bufferLength-1, "%s%s%s%s%s%s%s%s", HOME_DIRECTORY, M2MString_SLASH, M2MSystem_DIRECTORY, M2MString_SLASH, LOG_DIRECTORY, M2MString_SLASH, M2MLogger_DEFAULT_LOGGER_NAME, M2MLogger_LOG_FILE_EXTENTION)>0)
+		if (snprintf(&(buffer[0]), bufferLength-1, "%s%s%s%s%s%s%s%s", HOME_DIRECTORY, M2MString_SLASH, M2MSystem_DIRECTORY, M2MString_SLASH, LOG_DIRECTORY, M2MString_SLASH, M2MLogger_DEFAULT_LOGGER_NAME, M2MFileAppender_LOG_FILE_EXTENTION)>0)
 			{
 			return buffer;
 			}
@@ -1744,12 +1744,10 @@ M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const
  */
 M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, uint32_t maxFileSize)
 	{
-	//========== Variable ==========
-	const uint32_t DEFAULT_MAX_FILE_SIZE = 1048576;
-
 	//===== Check argument =====
 	if (self!=NULL && maxFileSize>0)
 		{
+		//===== Set max log file size =====
 		self->maxFileSize = maxFileSize;
 		return self;
 		}
@@ -1760,7 +1758,8 @@ M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, uint32_t
 		}
 	else
 		{
-		self->maxFileSize = DEFAULT_MAX_FILE_SIZE;
+		//===== Set default max log file size =====
+		self->maxFileSize = M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE;
 		return self;
 		}
 	}

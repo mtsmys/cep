@@ -30,12 +30,14 @@
 #include "m2m/graph/M2MGraph.h"
 
 
-
-
+/*******************************************************************************
+ * Definition
+ ******************************************************************************/
 /**
+ * Get logging object owned by the argument M2MGraph structure object.<br>
  *
- * @param[in] self
- * @return
+ * @param[in] self	M2MGraph structure object
+ * @return			Logging object owned by M2MGraph structure object
  */
 static M2MFileAppender *this_getLogger (const M2MGraph *self);
 
@@ -44,6 +46,51 @@ static M2MFileAppender *this_getLogger (const M2MGraph *self);
 /*******************************************************************************
  * Private function
  ******************************************************************************/
+/**
+ *
+ * @return
+ */
+static M2MFileAppender *this_createNewLogger ()
+	{
+	//========== Variable ==========
+	M2MFileAppender *logger = NULL;
+	M2MString DEFAULT_LOG_FILE_PATH[1024];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_createNewLogger()";
+
+	//===== Create new logger object =====
+	if ((logger=M2MFileAppender_new())!=NULL)
+		{
+		//===== Set-up logger object =====
+		if (M2MFileAppender_setAppend(logger, true)!=NULL
+				&& M2MFileAppender_setEncoding(logger, M2MSystem_UTF8)!=NULL
+				&& M2MFileAppender_getDefaultLogFilePath(DEFAULT_LOG_FILE_PATH, sizeof(DEFAULT_LOG_FILE_PATH))!=NULL
+				&& M2MFileAppender_setLogFilePath(logger, DEFAULT_LOG_FILE_PATH)!=NULL
+				&& M2MFileAppender_setLogLevel(logger, M2MLogLevel_TRACE)!=NULL
+				&& M2MFileAppender_setLoggerName(logger, M2MLogger_DEFAULT_LOGGER_NAME)!=NULL
+				&& M2MFileAppender_setMaxBackupIndex(logger, 0)!=NULL
+				&& M2MFileAppender_setMaxFileSize(logger, 0)!=NULL
+				)
+			{
+			//===== Return created logger object =====
+			return logger;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MFileAppender_delete(&logger);
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set-up \"M2MFileAppender\" structure object");
+			return NULL;
+			}
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" structure object");
+		return NULL;
+		}
+	}
+
+
 /**
  * Releases the heap memory of the database name possessed by the M2MGraph object.<br>
  *
@@ -63,7 +110,7 @@ static void this_deleteDatabaseName (M2MGraph *self)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		}
 	else
 		{
@@ -92,11 +139,40 @@ static void this_deleteFileDatabase (M2MGraph *self)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		}
 	else
 		{
 		M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"SQLite3 database object hasn't been set yet");
+		}
+	return;
+	}
+
+
+/**
+ * Releases the heap memory of the logging object possessed by the M2MGraph object.<br>
+ *
+ * @param[in,out] self	M2MGraph structure object
+ */
+static void this_deleteLogger (M2MGraph *self)
+	{
+	//========== Variable ==========
+	M2MFileAppender *logger = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_deleteLogger()";
+
+	//===== Check argument =====
+	if (self!=NULL && (logger=this_getLogger(self))!=NULL)
+		{
+		//===== Release allocated memory =====
+		M2MFileAppender_delete(&logger);
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		}
+	else
+		{
 		}
 	return;
 	}
@@ -121,7 +197,7 @@ static void this_deleteMemoryDatabase (M2MGraph *self)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		}
 	else
 		{
@@ -132,18 +208,25 @@ static void this_deleteMemoryDatabase (M2MGraph *self)
 
 
 /**
+ * Get logging object owned by the argument M2MGraph structure object.<br>
  *
- * @param[in] self
- * @return
+ * @param[in] self	M2MGraph structure object
+ * @return			Logging object owned by M2MGraph structure object
  */
 static M2MFileAppender *this_getLogger (const M2MGraph *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_getLogger()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		return self->logger;
 		}
+	//===== Argument error =====
 	else
 		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -157,6 +240,7 @@ static bool this_isClosed (sqlite3 *fileDatabase)
 	{
 	//========== Variable ==========
 	M2MString fileDatabaseName[1024];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_isClosed()";
 
 	//===== Check argument =====
 	if (fileDatabase!=NULL)
@@ -175,6 +259,7 @@ static bool this_isClosed (sqlite3 *fileDatabase)
 	//===== Argument error =====
 	else
 		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"fileDatabase\" structure object is NULL");
 		return true;
 		}
 	}
@@ -190,7 +275,7 @@ static bool this_isClosed (sqlite3 *fileDatabase)
 static M2MGraph *this_setDatabaseName (M2MGraph *self, const M2MString *databaseName)
 	{
 	//========== Variable ==========
-	M2MString MESSAGE[256];
+	M2MString MESSAGE[1024];
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_setDatabaseName()";
 
 	//===== Check argument =====
@@ -238,12 +323,45 @@ static M2MGraph *this_setDatabaseName (M2MGraph *self, const M2MString *database
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
 		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant");
+		return NULL;
+		}
+	}
+
+
+/**
+ * Set logging object as member variable of the M2MGraph structure object.<br>
+ *
+ * @param[in,out] self		M2MGraph structure object to be set SQLite3 file database
+ * @param[in] logger		Logging structure object
+ * @return					M2MGraph structure object with member variable updated or NULL (in case of error)
+ */
+static M2MGraph *this_setLogger (M2MGraph *self, M2MFileAppender *logger)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.this_setLogger()";
+
+	//===== Check argument =====
+	if (self!=NULL && logger!=NULL)
+		{
+		//===== Set logging object =====
+		self->logger = logger;
+		return self;
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		return NULL;
+		}
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"logger\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -285,7 +403,7 @@ static M2MGraph *this_setFileDatabase (M2MGraph *self, sqlite3 *fileDatabase)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
 		return NULL;
 		}
 	else
@@ -332,7 +450,7 @@ static M2MGraph *this_setMemoryDatabase (M2MGraph *self, sqlite3 *memoryDatabase
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
 		return NULL;
 		}
 	else
@@ -361,6 +479,7 @@ M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const u
 	{
 	//========== Variable ==========
 	sqlite3 *fileDatabase = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_connect()";
 
 	//===== Check argument =====
 	if (self!=NULL && nodeID>0 && anotherNodeID>0)
@@ -373,24 +492,24 @@ M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const u
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get \"sqlite3\" object possessed by \"M2MGraph\" object");
+			M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get \"sqlite3\" object possessed by \"M2MGraph\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
 		return NULL;
 		}
 	else if (nodeID<=0)
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"oneNodeID\" isn't positive");
+		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"oneNodeID\" isn't positive");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" isn't positive");
+		M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" isn't positive");
 		return NULL;
 		}
 	}
@@ -400,7 +519,7 @@ M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const u
  * Destructor.<br>
  * Release the heap memory for M2MGraph structure object.<br>
  *
- * @param[in,out] self	M2MGraph structure object to be freed of memory area
+ * @param[in,out] self	M2MGraph structure object which is to be released memory
  */
 void M2MGraph_delete (M2MGraph **self)
 	{
@@ -411,6 +530,7 @@ void M2MGraph_delete (M2MGraph **self)
 		this_deleteDatabaseName((*self));
 		this_deleteFileDatabase((*self));
 		this_deleteMemoryDatabase((*self));
+		this_deleteLogger((*self));
 		M2MHeap_free((*self));
 		}
 	//===== Argument error =====
@@ -422,13 +542,16 @@ void M2MGraph_delete (M2MGraph **self)
 
 
 /**
- * Return string indicating the database name possessed by the M2MGraph object.<br>
+ * Get string indicating the database name possessed by the M2MGraph object.<br>
  *
  * @param[in] self	M2MGraph structure object
  * @return			String indicating database file name or NULL (in case of error)
  */
 M2MString *M2MGraph_getDatabaseName (const M2MGraph *self)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_getDatabaseName()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -437,13 +560,15 @@ M2MString *M2MGraph_getDatabaseName (const M2MGraph *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
+ * Get the SQLite connection object on file possessed by the M2MGraph object.<br>
+ *
  * @param[in] self		M2MGraph structure object
  * @return				SQLite3 database object
  */
@@ -452,6 +577,7 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
 	//========== Variable ==========
 	M2MString *databaseName = NULL;
 	sqlite3 *fileDatabase = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_getFileDatabase()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -467,7 +593,7 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get the SQLite3 database object whose connection is alive");
+				M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the SQLite3 database object whose connection is alive");
 				return NULL;
 				}
 			}
@@ -485,7 +611,7 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
 			else
 				{
 				M2MSQLiteConfig_closeDatabase(fileDatabase);
-				M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to connect with SQLite3 database");
+				M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to connect with SQLite3 database");
 				return NULL;
 				}
 			}
@@ -493,13 +619,15 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
+ * Get the SQLite connection object on memory possessed by the M2MGraph object.<br>
+ *
  * @param[in] self		M2MGraph structure object
  * @return				SQLite3 database object
  */
@@ -508,6 +636,7 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
 	//========== Variable ==========
 	sqlite3 *memoryDatabase = NULL;
 	const M2MString *DATA_SOURCE_NAME = (M2MString *)":memory:";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_getMemoryDatabase()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -523,7 +652,7 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get the SQLite3 database object whose connection is alive");
+				M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the SQLite3 database object whose connection is alive");
 				return NULL;
 				}
 			}
@@ -540,7 +669,7 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
 			else
 				{
 				M2MSQLiteConfig_closeDatabase(memoryDatabase);
-				M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to connect with SQLite3 database");
+				M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to connect with SQLite3 database");
 				return NULL;
 				}
 			}
@@ -548,7 +677,7 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -556,6 +685,9 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self)
 
 /**
  * Constructor.<br>
+ * This function creates new M2MGraph structure object.<br>
+ * When creating, this function executes memory allocation, so caller must <br>
+ * release the memory for avoiding memory leak.<br>
  *
  * @param[in] databaseName	String indicating SQLite3 file database name
  * @return					Created new M2MGraph structure object or NULL (in case of error)
@@ -564,6 +696,8 @@ M2MGraph *M2MGraph_new (const M2MString *databaseName)
 	{
 	//========== Variable ==========
 	M2MGraph *self = NULL;
+	M2MFileAppender *logger = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_new()";
 
 	//===== Check argument =====
 	if (databaseName!=NULL && M2MString_length(databaseName)>0)
@@ -571,10 +705,13 @@ M2MGraph *M2MGraph_new (const M2MString *databaseName)
 		//===== Get heap memory =====
 		if ((self=(M2MGraph *)M2MHeap_malloc(sizeof(M2MGraph)))!=NULL)
 			{
-			//===== Set file database name =====
-			if (this_setDatabaseName(self, databaseName)!=NULL)
+			//===== Initialize M2MGraph object =====
+			if ((logger=this_createNewLogger())!=NULL
+					&& this_setLogger(self, logger)!=NULL
+					&& this_setDatabaseName(self, databaseName)!=NULL)
 				{
-				M2MLogger_debug(this_getLogger(self), __func__, __LINE__, (M2MString *)"Succeed to create a M2MGraph structure object");
+				M2MLogger_info(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Succeed to create a M2MGraph structure object");
+				//===== Return created M2MGraph object =====
 				return self;
 				}
 			//===== Error handling =====
@@ -582,21 +719,21 @@ M2MGraph *M2MGraph_new (const M2MString *databaseName)
 				{
 				//===== Release heap memory =====
 				M2MGraph_delete(&self);
-				M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to initialize M2MGraph structure object");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to initialize M2MGraph structure object");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Failed to get heap memory for creating M2MGraph structure object");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to allocate heap memory for creating M2MGraph structure object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(this_getLogger(self), __func__, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"databaseName\" string is NULL or vacant");
 		return NULL;
 		}
 	}

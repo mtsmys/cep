@@ -61,7 +61,7 @@ static size_t this_getStringlength (const unsigned char *string)
  ******************************************************************************/
 /**
  *
- * @return
+ * @return Integer number of thread ID.<br>
  */
 int32_t M2MSystem_getThreadID ()
 	{

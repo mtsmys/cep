@@ -44,6 +44,7 @@ void M2MSQLiteConfig_closeDatabase (sqlite3 *database)
 	sqlite3_stmt *statement = NULL;
 	sqlite3_stmt *next = NULL;
 	M2MString message[256];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_closeDatabase()";
 
 	//===== Check argument =====
 	if (database!=NULL)
@@ -76,14 +77,14 @@ void M2MSQLiteConfig_closeDatabase (sqlite3 *database)
 				{
 				memset(message, 0, sizeof(message));
 				snprintf(message, sizeof(message)-1, (M2MString *)"Failed to close SQLite3 database because %s", (M2MString *)sqlite3_errmsg(database));
-				M2MLogger_error(NULL, __func__, __LINE__, message);
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, message);
 				}
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
 		}
 	return;
 	}
@@ -101,6 +102,7 @@ sqlite3_stmt *M2MSQLiteConfig_getPreparedStatement (sqlite3 *database, const M2M
 	//========== Variable ==========
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_getPreparedStatement()";
 
 	//===== Check argument =====
 	if (database!=NULL
@@ -116,7 +118,7 @@ sqlite3_stmt *M2MSQLiteConfig_getPreparedStatement (sqlite3 *database, const M2M
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)sqlite3_errmsg(database));
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database));
 			sqlite3_finalize(statement);
 			return NULL;
 			}
@@ -124,12 +126,12 @@ sqlite3_stmt *M2MSQLiteConfig_getPreparedStatement (sqlite3 *database, const M2M
 	//===== Argument error =====
 	else if (database==NULL)
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated SQLite3 database object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated SQLite3 database object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -144,6 +146,9 @@ sqlite3_stmt *M2MSQLiteConfig_getPreparedStatement (sqlite3 *database, const M2M
  */
 M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MString **sql)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_getTableInfoSQL()";
+
 	//===== Check argument =====
 	if (tableName!=NULL && M2MString_length(tableName)>0 && sql!=NULL)
 		{
@@ -157,19 +162,19 @@ M2MString *M2MSQLiteConfig_getTableInfoSQL (const M2MString *tableName, M2MStrin
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to get heap memory for copying SQL string");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying SQL string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (tableName==NULL || M2MString_length(tableName)<=0)
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" is NULL");
 		return NULL;
 		}
 	}
@@ -190,6 +195,7 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
 	int result = 0;
 	int numberOfTable = -1;
 	M2MString message[256];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_isExistingTable()";
 	const M2MString *SQL = (M2MString *)"SELECT COUNT(DISTINCT name) AS result FROM sqlite_master WHERE type = 'table' AND name = ?";
 
 	//===== Check argument =====
@@ -222,26 +228,26 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
 				sqlite3_finalize(statement);
 				memset(message, 0, sizeof(message));
 				snprintf(message, sizeof(message)-1, (M2MString *)"Failed to execute SQL statement because %s", (M2MString *)sqlite3_errmsg(database));
-				M2MLogger_error(NULL, __func__, __LINE__, message);
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, message);
 				return false;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to get SQLite3 prepared statement object");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get SQLite3 prepared statement object");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else if (database==NULL)
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
 		return false;
 		}
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return false;
 		}
 	}
@@ -262,6 +268,7 @@ sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
 	//========== Variable ==========
 	sqlite3 *database = NULL;
 	M2MString message[256];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_openDatabase()";
 
 	//===== Check argument =====
 	if (filename!=NULL && M2MString_length(filename)>0)
@@ -279,14 +286,14 @@ sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
 			M2MSQLiteConfig_closeDatabase(database);
 			memset(message, 0, sizeof(message));
 			snprintf(message, sizeof(message)-1, (M2MString *)"Failed to open a SQLite3 database(=\"%s\")", filename);
-			M2MLogger_error(NULL, __func__, __LINE__, message);
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, message);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"filename\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"filename\" string is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -303,6 +310,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	{
 	//========== Variable ==========
 	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_setAutoVacuum()";
 	const M2MString *PRAGMA_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 1 ";
 	const M2MString *PRAGMA_NOT_AUTO_VACUUM_SQL = (M2MString *)"PRAGMA auto_vacuum = 0 ";
 
@@ -316,7 +324,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to enable auto vacuum mode");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to enable auto vacuum mode");
 			}
 		}
 	//===== When automatic vacuum is disabled =====
@@ -329,7 +337,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to disable auto vacuum mode");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to disable auto vacuum mode");
 			}
 		}
 	return result;
@@ -347,6 +355,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
 	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_setSynchronous()";
 	const M2MString *PRAGMA_SYNCHRONOUS_NORMAL_SQL = (M2MString *)"PRAGMA synchronous = NORMAL ";
 	const M2MString *PRAGMA_SYNCHRONOUS_OFF_SQL = (M2MString *)"PRAGMA synchronous = OFF ";
 
@@ -360,7 +369,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"NORMAL\"");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"NORMAL\"");
 			}
 		}
 	//===== In the case of OFF mode =====
@@ -373,7 +382,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"OFF\"");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"OFF\"");
 			}
 		}
 	return result;
@@ -390,6 +399,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	{
 	//========== Variable ==========
 	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_setUTF8()";
 	const M2MString *PRAGMA_ENCODING_SQL = (M2MString *)"PRAGMA encoding = 'UTF-8'";
 
 	//===== Set UTF-8 to SQLite3 database =====
@@ -399,7 +409,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set the encoding into \"UTF-8\"");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the encoding into \"UTF-8\"");
 		}
 	return result;
 	}
@@ -417,6 +427,9 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
  */
 bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement)
 	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_setValueIntoPreparedStatement()";
+
 	//===== Check argument =====
 	if (index>=1 && statement!=NULL)
 		{
@@ -431,7 +444,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"BLOB\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"BLOB\" type value");
 				return false;
 				}
 			}
@@ -448,7 +461,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value");
+					M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value");
 					return false;
 					}
 				}
@@ -462,7 +475,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value");
+					M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"BOOL\" type value");
 					return false;
 					}
 				}
@@ -479,7 +492,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"CHAR\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"CHAR\" type value");
 				return false;
 				}
 			}
@@ -494,7 +507,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"DATETIME\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"DATETIME\" type value");
 				return false;
 				}
 			}
@@ -509,7 +522,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"DOUBLE\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"DOUBLE\" type value");
 				return false;
 				}
 			}
@@ -529,7 +542,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"FLOAT\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"FLOAT\" type value");
 				return false;
 				}
 			}
@@ -544,7 +557,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"INTEGER\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"INTEGER\" type value");
 				return false;
 				}
 			}
@@ -559,7 +572,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"NULL\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"NULL\" type value");
 				return false;
 				}
 			}
@@ -574,7 +587,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"NUMERIC\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"NUMERIC\" type value");
 				return false;
 				}
 			}
@@ -589,7 +602,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"REAL\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"REAL\" type value");
 				return false;
 				}
 			}
@@ -604,7 +617,7 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"TEXT\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"TEXT\" type value");
 				return false;
 				}
 			}
@@ -619,26 +632,26 @@ bool M2MSQLiteConfig_setValueIntoPreparedStatement (const M2MDataType dataType, 
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to set \"VARCHAR\" type value");
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set \"VARCHAR\" type value");
 				return false;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"A data type matching the argument can't be found");
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"A data type matching the argument can't be found");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else if (index<=0)
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"index\" number of position of the data value isn't positive");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"index\" number of position of the data value isn't positive");
 		return false;
 		}
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3_stmt\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3_stmt\" object is NULL");
 		return false;
 		}
 	}
@@ -655,6 +668,7 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	{
 	//========== Variable ==========
 	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_setWAL()";
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
 
 	//===== Set journal mode of SQLite3 database =====
@@ -664,7 +678,7 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to change the journal mode into \"WAL\"");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to change the journal mode into \"WAL\"");
 		}
 	return result;
 	}
@@ -680,6 +694,7 @@ int M2MSQLiteConfig_next (sqlite3_stmt *statement)
 	{
 	//========== Variable ==========
 	int result = 0;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_next()";
 
 	//===== Check argument =====
 	if (statement!=NULL)
@@ -694,7 +709,7 @@ int M2MSQLiteConfig_next (sqlite3_stmt *statement)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Argument error! Indicated \"statement\" object is NULL");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"statement\" object is NULL");
 		return SQLITE_ERROR;
 		}
 	}
@@ -710,6 +725,7 @@ bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	{
 	//========== Variable ==========
 	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_vacuum()";
 	const M2MString *SQL = "VACUUM ";
 
 	//===== Vacuum SQLite3 database =====
@@ -719,7 +735,7 @@ bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	//===== Error handling =====
 	else
 		{
-		M2MLogger_error(NULL, __func__, __LINE__, (M2MString *)"Failed to execute vacuum process");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to execute vacuum process");
 		}
 	return result;
 	}

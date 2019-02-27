@@ -61,6 +61,30 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
+ * String indicating log file extension.<br>
+ */
+#ifndef M2MFileAppender_LOG_FILE_EXTENTION
+#define M2MFileAppender_LOG_FILE_EXTENTION (M2MString *)".log"
+#endif /* M2MFileAppender_LOG_FILE_EXTENTION */
+
+
+/**
+ * String indicating log file permission(="0755")
+ */
+#ifndef M2MFileAppender_LOG_FILE_PERMISSION
+#define M2MFileAppender_LOG_FILE_PERMISSION (M2MString *)"0755"
+#endif /* M2MFileAppender_LOG_FILE_PERMISSION */
+
+
+/**
+ * Default maximum size of log file(=8,388,608[Byte])
+ */
+#ifndef M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE
+#define M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE (uint32_t)8388608
+#endif /* M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE */
+
+
+/**
  * FileAppender object
  *
  * @param super

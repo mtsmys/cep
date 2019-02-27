@@ -100,18 +100,23 @@ M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32
 				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, time)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, logLevelString)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
 						&& M2MString_append(buffer, threadID)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, functionName)!=NULL
 						&& M2MString_append(buffer, M2MString_COLON)!=NULL
 						&& M2MString_append(buffer, lineNumberString)!=NULL
 						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, errnoMessage)!=NULL
 						&& M2MString_append(buffer, M2MString_COLON)!=NULL
@@ -148,18 +153,23 @@ M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32
 				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, time)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, logLevelString)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
 						&& M2MString_append(buffer, threadID)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, functionName)!=NULL
 						&& M2MString_append(buffer, M2MString_COLON)!=NULL
 						&& M2MString_append(buffer, lineNumberString)!=NULL
 						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
 						&& M2MString_append(buffer, message)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL

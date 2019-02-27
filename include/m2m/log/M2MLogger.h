@@ -66,30 +66,6 @@ extern "C"
 
 
 /**
- * String indicating log file extension.<br>
- */
-#ifndef M2MLogger_LOG_FILE_EXTENTION
-#define M2MLogger_LOG_FILE_EXTENTION (M2MString *)".log"
-#endif /* M2MLogger_LOG_FILE_EXTENTION */
-
-
-/**
- * String indicating log file permission(="0755")
- */
-#ifndef M2MLogger_LOG_FILE_PERMISSION
-#define M2MLogger_LOG_FILE_PERMISSION (M2MString *)"0755"
-#endif /* M2MLogger_LOG_FILE_PERMISSION */
-
-
-/**
- * Maximum size of log file(8,388,608[Byte])
- */
-#ifndef M2MLogger_MAX_LOG_FILE_LENGTH
-#define M2MLogger_MAX_LOG_FILE_LENGTH (unsigned int)8388608
-#endif /* M2MLogger_MAX_LOG_FILE_LENGTH */
-
-
-/**
  * Logger structure object.<br>
  *
  * @param loggerName	logger name string

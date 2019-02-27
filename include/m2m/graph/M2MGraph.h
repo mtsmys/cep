@@ -37,6 +37,7 @@
 #include "m2m/graph/M2MNode.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
+#include "m2m/log/M2MLogger.h"
 #include "m2m/io/M2MHeap.h"
 #include <sqlite3.h>
 
@@ -55,7 +56,7 @@ extern "C"
 /**
  * @param databaseName		String indicating SQLite3 database file name
  * @param fileDatabase		Handler of SQLite3 file database connection
- * @param logger			Logger object
+ * @param logger			Logging object
  * @param memoryDatabase	Handler of SQLite3 memory database connection
  */
 #ifndef M2MGraph
@@ -88,14 +89,15 @@ M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const u
 
 /**
  * Destructor.<br>
+ * Release the heap memory for M2MGraph structure object.<br>
  *
- * @param[in,out] self	M2MGraph structure object to be freed of memory area
+ * @param[in,out] self	M2MGraph structure object which is to be released memory
  */
 void M2MGraph_delete (M2MGraph **self);
 
 
 /**
- * Return string indicating the database name possessed by the M2MGraph object.<br>
+ * Get string indicating the database name possessed by the M2MGraph object.<br>
  *
  * @param[in] self	M2MGraph structure object
  * @return			String indicating database file name or NULL (in case of error)
@@ -104,6 +106,8 @@ M2MString *M2MGraph_getDatabaseName (const M2MGraph *self);
 
 
 /**
+ * Get the SQLite connection object on file possessed by the M2MGraph object.<br>
+ *
  * @param[in] self		M2MGraph structure object
  * @return				SQLite3 database object
  */
@@ -111,6 +115,8 @@ sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self);
 
 
 /**
+ * Get the SQLite connection object on memory possessed by the M2MGraph object.<br>
+ *
  * @param[in] self		M2MGraph structure object
  * @return				SQLite3 database object
  */
@@ -119,6 +125,9 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self);
 
 /**
  * Constructor.<br>
+ * This function creates new M2MGraph structure object.<br>
+ * When creating, this function executes memory allocation, so caller must <br>
+ * release the memory for avoiding memory leak.<br>
  *
  * @param[in] databaseName	String indicating SQLite3 file database name
  * @return					Created new M2MGraph structure object or NULL (in case of error)
