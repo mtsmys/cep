@@ -77,10 +77,18 @@ extern "C"
 
 
 /**
- * Default maximum size of log file(=8,388,608[Byte])
+ * Default maximum number of backup files(=5)
+ */
+#ifndef M2MFileAppender_DEFAULT_MAX_BACKUP_INDEX
+#define M2MFileAppender_DEFAULT_MAX_BACKUP_INDEX (uint32_t)5
+#endif /* M2MFileAppender_DEFAULT_MAX_BACKUP_INDEX */
+
+
+/**
+ * Default maximum size string of log file(="8,388,608"[Byte])
  */
 #ifndef M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE
-#define M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE (uint32_t)8388608
+#define M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE (M2MString *)"8388608"
 #endif /* M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE */
 
 
@@ -170,6 +178,13 @@ void M2MFileAppender_delete (M2MFileAppender **self);
 
 
 /**
+ * @param[in] self	M2MFileAppender structure object
+ * @return			right or wring to append to logging
+ */
+bool M2MFileAppender_getAppend (const M2MFileAppender *self);
+
+
+/**
  * Create new default log file pathname string and copy it into the argument buffer.<br>
  *
  * @param[out] buffer		Buffer for copying default log file pathname string
@@ -180,19 +195,28 @@ M2MString *M2MFileAppender_getDefaultLogFilePath (M2MString *buffer, const size_
 
 
 /**
- * This method copies log file pathname string into indicated buffer.<br>
- * The pathname independent with backbeat library, so if caller won't<br>
- * use the pathname, it isn't suitable for calling this method.<br>
- * The pathname is follow.<br>
- * <br>
- * ~/.backbeat/log/(loggerName).log<br>
  *
- * @param[in] loggerName	logger name string
- * @param[out] buffer		buffer for copying log file pathname string
- * @param[in] bufferLength	lengh of buffer[Byte]
- * @return					log file pathname string or NULL(means error)
+ * @param[in] self	File logging structure object
+ * @return			 or NULL (in case of error)
  */
-M2MString *M2MFileAppender_getLogFilePath (const M2MString *loggerName, M2MString *buffer, const size_t bufferLength);
+M2MString *M2MFileAppender_getEncoding (const M2MFileAppender *self);
+
+
+/**
+ * This method returns opened log file object.<br>
+ *
+ * @param[in] self	logging object
+ * @return			opened log file or NULL(means error)
+ */
+M2MFile *M2MFileAppender_getLogFile (M2MFileAppender *self);
+
+
+/**
+ *
+ * @param[in] self	File logging structure object
+ * @return			Log file pathname string or NULL (in case of error)
+ */
+M2MString *M2MFileAppender_getLogFilePath (const M2MFileAppender *self);
 
 
 /**
@@ -207,6 +231,20 @@ M2MLogLevel M2MFileAppender_getLogLevel (const M2MFileAppender *self);
  * @return
  */
 M2MString *M2MFileAppender_getLoggerName (const M2MFileAppender *self);
+
+
+/**
+ * @param[in] self
+ * @return
+ */
+uint32_t M2MFileAppender_getMaxBackupIndex (const M2MFileAppender *self);
+
+
+/**
+ * @param[in] self
+ * @return
+ */
+uint32_t M2MFileAppender_getMaxFileSize (const M2MFileAppender *self);
 
 
 /**
@@ -248,7 +286,21 @@ M2MFileAppender *M2MFileAppender_setAppend (M2MFileAppender *self, const bool fl
  * @param[in] self
  * @param[in] encoding
  */
-unsigned char *M2MFileAppender_setEncoding (M2MFileAppender *self, const M2MString *encoding);
+M2MFileAppender *M2MFileAppender_setEncoding (M2MFileAppender *self, const M2MString *encoding);
+
+
+/**
+ * @param[in] self
+ * @param[in] filePath
+ */
+M2MFileAppender *M2MFileAppender_setLogFilePath (M2MFileAppender *self, const M2MString *filePath);
+
+
+/**
+ * @param[in] self
+ * @param[in] loggerName
+ */
+M2MFileAppender *M2MFileAppender_setLoggerName (M2MFileAppender *self, const M2MString *loggerName);
 
 
 /**
@@ -260,30 +312,18 @@ M2MFileAppender *M2MFileAppender_setLogLevel (M2MFileAppender *self, const M2MLo
 
 /**
  * @param[in] self
- * @param[in] filePath
- */
-unsigned char *M2MFileAppender_setLogFilePath (M2MFileAppender *self, const M2MString *filePath);
-
-
-/**
- * @param[in] self
- * @param[in] loggerName
- */
-unsigned char *M2MFileAppender_setLoggerName (const M2MFileAppender *self, const M2MString *loggerName);
-
-
-/**
- * @param[in] self
  * @param[in] maxBackupIndex
  */
-M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const unsigned int maxBackupIndex);
+M2MFileAppender *M2MFileAppender_setMaxBackupIndex (M2MFileAppender *self, const uint32_t maxBackupIndex);
 
 
 /**
- * @param[in] self
- * @param[in] maxFileSize
+ * Set max file size into indicated File logging structure object.<br>
+ *
+ * @param[in,out] self			File logging structure object
+ * @param[in] maxFileSizeString	Number string indicating max file size [Byte]
  */
-M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, unsigned int maxFileSize);
+M2MFileAppender *M2MFileAppender_setMaxFileSize (M2MFileAppender *self, const M2MString *maxFileSizeString);
 
 
 

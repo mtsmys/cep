@@ -54,8 +54,8 @@ static M2MFileAppender *this_createNewLogger ()
 				&& M2MFileAppender_setLogFilePath(logger, DEFAULT_LOG_FILE_PATH)!=NULL
 				&& M2MFileAppender_setLogLevel(logger, M2MLogLevel_TRACE)!=NULL
 				&& M2MFileAppender_setLoggerName(logger, M2MLogger_DEFAULT_LOGGER_NAME)!=NULL
-				&& M2MFileAppender_setMaxBackupIndex(logger, 0)!=NULL
-				&& M2MFileAppender_setMaxFileSize(logger, 0)!=NULL
+				&& M2MFileAppender_setMaxBackupIndex(logger, M2MFileAppender_DEFAULT_MAX_BACKUP_INDEX)!=NULL
+				&& M2MFileAppender_setMaxFileSize(logger, M2MFileAppender_DEFAULT_MAX_LOG_FILE_SIZE)!=NULL
 				)
 			{
 			//===== Return created logger object =====
