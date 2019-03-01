@@ -210,18 +210,6 @@ static M2MCEP *this_setTableManager (M2MCEP *self, const M2MTableManager *tableM
 
 
 /**
- * Set the value of the data type specified by the argument to the prepared statement.<br>
- *
- * @param[in] dataType		Enumerator indicating the data type of the field
- * @param[in] index			Field index (>=1)
- * @param[in] value			String indicating the input data of the field
- * @param[in] valueLength	String size indicating field input data [Byte]
- * @param[out] statement	Prepared statement object
- */
-static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement);
-
-
-/**
  * Update the number of records for executing the vacuum on the SQLite 3 database.<br>
  *
  * @param[in] self		CEP structure object
@@ -276,7 +264,7 @@ static void this_adjustMemoryDatabaseRecord (M2MCEP *self, const M2MString *tabl
 					//===== Create a DELETE statement =====
 					snprintf(sql, DELETE_SQL_LENGTH, DELETE_SQL, tableName, tableName, excess);
 					//===== Execute DELETE statement =====
-					if (M2MSQLRunner_executeUpdate(M2MCEP_getMemoryDatabase(self), sql)==true)
+					if (M2MSQLiteConfig_executeUpdate(M2MCEP_getMemoryDatabase(self), sql)==true)
 						{
 						memset(MESSAGE, 0, sizeof(MESSAGE));
 						snprintf(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Deleted \"%s\" of records in \"%d\" table of SQLite3 database in memory", tableName, excess);
@@ -683,7 +671,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 				{
 				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Initiates transaction processing to bulk insert record information into SQLite database on file");
 				//===== Start Transaction =====
-				M2MSQLRunner_beginTransaction(fileDatabase);
+				M2MSQLiteConfig_beginTransaction(fileDatabase);
 				//===== Repeat until record management object reaches the end =====
 				while (M2MDataFrame_next(dataFrame)!=NULL)
 					{
@@ -695,7 +683,7 @@ static void this_flushCEPRecord (M2MCEP *self)
 				//===== Insert / delete end record management object =====
 				this_insertRecordList(fileDatabase, dataFrame, tableManager, M2MDataFrame_getOldRecordList(dataFrame));
 				//===== End Transaction =====
-				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
+				M2MSQLiteConfig_commitTransaction(M2MCEP_getFileDatabase(self));
 				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Finished transaction processing to bulk insert records not inserted into SQLite database on file");
 				}
 			//===== In case of record non-persistence =====
@@ -921,30 +909,6 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 	else
 		{
 		return 0;
-		}
-	}
-
-
-/**
- * SQLite 3 Returns the maximum number of columns allowed in the table.<br>
- *
- * @param database	SQLite3 database management object
- * @return			Maximum number of columns in one table [pieces]
- */
-static unsigned int this_getMaxColumnLength (sqlite3 *database)
-	{
-	//========== Variable ==========
-	const unsigned int DEFAULT_MAX_COLUMN_LENGTH = (unsigned int)2000;
-
-	//===== Check argument =====
-	if (database!=NULL)
-		{
-		return (unsigned int)sqlite3_limit(database, SQLITE_LIMIT_COLUMN, -1);
-		}
-	//===== Argument error =====
-	else
-		{
-		return DEFAULT_MAX_COLUMN_LENGTH;
 		}
 	}
 
@@ -1194,7 +1158,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 	M2MColumnList *columnList = NULL;
 	M2MList *oldRecordList = NULL;
 	unsigned int oldRecordListLength = 0;
-	M2MDataType DATA_TYPE_ARRAY[this_getMaxColumnLength(fileDatabase)];
+	M2MDataType DATA_TYPE_ARRAY[M2MSQLiteConfig_getMaxColumnLength(fileDatabase)];
 	M2MString *value = NULL;
 	M2MString *valueIndex = NULL;
 	M2MString *insertSQL = NULL;
@@ -1251,7 +1215,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 					}
 				else
 					{
-					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase));
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(fileDatabase));
 					return;
 					}
 				}
@@ -1277,7 +1241,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 								&& (valueIndex=M2MString_indexOf(value, (M2MString *)M2MString_COMMA))!=NULL)
 							{
 							//===== Set value =====
-							this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
+							M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
 							//===== Move the field position to the next =====
 							columnIndex++;
 							//===== Move the position of the value to the next =====
@@ -1288,7 +1252,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 						if (columnIndex==(dataTypeArrayLength-1))
 							{
 							//===== Set the last insert data =====
-							this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
+							M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 							//===== Execute INSERT =====
 							while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
 								{
@@ -1300,7 +1264,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 							//===== Error handling =====
 							else
 								{
-								M2MLogger_error(METHOD_NAME, __LINE__, sqlite3_errmsg(fileDatabase), NULL);
+								M2MLogger_error(METHOD_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(fileDatabase), NULL);
 								}
 							}
 						//===== Reset parameters of INSERT statement =====
@@ -1330,7 +1294,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(fileDatabase));
+					M2MLogger_error(NULL, METHOD_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(fileDatabase));
 					}
 				}
 			//===== When not to perpetuate =====
@@ -1388,7 +1352,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
 	M2MColumnList *columnList = NULL;
-	M2MDataType DATA_TYPE_ARRAY[this_getMaxColumnLength(database)];
+	M2MDataType DATA_TYPE_ARRAY[M2MSQLiteConfig_getMaxColumnLength(database)];
 	M2MString *value = NULL;
 	M2MString *valueIndex = NULL;
 	M2MString *insertSQL = NULL;
@@ -1429,7 +1393,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 							&& (valueIndex=M2MString_indexOf(value, (M2MString *)M2MString_COMMA))!=NULL)
 						{
 						//===== Set value to INSERT statement =====
-						this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
+						M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
 						//===== Move the field position to the next =====
 						columnIndex++;
 						//===== Move the position of the value to the next =====
@@ -1440,7 +1404,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 					if (columnIndex==(dataTypeArrayLength-1))
 						{
 						//===== Set the last data to INSERT statement =====
-						this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
+						M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 						//===== Execute INSERT statement =====
 						while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
 							{
@@ -1478,7 +1442,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 						&& (valueIndex=M2MString_indexOf(value, (M2MString *)M2MString_COMMA))!=NULL)
 					{
 					//===== Set value to INSERT statement =====
-					this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
+					M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value)-M2MString_length(valueIndex), statement);
 					//===== Move the field position to the next =====
 					columnIndex++;
 					//===== Move the position of the value to the next =====
@@ -1486,7 +1450,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 					value = valueIndex;
 					}
 				//===== Set the last data to INSERT statement =====
-				this_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
+				M2MSQLiteConfig_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 				//===== Execute INSERT statement =====
 				while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
 					{
@@ -1517,7 +1481,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)sqlite3_errmsg(database));
+				M2MLogger_error(NULL, METHOD_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(database));
 				}
 			//===== Release heap memory area of INSERT statement =====
 			M2MHeap_free(insertSQL);
@@ -1606,7 +1570,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 				{
 				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Start transaction processing to insert records into SQLite database on file");
 				//===== Start Transaction =====
-				M2MSQLRunner_beginTransaction(M2MCEP_getFileDatabase(self));
+				M2MSQLiteConfig_beginTransaction(M2MCEP_getFileDatabase(self));
 				}
 			//===== In case of record non-persistence =====
 			else
@@ -1627,7 +1591,7 @@ static M2MCEP *this_insertRecordListToFileDatabase (M2MCEP *self)
 			if (this_getPersistence(self)==true)
 				{
 				//===== End transaction =====
-				M2MSQLRunner_commitTransaction(M2MCEP_getFileDatabase(self));
+				M2MSQLiteConfig_commitTransaction(M2MCEP_getFileDatabase(self));
 				M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Transaction processing for inserting records into SQLite database on file has ended");
 				}
 			//===== In case of record non-persistence =====
@@ -1691,7 +1655,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 			{
 			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Insert records into SQLite database in memory");
 			//===== Start Transaction =====
-			M2MSQLRunner_beginTransaction(memoryDatabase);
+			M2MSQLiteConfig_beginTransaction(memoryDatabase);
 			//===== Repeat until record management object reaches the end =====
 			while (M2MDataFrame_next(record)!=NULL)
 				{
@@ -1725,7 +1689,7 @@ static int this_insertRecordListToMemoryDatabase (M2MCEP *self)
 				M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Failed to insert record into SQLite database in memory");
 				}
 			//===== Commit =====
-			M2MSQLRunner_commitTransaction(memoryDatabase);
+			M2MSQLiteConfig_commitTransaction(memoryDatabase);
 			M2MLogger_debug(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"Finished inserting records into SQLite database in memory");
 			//===== Returns the number of inserted records =====
 			return numberOfRecord;
@@ -2090,192 +2054,6 @@ static M2MCEP *this_setTableManager (M2MCEP *self, const M2MTableManager *tableM
 		M2MLogger_error(M2MCEP_getLogger(self), METHOD_NAME, __LINE__, (M2MString *)"The table construction object specified by the argument is NULL");
 		return NULL;
 		}
-	}
-
-
-/**
- * Set the value of the data type specified by the argument to the prepared statement.<br>
- *
- * @param[in] dataType		Enumerator indicating the data type of the field
- * @param[in] index			Field index (>=1)
- * @param[in] value			String indicating the input data of the field
- * @param[in] valueLength	String size indicating field input data [Byte]
- * @param[out] statement	Prepared statement object
- */
-static void this_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement)
-	{
-	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_setValueIntoPreparedStatement()";
-
-	//===== Check argument =====
-	if (index>0 && statement!=NULL)
-		{
-		//===== In case of BLOB type data =====
-		if (dataType==M2MDataType_BLOB)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_blob(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"BLOB\" type data");
-				}
-			}
-		//===== In case of BOOL type data =====
-		else if (dataType==M2MDataType_BOOL)
-			{
-			}
-		//===== In case of CHAR type data =====
-		else if (dataType==M2MDataType_CHAR)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"CHAR\" type data");
-				}
-			}
-		//===== In case of DATETIME type data =====
-		else if (dataType==M2MDataType_DATETIME)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_int64(statement, index, M2MString_convertFromStringToSignedLong(value, valueLength))==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DATETIME\" type data");
-				}
-			}
-		//===== In case of DOUBLE type data =====
-		else if (dataType==M2MDataType_DOUBLE)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"DOUBLE\" type data");
-				}
-			}
-		//===== In case of ERROR type data =====
-		else if (dataType==M2MDataType_ERROR)
-			{
-			}
-		//===== In case of FLOAT type data =====
-		else if (dataType==M2MDataType_FLOAT)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"FLOAT\" type data");
-				}
-			}
-		//===== In case of INTEGER type data =====
-		else if (dataType==M2MDataType_INTEGER)
-			{
-			//=====  =====
-			if (sqlite3_bind_int(statement, index, M2MString_convertFromStringToSignedInteger(value, valueLength))==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"INTEGER\" type data");
-				}
-			}
-		//===== In case of NULL type data =====
-		else if (dataType==M2MDataType_NULL)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_null(statement, index)==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"NULL\" type data");
-				}
-			}
-		//===== In case of NUMERIC type data =====
-		else if (dataType==M2MDataType_NUMERIC)
-			{
-			}
-		//===== In case of REAL type data =====
-		else if (dataType==M2MDataType_REAL)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_double(statement, index, M2MString_convertFromStringToDouble(value, valueLength))==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"REAL\" type data");
-				}
-			}
-		//===== In case of TEXT type data =====
-		else if (dataType==M2MDataType_TEXT)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"TEXT\" type data");
-				}
-			}
-		//===== In case of VARCHAR type data =====
-		else if (dataType==M2MDataType_VARCHAR)
-			{
-			//===== Set the value =====
-			if (sqlite3_bind_text(statement, index, value, valueLength, SQLITE_TRANSIENT)==SQLITE_OK)
-				{
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to set \"VARCHAR\" type data");
-				}
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"Failed to find A data type matching the data type specified in the argument");
-			}
-		}
-	//===== Argument error =====
-	else if (index<=0)
-		{
-		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The index indicating the position of the data value specified by the argument is 0 or less");
-		}
-	else if (value==NULL)
-		{
-		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The string indicating the data value specified by the argument is NULL");
-		}
-	else if (valueLength>M2MString_length(value))
-		{
-		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The length [Byte] of the string indicating the data value specified by the argument is the actual size or more");
-		}
-	else
-		{
-		M2MLogger_error(NULL, METHOD_NAME, __LINE__, (M2MString *)"The prepared statement object specified by the argument is NULL");
-		}
-	return;
 	}
 
 
@@ -2885,11 +2663,11 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 						//===== Error handling =====
 						else if (dataLength<=0)
 							{
-							M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+							M2MLogger_error(FUNCTION_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(memoryDatabase), NULL);
 							}
 						else
 							{
-							M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+							M2MLogger_error(FUNCTION_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(memoryDatabase), NULL);
 							}
 						}
 					//===== When the data type of the SELECT result column is NULL =====
@@ -2924,7 +2702,7 @@ M2MString *M2MCEP_select (M2MCEP *self, const M2MString *sql, M2MString **result
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(FUNCTION_NAME, __LINE__, (M2MString *)sqlite3_errmsg(memoryDatabase), NULL);
+			M2MLogger_error(FUNCTION_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(memoryDatabase), NULL);
 			return NULL;
 			}
 		}
@@ -3099,7 +2877,6 @@ void M2MCEP_setSignalHandler (const M2MCEP *self)
 	//========== Variable ==========
 	struct sigaction newAction;
 	struct sigaction oldAction;
-	const M2MString *FUNCTION_NAME = (M2MString *)"M2MCEP_setSignalHandler()";
 
 	//=====  =====
 //	newAction.sa_handler = termination_handler;

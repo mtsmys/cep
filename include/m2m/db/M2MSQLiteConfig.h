@@ -42,10 +42,10 @@ extern "C"
 
 
 #include "m2m/db/M2MDataType.h"
-#include "m2m/db/M2MSQLRunner.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sqlite3.h>
 
@@ -70,16 +70,74 @@ extern "C"
 #endif /* M2MSQLiteConfig_DATABASE_DIRECTORY_PERMISSION */
 
 
+/**
+ * String indicating the use of SQLite3 memory database (=":memory:")
+ */
+#ifndef M2MSQLiteConfig_MEMORY_DATABASE
+#define M2MSQLiteConfig_MEMORY_DATABASE (M2MString *)":memory:"
+#endif /* M2MSQLiteConfig_MEMORY_DATABASE */
+
+
 
 /*******************************************************************************
  * Public function
  ******************************************************************************/
+/**
+ * This function starts transaction with indicated SQLite3 database as argument.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_beginTransaction (sqlite3 *database);
+
+
 /**
  * Close the connection of indicated SQLite3 database.<br>
  *
  * @param[in] database	SQLite3 database object to be closed
  */
 void M2MSQLiteConfig_closeDatabase (sqlite3 *database);
+
+
+/**
+ * Commit the transaction of the specified SQLite3 database object.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_commitTransaction (sqlite3 *database);
+
+
+/**
+ * Execute the SQL statement in the SQLite3 database object.<br>
+ * <br>
+ * [Caution!]<br>
+ * This function needs many times, so don't use this for "INSERT" SQL or <br>
+ * "UPDATE" SQL.<br>
+ *
+ * @param database	SQLite3 database manager object
+ * @param sql		SQL string
+ * @return			true: success, false: failuer
+ */
+bool M2MSQLiteConfig_executeUpdate (sqlite3 *database, const M2MString *sql);
+
+
+/**
+ * Get string indicating SQLite3 error message.<br>
+ *
+ * @param database	SQLite3 database management object
+ * @return			String indicating SQLite3 error message which is handled by argument
+ */
+M2MString *M2MSQLiteConfig_getErrorMessage (sqlite3 *database);
+
+
+/**
+ * SQLite 3 Returns the maximum number of columns allowed in the table.<br>
+ *
+ * @param database	SQLite3 database management object
+ * @return			Maximum number of columns in one table [pieces]
+ */
+int32_t M2MSQLiteConfig_getMaxColumnLength (sqlite3 *database);
 
 
 /**
@@ -119,10 +177,10 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
  * Otherwise, caller should SQLite3 file pathname string as "filename" <br>
  * argument.<br>
  *
- * @param[in] filename	String indicating database name
- * @return				Connection handler of opened SQLite3 database or NULL (in case of error)
+ * @param[in] sqliteFilePath	String indicating database file pathname(if you want to use in-memory database, please set ":memory:" string)
+ * @return						Connection handler of opened SQLite3 database or NULL (in case of error)
  */
-sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename);
+sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *sqliteFilePath);
 
 
 /**
@@ -132,6 +190,15 @@ sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename);
  * @return				Result code defined by SQLite3 API
  */
 int M2MSQLiteConfig_next (sqlite3_stmt *statement);
+
+
+/**
+ * Rollback the transaction of the specified SQLite3 database object.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_rollbackTransaction (sqlite3 *database);
 
 
 /**
@@ -164,7 +231,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database);
 
 
 /**
- * Set the data in specified type into SQLite prepared statement.<br>
+ * Set the data in specified data type into SQLite prepared statement.<br>
  *
  * @param[in] dataType		Data type of the SQLite3 database
  * @param[in] index			Index number of the field (>=1)

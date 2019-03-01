@@ -34,6 +34,49 @@
  * Public function
  ******************************************************************************/
 /**
+ * This function starts transaction with indicated SQLite3 database as argument.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_beginTransaction (sqlite3 *database)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_beginTransaction()";
+	const M2MString *BEGIN_SQL = (M2MString *)"BEGIN ";
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		//===== Execute SQL =====
+		if (M2MSQLiteConfig_executeUpdate(database, BEGIN_SQL)==true)
+			{
+			return true;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to start transaction in indicated SQLite3 database");
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		return false;
+		}
+	}
+
+
+
+
+
+
+
+
+
+/**
  * Close the connection of indicated SQLite3 database.<br>
  *
  * @param[in] database	SQLite3 database object to be closed
@@ -87,6 +130,137 @@ void M2MSQLiteConfig_closeDatabase (sqlite3 *database)
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
 		}
 	return;
+	}
+
+
+/**
+ * Commit the transaction of the specified SQLite3 database object.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_commitTransaction (sqlite3 *database)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_commitTransaction()";
+	const M2MString *COMMIT_SQL = (M2MString *)"COMMIT ";
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		//===== Commit =====
+		if (M2MSQLiteConfig_executeUpdate(database, COMMIT_SQL)==true)
+			{
+			return true;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to commit transaction in indicated SQLite3 database");
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		return false;
+		}
+	}
+
+
+/**
+ * Execute the SQL statement in the SQLite3 database object.<br>
+ * <br>
+ * [Caution!]<br>
+ * This function needs many times, so don't use this for "INSERT" SQL or <br>
+ * "UPDATE" SQL.<br>
+ *
+ * @param database	SQLite3 database manager object
+ * @param sql		SQL string
+ * @return			true: success, false: failuer
+ */
+bool M2MSQLiteConfig_executeUpdate (sqlite3 *database, const M2MString *sql)
+	{
+	//========== Variable ==========
+	sqlite3_stmt *statement = NULL;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_executeUpdate()";
+
+	//===== Check argument =====
+	if (database!=NULL
+			&& sql!=NULL && M2MString_length(sql)>0)
+		{
+		//===== Convert SQL statement to VDBE (internal execution format) =====
+		if (sqlite3_prepare(database, sql, -1, &statement, NULL)==SQLITE_OK)
+			{
+			//===== Execute SQL =====
+			while (sqlite3_step(statement)==SQLITE_BUSY)
+				{
+				}
+			//===== Check result status =====
+			if (sqlite3_finalize(statement)==SQLITE_OK)
+				{
+				return true;
+				}
+			//===== Error handling =====
+			else
+				{
+				return false;
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else if (database==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		return false;
+		}
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sql\" string is NULL or vacant");
+		return false;
+		}
+	}
+
+
+/**
+ * Get string indicating SQLite3 error message.<br>
+ *
+ * @param database	SQLite3 database management object
+ * @return			String indicating SQLite3 error message which is handled by argument
+ */
+M2MString *M2MSQLiteConfig_getErrorMessage (sqlite3 *database)
+	{
+	return (M2MString *)sqlite3_errmsg(database);
+	}
+
+
+/**
+ * SQLite 3 Returns the maximum number of columns allowed in the table.<br>
+ *
+ * @param database	SQLite3 database management object
+ * @return			Maximum number of columns in one table [pieces]
+ */
+int32_t M2MSQLiteConfig_getMaxColumnLength (sqlite3 *database)
+	{
+	//========== Variable ==========
+	const int32_t DEFAULT_MAX_COLUMN_LENGTH = 2000;
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		return (int32_t)sqlite3_limit(database, SQLITE_LIMIT_COLUMN, -1);
+		}
+	//===== Argument error =====
+	else
+		{
+		return DEFAULT_MAX_COLUMN_LENGTH;
+		}
 	}
 
 
@@ -194,7 +368,7 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
 	int numberOfTable = -1;
-	M2MString message[256];
+	M2MString message[1024];
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_isExistingTable()";
 	const M2MString *SQL = (M2MString *)"SELECT COUNT(DISTINCT name) AS result FROM sqlite_master WHERE type = 'table' AND name = ?";
 
@@ -260,21 +434,21 @@ bool M2MSQLiteConfig_isExistingTable (sqlite3 *database, const M2MString *tableN
  * Otherwise, caller should SQLite3 file pathname string as "filename" <br>
  * argument.<br>
  *
- * @param[in] filename	String indicating database name(if you want to use in-memory database, please set ":memory:" string)
- * @return				Connection handler of opened SQLite3 database or NULL (in case of error)
+ * @param[in] sqliteFilePath	String indicating database file pathname (if you want to use in-memory database, please set ":memory:" string)
+ * @return						Connection handler of opened SQLite3 database or NULL (in case of error)
  */
-sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
+sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *sqliteFilePath)
 	{
 	//========== Variable ==========
 	sqlite3 *database = NULL;
-	M2MString message[256];
+	M2MString message[1024];
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_openDatabase()";
 
 	//===== Check argument =====
-	if (filename!=NULL && M2MString_length(filename)>0)
+	if (sqliteFilePath!=NULL && M2MString_length(sqliteFilePath)>0)
 		{
 		//===== Open the SQLite3 database =====
-		if (sqlite3_open(filename, &database)==SQLITE_OK)
+		if (sqlite3_open(sqliteFilePath, &database)==SQLITE_OK)
 			{
 			//===== Return the connection handler =====
 			return database;
@@ -285,7 +459,7 @@ sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
 			//===== Close the SQLite3 database =====
 			M2MSQLiteConfig_closeDatabase(database);
 			memset(message, 0, sizeof(message));
-			snprintf(message, sizeof(message)-1, (M2MString *)"Failed to open a SQLite3 database(=\"%s\")", filename);
+			snprintf(message, sizeof(message)-1, (M2MString *)"Failed to open a SQLite3 database(=\"%s\")", sqliteFilePath);
 			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, message);
 			return NULL;
 			}
@@ -293,8 +467,44 @@ sqlite3 *M2MSQLiteConfig_openDatabase (const M2MString *filename)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"filename\" string is NULL or vacant");
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqliteFilePath\" string is NULL or vacant");
 		return NULL;
+		}
+	}
+
+
+/**
+ * Rollback the transaction of the specified SQLite3 database object.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @return				true: success, false: failure
+ */
+bool M2MSQLiteConfig_rollbackTransaction (sqlite3 *database)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLiteConfig_commitTransaction()";
+	const M2MString *ROLLBACK_SQL = (M2MString *)"ROLLBACK ";
+
+	//===== Check argument =====
+	if (database!=NULL)
+		{
+		//===== Commit =====
+		if (M2MSQLiteConfig_executeUpdate(database, ROLLBACK_SQL)==true)
+			{
+			return true;
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to rollback transaction in indicated SQLite3 database");
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
+		return false;
 		}
 	}
 
@@ -318,7 +528,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	if (flag==true)
 		{
 		//===== Execute SQL statement to disable automatic vacuum =====
-		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL))==true)
+		if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_AUTO_VACUUM_SQL))==true)
 			{
 			}
 		//===== Error handling =====
@@ -331,7 +541,7 @@ bool M2MSQLiteConfig_setAutoVacuum (sqlite3 *database, const bool flag)
 	else
 		{
 		//===== Execute SQL statement to disable automatic vacuum =====
-		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL))==true)
+		if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_NOT_AUTO_VACUUM_SQL))==true)
 			{
 			}
 		//===== Error handling =====
@@ -363,7 +573,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	if (synchronous==true)
 		{
 		//===== Set NORMAL synchronous mode to SQLite3 database =====
-		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL))==true)
+		if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_SYNCHRONOUS_NORMAL_SQL))==true)
 			{
 			}
 		//===== Error handling =====
@@ -376,7 +586,7 @@ bool M2MSQLiteConfig_setSynchronous (sqlite3 *database, const bool synchronous)
 	else
 		{
 		//===== Set OFF synchronous mode to SQLite3 database =====
-		if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL))==true)
+		if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_SYNCHRONOUS_OFF_SQL))==true)
 			{
 			}
 		//===== Error handling =====
@@ -403,7 +613,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 	const M2MString *PRAGMA_ENCODING_SQL = (M2MString *)"PRAGMA encoding = 'UTF-8'";
 
 	//===== Set UTF-8 to SQLite3 database =====
-	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_ENCODING_SQL))==true)
+	if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_ENCODING_SQL))==true)
 		{
 		}
 	//===== Error handling =====
@@ -416,7 +626,7 @@ bool M2MSQLiteConfig_setUTF8 (sqlite3 *database)
 
 
 /**
- * Set the data in specified type into SQLite prepared statement.<br>
+ * Set the data in specified data type into SQLite prepared statement.<br>
  *
  * @param[in] dataType		Data type of the SQLite3 database
  * @param[in] index			Index number of the field (>=1)
@@ -672,7 +882,7 @@ bool M2MSQLiteConfig_setWAL (sqlite3 *database, const bool synchronous)
 	const M2MString *PRAGMA_JOURNAL_MODE_SQL = (M2MString *)"PRAGMA journal_mode = WAL ";
 
 	//===== Set journal mode of SQLite3 database =====
-	if ((result=M2MSQLRunner_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL))==true)
+	if ((result=M2MSQLiteConfig_executeUpdate(database, PRAGMA_JOURNAL_MODE_SQL))==true)
 		{
 		}
 	//===== Error handling =====
@@ -729,7 +939,7 @@ bool M2MSQLiteConfig_vacuum (sqlite3 *database)
 	const M2MString *SQL = "VACUUM ";
 
 	//===== Vacuum SQLite3 database =====
-	if ((result=M2MSQLRunner_executeUpdate(database, SQL))==true)
+	if ((result=M2MSQLiteConfig_executeUpdate(database, SQL))==true)
 		{
 		}
 	//===== Error handling =====

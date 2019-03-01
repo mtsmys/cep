@@ -1273,7 +1273,7 @@ void M2MLogger_errorImpl (M2MFileAppender *self, const M2MString *functionName, 
 
 
 /**
- * @param[in] this
+ * @param[in,out] self
  */
 void M2MFileAppender_delete (M2MFileAppender **self)
 	{

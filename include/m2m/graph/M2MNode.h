@@ -39,9 +39,11 @@
 #include "m2m/log/M2MFileAppender.h"
 #include "m2m/log/M2MLogger.h"
 #include "m2m/time/M2MDate.h"
+#include "m2m/util/list/M2MList.h"
 #include <inttypes.h>
 #include <sqlite3.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 
@@ -111,6 +113,17 @@ extern "C"
  * Public function
  ******************************************************************************/
 /**
+ * Set a new record as node into the "m2m_node" table.<br>
+ *
+ * @param[in] database	SQLite3 database object
+ * @param[in] name		String indicating unique node name in "m2m_node" table
+ * @param[in] property	String indicating property belonging to the node or NULL
+ * @return				Number indicating node ID which is unique in "m2m_node" table
+ */
+uint32_t M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString *property);
+
+
+/**
  * Destructor.<br>
  * Delete a record indicated with ID in the "m2m_node" table.
  *
@@ -130,6 +143,30 @@ uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name);
 
 /**
  * @param[in] database	SQLite3 database object
+ * @param[in] name		String indicating node name
+ * @return				List object stored numbers indicating node IDs which are unique in "m2m_node" table
+ */
+M2MList *M2MNode_getIDList (sqlite3 *database, const M2MString *name);
+
+
+/**
+ * @param[in] database	SQLite3 database object
+ * @param[in] name		String indicating node name
+ * @return				String indicating node ID which is unique in "m2m_node" table
+ */
+M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name);
+
+
+/**
+ * @param[in] database	SQLite3 database object
+ * @param[in] name		String indicating node name
+ * @return				List object stored strings indicating node IDs which are unique in "m2m_node" table
+ */
+M2MList *M2MNode_getIDStringList (sqlite3 *database, const M2MString *name);
+
+
+/**
+ * @param[in] database	SQLite3 database object
  * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
  * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
  * @return				String indicating node name or NULL (in case of error)
@@ -144,18 +181,6 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
  * @return				String indicating node name or NULL (in case of error)
  */
 M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MString **property);
-
-
-/**
- * Constructor.<br>
- * Set a new record into the "m2m_node" table.<br>
- *
- * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating unique node name in "m2m_node" table
- * @param[in] property	String indicating property belonging to the node or NULL
- * @return				Number indicating node ID which is unique in "m2m_node" table
- */
-uint32_t M2MNode_new (sqlite3 *database, const M2MString *name, const M2MString *property);
 
 
 /**

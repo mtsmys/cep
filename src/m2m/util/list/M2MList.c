@@ -34,6 +34,29 @@
  * Declaration of private function
  ******************************************************************************/
 /**
+ * This method copies local time string into indicated "buffer" memory.<br>
+ * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
+ * This method doesn't allocation, so caller needs to prepare memory<br>
+ * before call this method.<br>
+ *
+ * @param[out] buffer		memory buffer for copying local time string
+ * @param[in] bufferLength	memory buffer length(max size)
+ * @return					length of local time string or 0(means error)
+ */
+static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
+
+
+/**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ();
+
+
+
+/*******************************************************************************
+ * Private function
+ ******************************************************************************/
+/**
  * Set the size of the value held in the list structure.<br>
  *
  * @param[in,out] self	List structure object
@@ -46,6 +69,183 @@ static M2MList *this_setValueLength (M2MList *self, const size_t valueLength);
 /*******************************************************************************
  * Private function
  ******************************************************************************/
+/**
+ * Copy the log message to the argument "buffer" pointer.<br>
+ * Buffering of array for copying is executed inside the function.<br>
+ * Therefore, it is necessary for caller to call the "M2MHeap_free()" function <br>
+ * in order to prevent memory leak after using the variable.<br>
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ * @param[out] buffer			Buffer to copy the created log message
+ * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
+ */
+static M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
+	{
+	//========== Variable ==========
+	M2MString *logLevelString = (M2MString *)"ERROR";
+	M2MString time[64];
+	M2MString lineNumberString[16];
+	M2MString errnoMessage[256];
+	M2MString threadID[128];
+	size_t functionNameLength = 0;
+	size_t messageLength = 0;
+
+	//===== Check argument =====
+	if (functionName!=NULL && (functionNameLength=M2MString_length(functionName))>0
+			&& message!=NULL && (messageLength=M2MString_length(message))>0
+			&& buffer!=NULL)
+		{
+		//===== Get line number string =====
+		memset(lineNumberString, 0, sizeof(lineNumberString));
+		snprintf(lineNumberString, sizeof(lineNumberString)-1, (M2MString *)"%d", lineNumber);
+		//===== Initialize array =====
+		memset(time, 0, sizeof(time));
+		//===== Get current time string from local calendar ======
+		if (this_getLocalTimeString(time, sizeof(time))>0
+				&& M2MSystem_getThreadIDString(threadID, sizeof(threadID))!=NULL)
+			{
+			//===== In the case of existing error number =====
+			if (errno!=0 && strerror_r(errno, errnoMessage, sizeof(errnoMessage))==0)
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, errnoMessage)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, M2MString_SPACE)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
+			//===== In the case of not existing error number =====
+			else
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			//===== Initialize error number =====
+			this_initErrorNumber();
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (logLevelString==NULL)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (functionName==NULL || functionNameLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (message==NULL || messageLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	}
+
+
 /**
  * Releases the heap memory of value held by list structure object.<br>
  *
@@ -70,42 +270,146 @@ static void this_deleteValue (M2MList *self)
 
 
 /**
- * Print out error message to standard error output.<br>
+ * This method copies local time string into indicated "buffer" memory.<br>
+ * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
+ * This method doesn't allocation, so caller needs to prepare memory<br>
+ * before call this method.<br>
  *
- * @param[in] methodName	String indicating function name
- * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
- * @param[in] message		Message string indicating error content
+ * @param[out] buffer		memory buffer for copying local time string
+ * @param[in] bufferLength	memory buffer length(max size)
+ * @return					length of local time string or 0(means error)
  */
-static void this_printErrorMessage (const M2MString *methodName, const unsigned int lineNumber, const M2MString *message)
+static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
 	{
 	//========== Variable ==========
-	const size_t TIME_LENGTH = 128;
-	M2MString TIME[TIME_LENGTH];
-	const size_t ERROR_MESSAGE_LENGTH = 256;
-	M2MString errorMessage[ERROR_MESSAGE_LENGTH];
+	struct timeval currentTime;
+	struct tm *localCalendar = NULL;
+	size_t miliSecondLength = 0;
+	M2MString *miliSecond = NULL;
+	M2MString second[8];
+	const M2MString *FORMAT = (M2MString *)"%Y-%m-%d %H:%M:%S.";
 
 	//===== Check argument =====
-	if (methodName!=NULL && M2MString_length(methodName)>0
-			&& message!=NULL && M2MString_length(message)>0)
+	if (buffer!=NULL && bufferLength>0)
 		{
 		//===== Initialize buffer =====
-		memset(TIME, 0, TIME_LENGTH);
-		memset(errorMessage, 0, ERROR_MESSAGE_LENGTH);
-		//===== Get local time string =====
-		if (M2MDate_getLocalTimeString(TIME, TIME_LENGTH)>0)
+		memset(buffer, 0, bufferLength);
+		//===== Get current time =====
+		if (gettimeofday(&currentTime, NULL)==0
+				&& (localCalendar=localtime(&(currentTime.tv_sec)))!=NULL)
 			{
-			fprintf(stderr, (M2MString *)"[ERROR]%s %s:%d[l]: %s\n", TIME, methodName, lineNumber, message);
+			//===== Convert time to string =====
+			strftime(buffer, bufferLength-1, FORMAT, localCalendar);
+			//===== Convert millisecond to string =====
+			if (M2MString_convertFromSignedLongToString((signed long)(currentTime.tv_usec/1000UL), &miliSecond)!=NULL
+					&& (miliSecondLength=M2MString_length(miliSecond))>0)
+				{
+				//===== In the case of digit number of millisecond is 1 =====
+				if (miliSecondLength==1)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"00%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== In the case of digit number of millisecond is 2 =====
+				else if (miliSecondLength==2)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"0%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== In the case of digit number of millisecond is 3 =====
+				else if (miliSecondLength==3)
+					{
+					memset(second, 0, sizeof(second));
+					//===== Convert millisecond into second format =====
+					M2MString_format(second, sizeof(second)-1, (M2MString *)"%s", miliSecond);
+					M2MHeap_free(miliSecond);
+					}
+				//===== Error handling =====
+				else
+					{
+					//===== Initialize buffer =====
+					memset(buffer, 0, bufferLength);
+					M2MHeap_free(miliSecond);
+					return 0;
+					}
+				//===== Check buffer length for copying millisecond string =====
+				if (M2MString_length(second)<(bufferLength-M2MString_length(buffer)-1))
+					{
+					//===== Copy millisecond string =====
+					memcpy(&(buffer[M2MString_length(buffer)]), second, M2MString_length(second));
+					//===== Release allocated memory =====
+					M2MHeap_free(miliSecond);
+					return M2MString_length(buffer);
+					}
+				//===== Error handling =====
+				else
+					{
+					//===== Initialize buffer =====
+					M2MHeap_free(miliSecond);
+					memset(buffer, 0, bufferLength);
+					return 0;
+					}
+				}
+			//===== Error handling =====
+			else
+				{
+				//===== Initialize buffer =====
+				M2MHeap_free(miliSecond);
+				memset(buffer, 0, bufferLength);
+				return 0;
+				}
 			}
 		//===== Error handling =====
 		else
 			{
-			// do nothing
+			return 0;
 			}
 		}
-	//===== Argument error =====
+	//===== Error handling =====
 	else
 		{
-		// do nothing
+		return 0;
+		}
+	}
+
+
+/**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ()
+	{
+	errno = 0;
+	return;
+	}
+
+
+/**
+ * Print out error message to standard error output.<br>
+ *
+ * @param[in] functionName	String indicating function name
+ * @param[in] lineNumber	Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message		Message string indicating error content
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (this_createNewLogMessage(functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_println(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
 		}
 	return;
 	}
@@ -121,7 +425,7 @@ static void this_printErrorMessage (const M2MString *methodName, const unsigned 
 static M2MList *this_setValueLength (M2MList *self, const size_t valueLength)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList.this_setValueLength()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList.this_setValueLength()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -132,7 +436,7 @@ static M2MList *this_setValueLength (M2MList *self, const size_t valueLength)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -148,7 +452,7 @@ static M2MList *this_setValueLength (M2MList *self, const size_t valueLength)
 static M2MList *this_setNext (M2MList *self, M2MList *next)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList.this_setNext()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList.this_setNext()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -159,7 +463,7 @@ static M2MList *this_setNext (M2MList *self, M2MList *next)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -175,7 +479,7 @@ static M2MList *this_setNext (M2MList *self, M2MList *next)
 static M2MList *this_setPrevious (M2MList *self, M2MList *previous)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList.this_setPrevious()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList.this_setPrevious()";
 
 	//===== Check argument =====
 	if (self!=NULL && previous!=NULL)
@@ -186,12 +490,12 @@ static M2MList *this_setPrevious (M2MList *self, M2MList *previous)
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"previous\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"previous\" object is NULL");
 		return NULL;
 		}
 	}
@@ -216,7 +520,7 @@ M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength
 	{
 	//========== Variable ==========
 	M2MList *node = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_add()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_add()";
 
 	//===== Check argument =====
 	if (self!=NULL && value!=NULL && 0<valueLength)
@@ -247,24 +551,24 @@ M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	else if (value==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"value\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"value\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"valueLength\" is negative");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"valueLength\" is negative");
 		return NULL;
 		}
 	}
@@ -279,7 +583,7 @@ M2MList *M2MList_add (M2MList *self, const void *value, const size_t valueLength
 M2MList *M2MList_begin (M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_begin()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_begin()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -295,7 +599,7 @@ M2MList *M2MList_begin (M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -310,7 +614,7 @@ void M2MList_delete (M2MList *self)
 	{
 	//========== Variable ==========
 	M2MList *next = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_delete()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_delete()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -334,13 +638,13 @@ void M2MList_delete (M2MList *self)
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		}
 	return;
 	}
@@ -357,7 +661,7 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 	{
 	//========== Variable ==========
 	unsigned int position = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_detect()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_detect()";
 
 	//===== Check argument =====
 	if (self!=NULL && index<M2MList_length(self))
@@ -387,19 +691,19 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"index\" number is invalid");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"index\" number is invalid");
 		return NULL;
 		}
 	}
@@ -414,7 +718,7 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 M2MList *M2MList_end (M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_end()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_end()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -430,7 +734,7 @@ M2MList *M2MList_end (M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -445,7 +749,7 @@ M2MList *M2MList_end (M2MList *self)
 void *M2MList_getValue (M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_getValue()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_getValue()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -455,7 +759,7 @@ void *M2MList_getValue (M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -470,7 +774,7 @@ void *M2MList_getValue (M2MList *self)
 size_t M2MList_getValueLength (M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_getValueLength()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_getValueLength()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -480,7 +784,7 @@ size_t M2MList_getValueLength (M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return 0;
 		}
 	}
@@ -495,7 +799,7 @@ size_t M2MList_getValueLength (M2MList *self)
 bool M2MList_isEmpty (M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_isEmpty()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_isEmpty()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -532,14 +836,14 @@ bool M2MList_isEmpty (M2MList *self)
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 			return true;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return true;
 		}
 	}
@@ -555,7 +859,7 @@ unsigned int M2MList_length (M2MList *self)
 	{
 	//========== Variable ==========
 	unsigned int length = 0;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_length()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_length()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -597,14 +901,14 @@ unsigned int M2MList_length (M2MList *self)
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return 0;
 		}
 	}
@@ -619,7 +923,7 @@ unsigned int M2MList_length (M2MList *self)
 M2MList *M2MList_next (const M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_next()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_next()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -629,7 +933,7 @@ M2MList *M2MList_next (const M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -638,13 +942,13 @@ M2MList *M2MList_next (const M2MList *self)
 /**
  * Get heap memory and create a new M2MList structure object.<br>
  *
- * @return	Created M2MList structure object
+ * @return	Created M2MList structure object or NULL (in case of error)
  */
 M2MList *M2MList_new ()
 	{
 	//========== Variable ==========
 	M2MList *self = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_new()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_new()";
 
 	//===== Get heap memory =====
 	if ((self=(M2MList *)M2MHeap_malloc(sizeof(M2MList)))!=NULL)
@@ -661,7 +965,7 @@ M2MList *M2MList_new ()
 			else
 				{
 				M2MList_delete(self);
-				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set next pointer of newly created M2MList object");
+				this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set next pointer of newly created M2MList object");
 				return NULL;
 				}
 			}
@@ -669,14 +973,14 @@ M2MList *M2MList_new ()
 		else
 			{
 			M2MList_delete(self);
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to set previous pointer of newly created M2MList object");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set previous pointer of newly created M2MList object");
 			return NULL;
 			}
 		}
 	//===== Error handling =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for creating M2MList object");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory for creating M2MList object");
 		return NULL;
 		}
 	}
@@ -692,7 +996,7 @@ M2MList *M2MList_new ()
 M2MList *M2MList_previous (const M2MList *self)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_previous()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_previous()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -702,7 +1006,7 @@ M2MList *M2MList_previous (const M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	}
@@ -727,7 +1031,7 @@ M2MList *M2MList_remove (M2MList *self)
 	unsigned int length = 0;
 	M2MList *previous = NULL;
 	M2MList *next = NULL;
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_remove()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_remove()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -817,7 +1121,7 @@ M2MList *M2MList_remove (M2MList *self)
 	//===== Argument error =====
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return self;
 		}
 	}
@@ -837,7 +1141,7 @@ M2MList *M2MList_remove (M2MList *self)
 M2MList *M2MList_set (M2MList *self, const void *value, const size_t valueLength)
 	{
 	//========== Variable ==========
-	const M2MString *METHOD_NAME = (M2MString *)"M2MList_set()";
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_set()";
 
 	//===== Check argument =====
 	if (self!=NULL && value!=NULL && 0<valueLength)
@@ -855,24 +1159,24 @@ M2MList *M2MList_set (M2MList *self, const void *value, const size_t valueLength
 		//===== Error handling =====
 		else
 			{
-			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying a value");
+			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get heap memory for copying a value");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
 		}
 	else if (value==NULL)
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"value\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"value\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"valueLength\" number is invalid");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"valueLength\" number is invalid");
 		return NULL;
 		}
 	}

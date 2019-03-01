@@ -31,7 +31,7 @@
 
 
 /*******************************************************************************
- * Private function
+ * Declaration of private function
  ******************************************************************************/
 /**
  * This method copies local time string into indicated "buffer" memory.<br>
@@ -68,7 +68,7 @@ static void this_initErrorNumber ();
  * @param[out] buffer			Buffer to copy the created log message
  * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
  */
-M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
+static M2MString *this_createNewLogMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
 	{
 	//========== Variable ==========
 	M2MString *logLevelString = (M2MString *)"ERROR";

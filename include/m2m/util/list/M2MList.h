@@ -33,6 +33,8 @@
 #define M2M_UTIL_LIST_M2MLIST_H_
 
 
+
+#include "m2m/M2MSystem.h"
 #include "m2m/io/M2MHeap.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/time/M2MDate.h"
@@ -172,7 +174,7 @@ M2MList *M2MList_next (const M2MList *self);
 /**
  * Get heap memory and create a new M2MList structure object.<br>
  *
- * @return	Created M2MList structure object
+ * @return	Created M2MList structure object or NULL (in case of error)
  */
 M2MList *M2MList_new ();
 

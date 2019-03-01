@@ -54,18 +54,16 @@ extern "C"
  * Definition
  ******************************************************************************/
 /**
- * @param databaseName		String indicating SQLite3 database file name
- * @param fileDatabase		Handler of SQLite3 file database connection
+ * @param database			Handler of SQLite3 database connection
  * @param logger			Logging object
- * @param memoryDatabase	Handler of SQLite3 memory database connection
+ * @param sqliteFilePath	String indicating SQLite3 database file pathname (if you want to use in-memory database, please set ":memory:" string)
  */
 #ifndef M2MGraph
 typedef struct
 	{
-	M2MString *databaseName;
-	sqlite3 *fileDatabase;
+	sqlite3 *database;
 	M2MFileAppender *logger;
-	sqlite3 *memoryDatabase;
+	M2MString *sqliteFilePath;
 	} M2MGraph;
 #endif /* M2MGraph */
 
@@ -97,30 +95,30 @@ void M2MGraph_delete (M2MGraph **self);
 
 
 /**
- * Get string indicating the database name possessed by the M2MGraph object.<br>
+ * Get the SQLite connection object on file or memory.<br>
+ *
+ * @param[in] self		M2MGraph structure object
+ * @return				SQLite3 database object
+ */
+sqlite3 *M2MGraph_getDatabase (M2MGraph *self);
+
+
+/**
+ * Get logging object owned by the argument M2MGraph structure object.<br>
+ *
+ * @param[in] self	M2MGraph structure object
+ * @return			Logging object owned by M2MGraph structure object
+ */
+M2MFileAppender *M2MGraph_getLogger (const M2MGraph *self);
+
+
+/**
+ * Get string indicating the database file pathname possessed by the M2MGraph object.<br>
  *
  * @param[in] self	M2MGraph structure object
  * @return			String indicating database file name or NULL (in case of error)
  */
-M2MString *M2MGraph_getDatabaseName (const M2MGraph *self);
-
-
-/**
- * Get the SQLite connection object on file possessed by the M2MGraph object.<br>
- *
- * @param[in] self		M2MGraph structure object
- * @return				SQLite3 database object
- */
-sqlite3 *M2MGraph_getFileDatabase (const M2MGraph *self);
-
-
-/**
- * Get the SQLite connection object on memory possessed by the M2MGraph object.<br>
- *
- * @param[in] self		M2MGraph structure object
- * @return				SQLite3 database object
- */
-sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self);
+M2MString *M2MGraph_getSQLiteFilePath (const M2MGraph *self);
 
 
 /**
@@ -129,10 +127,10 @@ sqlite3 *M2MGraph_getMemoryDatabase (const M2MGraph *self);
  * When creating, this function executes memory allocation, so caller must <br>
  * release the memory for avoiding memory leak.<br>
  *
- * @param[in] databaseName	String indicating SQLite3 file database name
- * @return					Created new M2MGraph structure object or NULL (in case of error)
+ * @param[in] sqliteFilePath	String indicating SQLite3 file pathname (if you want to use in-memory database, please set ":memory:" string)
+ * @return						Created new M2MGraph structure object or NULL (in case of error)
  */
-M2MGraph *M2MGraph_new (const M2MString *databaseName);
+M2MGraph *M2MGraph_new (const M2MString *sqliteFilePath);
 
 
 
