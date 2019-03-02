@@ -91,7 +91,7 @@ static void this_deleteDatabase (M2MGraph *self)
 	//===== Check argument =====
 	if (self!=NULL && self->database!=NULL)
 		{
-		M2MSQLiteConfig_closeDatabase(self->database);
+		M2MSQLite_closeDatabase(self->database);
 		M2MLogger_info(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Closed the SQLite3 database object");
 		}
 	//===== Argument error =====
@@ -181,7 +181,7 @@ static sqlite3 *this_openDatabase (const M2MGraph *self)
 	if (self!=NULL)
 		{
 		//===== Connect with SQLite database =====
-		if ((database=M2MSQLiteConfig_openDatabase(M2MGraph_getSQLiteFilePath(self)))!=NULL)
+		if ((database=M2MSQLite_openDatabase(M2MGraph_getSQLiteFilePath(self)))!=NULL)
 			{
 			M2MLogger_info(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Now connected with SQLite3 database");
 			return database;
@@ -294,11 +294,11 @@ static M2MGraph *this_setSQLiteFilePath (M2MGraph *self, const M2MString *sqlite
 		if (M2MString_append(&(self->sqliteFilePath), sqliteFilePath)!=NULL)
 			{
 			//===== In the case of file extension isn't given in name =====
-			if (M2MString_indexOf(sqliteFilePath, M2MSQLiteConfig_MEMORY_DATABASE)==NULL
-					&& M2MString_lastIndexOf(sqliteFilePath, M2MSQLiteConfig_FILE_EXTENSION)==NULL)
+			if (M2MString_indexOf(sqliteFilePath, M2MSQLite_MEMORY_DATABASE)==NULL
+					&& M2MString_lastIndexOf(sqliteFilePath, M2MSQLite_FILE_EXTENSION)==NULL)
 				{
 				//===== Copy SQLite3 file extension =====
-				if (M2MString_append(&(self->sqliteFilePath), M2MSQLiteConfig_FILE_EXTENSION)!=NULL)
+				if (M2MString_append(&(self->sqliteFilePath), M2MSQLite_FILE_EXTENSION)!=NULL)
 					{
 					// do nothing
 					}
@@ -456,7 +456,7 @@ sqlite3 *M2MGraph_getDatabase (M2MGraph *self)
 				//===== Error handling =====
 				else
 					{
-					M2MSQLiteConfig_closeDatabase(database);
+					M2MSQLite_closeDatabase(database);
 					M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the connection with SQLite3 database as member variable of \"M2MGraph\" object");
 					return NULL;
 					}

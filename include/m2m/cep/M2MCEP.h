@@ -34,8 +34,8 @@
 
 
 #include "m2m/cep/M2MDataFrame.h"
+#include "m2m/db/M2MSQLite.h"
 #include "m2m/db/M2MTableManager.h"
-#include "m2m/db/M2MSQLiteConfig.h"
 #include "m2m/io/M2MDirectory.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"

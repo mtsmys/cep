@@ -33,7 +33,7 @@
 #define M2M_DB_M2MTABLEMANAGER_H_
 
 
-#include "m2m/db/M2MSQLiteConfig.h"
+#include "m2m/db/M2MSQLite.h"
 #include "m2m/db/M2MColumnList.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MLogger.h"

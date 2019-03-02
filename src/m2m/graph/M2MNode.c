@@ -99,7 +99,7 @@ static bool this_createNewTable (sqlite3 *database)
 	if (database!=NULL)
 		{
 		//===== Check the existence of the table =====
-		if (M2MSQLiteConfig_isExistingTable(database, M2MNode_TABLE_NAME)==true)
+		if (M2MSQLite_isExistingTable(database, M2MNode_TABLE_NAME)==true)
 			{
 			return true;
 			}
@@ -119,13 +119,13 @@ static bool this_createNewTable (sqlite3 *database)
 					M2MNode_COLUMN_RIGHT);
 
 			//===== Startup transaction =====
-			if (M2MSQLiteConfig_beginTransaction(database)==true)
+			if (M2MSQLite_beginTransaction(database)==true)
 				{
 				//===== Execute SQL =====
-				if (M2MSQLiteConfig_executeUpdate(database, buffer)==true)
+				if (M2MSQLite_executeUpdate(database, buffer)==true)
 					{
 					//===== Shutdown transaction =====
-					M2MSQLiteConfig_commitTransaction(database);
+					M2MSQLite_commitTransaction(database);
 					return true;
 					}
 				//===== Error handling =====
@@ -133,7 +133,7 @@ static bool this_createNewTable (sqlite3 *database)
 					{
 					M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create a table in the SQLite3 database");
 					//===== Shutdown transaction =====
-					M2MSQLiteConfig_rollbackTransaction(database);
+					M2MSQLite_rollbackTransaction(database);
 					return false;
 					}
 				}
@@ -183,22 +183,22 @@ static M2MString *this_getID (sqlite3 *database, const M2MString *name)
 				M2MNode_TABLE_NAME,
 				M2MNode_COLUMN_NAME);
 		//===== Get prepared statement =====
-		if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+		if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 			{
 			//===== Execute SQL =====
-			if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, name, nameLength, statement)==true
-					&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
+			if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, name, nameLength, statement)==true
+					&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
 					&& (text=(M2MString *)sqlite3_column_text(statement, 0))!=NULL)
 				{
 				//===== Release prepared statement object =====
-				sqlite3_finalize(statement);
+				M2MSQLite_closeStatement(statement);
 				return text;
 				}
 			//===== Error handling =====
 			else
 				{
 				//===== Release prepared statement object =====
-				sqlite3_finalize(statement);
+				M2MSQLite_closeStatement(statement);
 				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get node ID string from SQLite table");
 				return NULL;
 				}
@@ -292,42 +292,42 @@ static uint32_t this_setRecord (sqlite3 *database, const M2MString *name, const 
 					M2MNode_COLUMN_NAME,
 					M2MNode_COLUMN_PROPERTY);
 			//===== Startup transaction =====
-			if (M2MSQLiteConfig_beginTransaction(database)==true)
+			if (M2MSQLite_beginTransaction(database)==true)
 				{
 				//===== Create new prepared statement =====
-				if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+				if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 					{
 					//===== Set value into statement =====
-					M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement);
-					M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 2, name, nameLength, statement);
+					M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement);
+					M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 2, name, nameLength, statement);
 					//===== In the case of existing node property information =====
 					if (property!=NULL && (propertyLength=M2MString_length(property))>0)
 						{
 						//===== Set value into statement =====
-						M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, property, propertyLength, statement);
+						M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, property, propertyLength, statement);
 						}
 					//===== In the case of no existing node property information =====
 					else
 						{
 						//===== Set value into statement =====
-						M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NULL, 3, property, 0, statement);
+						M2MSQLite_setValueIntoPreparedStatement(M2MDataType_NULL, 3, property, 0, statement);
 						}
 					//===== Execute INSERT SQL =====
-					if ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
+					if ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
 						{
 						//===== Finish transaction =====
-						M2MSQLiteConfig_commitTransaction(database);
+						M2MSQLite_commitTransaction(database);
 						//===== Release prepared statement object =====
-						sqlite3_finalize(statement);
+						M2MSQLite_closeStatement(statement);
 						return nodeID;
 						}
 					//===== Error handling =====
 					else
 						{
 						//===== Finish transaction =====
-						M2MSQLiteConfig_rollbackTransaction(database);
+						M2MSQLite_rollbackTransaction(database);
 						//===== Release prepared statement object =====
-						sqlite3_finalize(statement);
+						M2MSQLite_closeStatement(statement);
 						return 0;
 						}
 					}
@@ -403,25 +403,25 @@ static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *node
 				M2MNode_COLUMN_RIGHT,
 				M2MNode_COLUMN_ID);
 		//=====  =====
-		if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+		if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 			{
 			//===== In case of setting Nested Sets Model values =====
 			if (left!=NULL && (leftLength=M2MString_length(left))>0
 					&& right!=NULL && (rightLength=M2MString_length(right))>0)
 				{
 				//===== Set values into statement =====
-				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 1, left, leftLength, statement)==true
-						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 2, right, rightLength, statement)==true
-						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
-						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
+				if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 1, left, leftLength, statement)==true
+						&& M2MSQLite_setValueIntoPreparedStatement(M2MDataType_NUMERIC, 2, right, rightLength, statement)==true
+						&& M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
+						&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
 					{
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return true;
 					}
 				//===== Error handling =====
 				else
 					{
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return false;
 					}
 				}
@@ -429,25 +429,25 @@ static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *node
 			else if (left==NULL && right==NULL)
 				{
 				//===== Set values into statement =====
-				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NULL, 1, NULL, 0, statement)==true
-						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_NULL, 2, NULL, 0, statement)==true
-						&& M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
-						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
+				if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_NULL, 1, NULL, 0, statement)==true
+						&& M2MSQLite_setValueIntoPreparedStatement(M2MDataType_NULL, 2, NULL, 0, statement)==true
+						&& M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 3, nodeID, nodeIDLength, statement)==true
+						&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
 					{
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return true;
 					}
 				//===== Error handling =====
 				else
 					{
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return false;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				sqlite3_finalize(statement);
+				M2MSQLite_closeStatement(statement);
 				return false;
 				}
 			}
@@ -554,11 +554,11 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID)
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID);
 			//===== Get prepared statement =====
-			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+			if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 				{
 				//===== Execute SQL statement =====
-				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
-						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
+				if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
+						&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE))
 					{
 					}
 				//===== Error handling =====
@@ -566,7 +566,7 @@ void M2MNode_delete (sqlite3 *database, const uint32_t nodeID)
 					{
 					}
 				//===== Release prepared statement object =====
-				sqlite3_finalize(statement);
+				M2MSQLite_closeStatement(statement);
 				}
 			//===== Error handling =====
 			else
@@ -777,22 +777,22 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID);
 			//===== Get SQLite3 prepared statement =====
-			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+			if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 				{
 				//=====  =====
-				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
-						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
+				if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
+						&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
 						&& M2MString_append(name, sqlite3_column_text(statement, 0))!=NULL)
 					{
 					//===== Release prepared statement object =====
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return (*name);
 					}
 				//===== Error handling =====
 				else
 					{
 					//===== Release prepared statement object =====
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return NULL;
 					}
 				}
@@ -846,22 +846,22 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID);
 			//===== Get SQLite3 prepared statement =====
-			if ((statement=M2MSQLiteConfig_getPreparedStatement(database, buffer))!=NULL)
+			if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
 				{
 				//=====  =====
-				if (M2MSQLiteConfig_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
-						&& ((result=M2MSQLiteConfig_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
+				if (M2MSQLite_setValueIntoPreparedStatement(M2MDataType_TEXT, 1, hexadecimalString, M2MString_length(hexadecimalString), statement)==true
+						&& ((result=M2MSQLite_next(statement))==SQLITE_ROW || result==SQLITE_DONE)
 						&& M2MString_append(property, sqlite3_column_text(statement, 0))!=NULL)
 					{
 					//===== Release prepared statement object =====
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return (*property);
 					}
 				//===== Error handling =====
 				else
 					{
 					//===== Release prepared statement object =====
-					sqlite3_finalize(statement);
+					M2MSQLite_closeStatement(statement);
 					return NULL;
 					}
 				}

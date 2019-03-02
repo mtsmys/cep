@@ -668,7 +668,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 			while ((next=this_next(self))!=NULL)
 				{
 				//===== When a table with the same name exists =====
-				if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
+				if (M2MSQLite_isExistingTable(database, this_getTableName(self))==true)
 					{
 					// do nothing
 					}
@@ -685,7 +685,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 						{
 						M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
 						//===== Start transaction =====
-						M2MSQLiteConfig_beginTransaction(database);
+						M2MSQLite_beginTransaction(database);
 						//===== Set a flag =====
 						executeUpdate = true;
 						}
@@ -693,14 +693,14 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					if (this_getTableCreateSQL(self, &sql)!=NULL)
 						{
 						//===== Execute SQL =====
-						if (M2MSQLiteConfig_executeUpdate(database, sql)==true)
+						if (M2MSQLite_executeUpdate(database, sql)==true)
 							{
 							M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 							}
 						//===== Error handling =====
 						else
 							{
-							M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(database));
+							M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, M2MSQLite_getErrorMessage(database));
 							}
 						//===== Free heap memory area of SQL statement =====
 						M2MHeap_free(sql);
@@ -717,7 +717,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				self = next;
 				}
 			//===== When a table with the same name exists =====
-			if (M2MSQLiteConfig_isExistingTable(database, this_getTableName(self))==true)
+			if (M2MSQLite_isExistingTable(database, this_getTableName(self))==true)
 				{
 				// do nothing
 				}
@@ -734,7 +734,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 					{
 					M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Start the construction process of CEP table");
 					//===== Start transaction =====
-					M2MSQLiteConfig_beginTransaction(database);
+					M2MSQLite_beginTransaction(database);
 					//===== Set a flag =====
 					executeUpdate = true;
 					}
@@ -742,14 +742,14 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 				if (this_getTableCreateSQL(self, &sql)!=NULL)
 					{
 					//===== Execute SQL =====
-					if (M2MSQLiteConfig_executeUpdate(database, sql)==true)
+					if (M2MSQLite_executeUpdate(database, sql)==true)
 						{
 						M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"CREATE statement for CEP table construction was executed");
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, M2MSQLiteConfig_getErrorMessage(database));
+						M2MLogger_error(this_getLogger(self), FUNCTION_NAME, __LINE__, M2MSQLite_getErrorMessage(database));
 						}
 					//===== Free heap memory area of SQL statement =====
 					M2MHeap_free(sql);
@@ -766,7 +766,7 @@ void M2MTableManager_createTable (M2MTableManager *self, sqlite3 *database)
 			if (executeUpdate==true)
 				{
 				//===== End transaction =====
-				M2MSQLiteConfig_commitTransaction(database);
+				M2MSQLite_commitTransaction(database);
 				M2MLogger_debug(this_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Finish CEP table construction processing");
 				}
 			//===== When the SQL statement for table construction has not been executed yet =====
