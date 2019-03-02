@@ -38,6 +38,7 @@
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
 #include "m2m/time/M2MDate.h"
+#include "m2m/util/M2MBase64.h"
 #include "m2m/util/list/M2MList.h"
 #include <inttypes.h>
 #include <sqlite3.h>

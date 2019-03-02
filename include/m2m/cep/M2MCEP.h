@@ -39,9 +39,11 @@
 #include "m2m/io/M2MDirectory.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
+#include "m2m/util/list/M2MList.h"
 #include "m2m/util/M2MBase64.h"
 #include <signal.h>
 #include <sqlite3.h>
+#include <stdbool.h>
 
 
 

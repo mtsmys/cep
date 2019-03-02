@@ -243,6 +243,7 @@ static uint32_t this_initSeedVariable (const uint32_t x)
 	{
 	//========== Variable ==========
 	float random = 0.0;
+	const float DIFFERENCE = 0.5;
 
 	//===== In case of first time =====
 	if (this_initSeed==true)
@@ -250,8 +251,8 @@ static uint32_t this_initSeedVariable (const uint32_t x)
 		//===== Lower the flag =====
 		this_initSeed = false;
 		//===== Get random number =====
-		srand((unsigned int) time(0));
-		random = (rand() + 0.5) / (RAND_MAX + 1);
+		srand((uint32_t)time(0));
+		random = (rand() + DIFFERENCE) / (RAND_MAX + 1);
 		//===== Return the randomized number =====
 		return (uint32_t)(random * x);
 		}
@@ -657,6 +658,13 @@ M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList)
 	//========== Variable ==========
 	M2MString sql[1024];
 	sqlite3_stmt *statement = NULL;
+	int32_t resultCode = 0;
+	int32_t columnLength = -1;
+	uint32_t i = 0;
+	M2MString *value = NULL;
+	size_t valueLength = 0;
+	uint32_t id = 0;
+	int32_t sqliteColumnType = 0;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode_getIDList()";
 	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s ORDER BY %s ";
 
@@ -669,6 +677,77 @@ M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList)
 			//===== Prepare SQL statement =====
 			memset(sql, 0, sizeof(sql));
 			snprintf(sql, sizeof(sql)-1, SQL_FORMAT, M2MNode_COLUMN_ID, M2MNode_TABLE_NAME, M2MNode_COLUMN_NAME);
+			//===== Get prepared statement object =====
+			if ((statement=M2MSQLite_getPreparedStatement(database, sql))!=NULL)
+				{
+				//===== Execute SQL (repeat until the result row reaches the end) =====
+				while ((resultCode=sqlite3_step(statement))==SQLITE_ROW)
+					{
+					//===== When the number of columns of the SELECT result has not been acquired yet =====
+					if (columnLength<0)
+						{
+						//===== Get number of columns of SELECT result =====
+						columnLength = sqlite3_column_count(statement);
+						}
+					//===== When acquiring the number of columns of the SELECT result =====
+					else
+						{
+						// do nothing
+						}
+					//===== Repeat the output of SELECT result data by the number of columns =====
+					for (i=0; i<columnLength; i++)
+						{
+						//===== When the data type of the SELECT result column is an integer =====
+						if ((sqliteColumnType=sqlite3_column_type(statement, i))==SQLITE_INTEGER)
+							{
+							}
+						//===== When the data type of the SELECT result column is a floating point number =====
+						else if (sqliteColumnType==SQLITE_FLOAT)
+							{
+							}
+						//===== When the data type of the SELECT result column is a character string =====
+						else if (sqliteColumnType==SQLITE_TEXT)
+							{
+							if ((valueLength=(size_t)sqlite3_column_bytes(statement, i))>0
+									&& (value=(M2MString *)M2MHeap_malloc(valueLength+1))!=NULL
+									&& memset(value, 0, valueLength+1)!=NULL
+									&& memcpy(value, sqlite3_column_text(statement, i), valueLength)!=NULL)
+								{
+								id = M2MString_convertFromStringToUnsignedInteger(value, valueLength);
+								M2MList_add((*idList), &id, sizeof(uint32_t));
+								}
+							//===== Error handling =====
+							else
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get character string data of SELECT result");
+								}
+							}
+						//===== When the data type of the SELECT result column is byte data =====
+						else if (sqliteColumnType==SQLITE_BLOB)
+							{
+							}
+						//===== When the data type of the SELECT result column is NULL =====
+						else if (sqliteColumnType==SQLITE_NULL)
+							{
+							}
+						//===== In other cases =====
+						else
+							{
+							M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"SQLite internal error! (The data type of the SELECT result differs from the value of the rule)");
+							}
+						}
+					}
+				//===== Close SQLite3 statement object =====
+				M2MSQLite_closeStatement(statement);
+				return (*idList);
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get prepared statement object depending on indicated \"sql\" string");
+				M2MList_delete((*idList));
+				return NULL;
+				}
 			}
 		//===== Error handling =====
 		else
@@ -740,14 +819,137 @@ M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name, M2MStr
 M2MList *M2MNode_getIDStringList (sqlite3 *database, M2MList **idStringList)
 	{
 	//========== Variable ==========
+	M2MString sql[1024];
+	sqlite3_stmt *statement = NULL;
+	int32_t resultCode = 0;
+	int32_t columnLength = -1;
+	uint32_t i = 0;
+	M2MString *value = NULL;
+	size_t valueLength = 0;
+	int32_t sqliteColumnType = 0;
+	const bool CHUNK = false;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode_getIDStringList()";
+	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s ORDER BY %s ";
 
 	//===== Check argument =====
 	if (database!=NULL && idStringList!=NULL)
 		{
-		//===== Prepare buffer for storing ID number strings =====
+		//===== Prepare buffer for storing ID numbers =====
 		if (((*idStringList)=M2MList_new())!=NULL)
 			{
+			//===== Prepare SQL statement =====
+			memset(sql, 0, sizeof(sql));
+			snprintf(sql, sizeof(sql)-1, SQL_FORMAT, M2MNode_COLUMN_ID, M2MNode_TABLE_NAME, M2MNode_COLUMN_NAME);
+			//===== Get prepared statement object =====
+			if ((statement=M2MSQLite_getPreparedStatement(database, sql))!=NULL)
+				{
+				//===== Execute SQL (repeat until the result row reaches the end) =====
+				while ((resultCode=sqlite3_step(statement))==SQLITE_ROW)
+					{
+					//===== When the number of columns of the SELECT result has not been acquired yet =====
+					if (columnLength<0)
+						{
+						//===== Get number of columns of SELECT result =====
+						columnLength = sqlite3_column_count(statement);
+						}
+					//===== When acquiring the number of columns of the SELECT result =====
+					else
+						{
+						// do nothing
+						}
+					//===== Repeat the output of SELECT result data by the number of columns =====
+					for (i=0; i<columnLength; i++)
+						{
+						//===== When the data type of the SELECT result column is an integer =====
+						if ((sqliteColumnType=sqlite3_column_type(statement, i))==SQLITE_INTEGER)
+							{
+							if (M2MString_convertFromSignedIntegerToString(sqlite3_column_int(statement, i), &value)!=NULL)
+								{
+								M2MList_add((*idStringList), value, M2MString_length(value));
+								M2MHeap_free(value);
+								}
+							//===== Error handling =====
+							else
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to convert Integer data of SELECT result to character string");
+								}
+							}
+						//===== When the data type of the SELECT result column is a floating point number =====
+						else if (sqliteColumnType==SQLITE_FLOAT)
+							{
+							if (M2MString_convertFromDoubleToString(sqlite3_column_double(statement, i), &value)!=NULL)
+								{
+								M2MList_add((*idStringList), value, M2MString_length(value));
+								M2MHeap_free(value);
+								}
+							//===== Error handling =====
+							else
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to convert Floating point number data of SELECT result to character string");
+								}
+							}
+						//===== When the data type of the SELECT result column is a character string =====
+						else if (sqliteColumnType==SQLITE_TEXT)
+							{
+							if ((valueLength=(size_t)sqlite3_column_bytes(statement, i))>0
+									&& (value=(M2MString *)M2MHeap_malloc(valueLength+1))!=NULL
+									&& memset(value, 0, valueLength+1)!=NULL
+									&& memcpy(value, sqlite3_column_text(statement, i), valueLength)!=NULL)
+								{
+								M2MList_add((*idStringList), value, M2MString_length(value));
+								M2MHeap_free(value);
+								}
+							//===== Error handling =====
+							else
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get character string data of SELECT result");
+								}
+							}
+						//===== When the data type of the SELECT result column is byte data =====
+						else if (sqliteColumnType==SQLITE_BLOB)
+							{
+							if ((valueLength=(size_t)sqlite3_column_bytes(statement, i))>0
+									&& M2MBase64_encode(
+											(unsigned char *)sqlite3_column_blob(statement, i),
+											valueLength,
+											&value,
+											CHUNK)!=NULL)
+								{
+								M2MList_add((*idStringList), value, M2MString_length(value));
+								M2MHeap_free(value);
+								}
+							//===== Error handling =====
+							else if (valueLength<=0)
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, M2MSQLite_getErrorMessage(database));
+								}
+							else
+								{
+								M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, M2MSQLite_getErrorMessage(database));
+								}
+							}
+						//===== When the data type of the SELECT result column is NULL =====
+						else if (sqliteColumnType==SQLITE_NULL)
+							{
+							}
+						//===== In other cases =====
+						else
+							{
+							M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"SQLite internal error! (The data type of the SELECT result differs from the value of the rule)");
+							}
+						}
+					}
+				//===== Close SQLite3 statement object =====
+				M2MSQLite_closeStatement(statement);
+				return (*idStringList);
+				}
+			//===== Error handling =====
+			else
+				{
+				M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get prepared statement object depending on indicated \"sql\" string");
+				M2MList_delete((*idStringList));
+				return NULL;
+				}
 			}
 		//===== Error handling =====
 		else

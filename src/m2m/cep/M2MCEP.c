@@ -1166,7 +1166,6 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 	M2MString *columnNameCSV = NULL;
 	unsigned int columnIndex = 0;
 	unsigned int dataTypeArrayLength = 0;
-	int resultCode = 0;
 	int rest = 0;
 	unsigned int i = 0;
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
@@ -1254,11 +1253,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 							//===== Set the last insert data =====
 							M2MSQLite_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 							//===== Execute INSERT =====
-							while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
-								{
-								}
-							//===== When INSERT succeeds =====
-							if (resultCode==SQLITE_DONE)
+							if (M2MSQLite_next(statement)==SQLITE_DONE)
 								{
 								}
 							//===== Error handling =====
@@ -1354,7 +1349,6 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 	int numberOfRecord = 0;
 	unsigned int columnIndex = 0;
 	unsigned int dataTypeArrayLength = 0;
-	int resultCode = 0;
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
 	const M2MString *METHOD_NAME = (M2MString *)"M2MCEP.this_insertRecordList()";
 
@@ -1399,11 +1393,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 						//===== Set the last data to INSERT statement =====
 						M2MSQLite_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 						//===== Execute INSERT statement =====
-						while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
-							{
-							}
-						//===== When INSERT succeeds =====
-						if (resultCode==SQLITE_DONE)
+						if (M2MSQLite_next(statement)==SQLITE_DONE)
 							{
 							}
 						//===== Error handling =====
@@ -1445,11 +1435,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 				//===== Set the last data to INSERT statement =====
 				M2MSQLite_setValueIntoPreparedStatement(DATA_TYPE_ARRAY[columnIndex], columnIndex+1, value, M2MString_length(value), statement);
 				//===== Execute INSERT statement =====
-				while ((resultCode=sqlite3_step(statement))==SQLITE_BUSY)
-					{
-					}
-				//===== When INSERT succeeds =====
-				if (resultCode==SQLITE_DONE)
+				if (M2MSQLite_next(statement)==SQLITE_DONE)
 					{
 					}
 				//===== Error handling =====

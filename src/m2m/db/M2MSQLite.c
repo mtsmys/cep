@@ -260,13 +260,20 @@ bool M2MSQLite_executeUpdate (sqlite3 *database, const M2MString *sql)
 		//===== Convert SQL statement to VDBE (internal execution format) =====
 		if ((statement=this_getStatement(database, sql))!=NULL)
 			{
-			//===== Execute SQL =====
-			while (sqlite3_step(statement)==SQLITE_BUSY)
+			//===== Execute INSERT/UPDATE =====
+			if (M2MSQLite_next(statement)==SQLITE_DONE)
 				{
+				//===== Check result status =====
+				M2MSQLite_closeStatement(statement);
+				return true;
 				}
-			//===== Check result status =====
-			M2MSQLite_closeStatement(statement);
-			return true;
+			//===== Error handling =====
+			else
+				{
+				//===== Check result status =====
+				M2MSQLite_closeStatement(statement);
+				return false;
+				}
 			}
 		//===== Error handling =====
 		else
@@ -484,6 +491,37 @@ bool M2MSQLite_isExistingTable (sqlite3 *database, const M2MString *tableName)
 		{
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"tableName\" string is NULL or vacant");
 		return false;
+		}
+	}
+
+
+/**
+ * Execute SQL on the prepared statement object and return result code.<br>
+ *
+ * @param[in] statement	SQLite3 prepared statement object
+ * @return				Result code defined by SQLite3 API
+ */
+int M2MSQLite_next (sqlite3_stmt *statement)
+	{
+	//========== Variable ==========
+	int result = 0;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLite_next()";
+
+	//===== Check argument =====
+	if (statement!=NULL)
+		{
+		//===== Execute SQL statement =====
+		while ((result=sqlite3_step(statement))==SQLITE_BUSY)
+			{
+			}
+		//===== Return result code =====
+		return result;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"statement\" object is NULL");
+		return SQLITE_ERROR;
 		}
 	}
 
@@ -954,37 +992,6 @@ bool M2MSQLite_setWAL (sqlite3 *database, const bool synchronous)
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to change the journal mode into \"WAL\"");
 		}
 	return result;
-	}
-
-
-/**
- * Execute SQL on the prepared statement object and return result code.<br>
- *
- * @param[in] statement	SQLite3 prepared statement object
- * @return				Result code defined by SQLite3 API
- */
-int M2MSQLite_next (sqlite3_stmt *statement)
-	{
-	//========== Variable ==========
-	int result = 0;
-	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLite_next()";
-
-	//===== Check argument =====
-	if (statement!=NULL)
-		{
-		//===== Execute SQL statement =====
-		while ((result=sqlite3_step(statement))==SQLITE_BUSY)
-			{
-			}
-		//===== Return result code =====
-		return result;
-		}
-	//===== Argument error =====
-	else
-		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"statement\" object is NULL");
-		return SQLITE_ERROR;
-		}
 	}
 
 
