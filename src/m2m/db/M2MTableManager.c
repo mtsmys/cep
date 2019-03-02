@@ -175,7 +175,7 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 	//========== Variable ==========
 	M2MColumn *column = NULL;
 	M2MString *columnName = NULL;
-	M2MDataType dataType = 0;
+	M2MSQLiteDataType dataType = 0;
 	M2MString *dataTypeString = NULL;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MTableManager.this_getColumnDefinition()";
 
@@ -185,7 +185,7 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 		//===== Get a column information object =====
 		if ((column=M2MColumnList_getColumn(columnList))!=NULL
 				&& (columnName=M2MColumn_getName(column))!=NULL
-				&& (dataTypeString=M2MDataType_toString(dataType=M2MColumn_getDataType(column)))!=NULL)
+				&& (dataTypeString=M2MSQLiteDataType_toString(dataType=M2MColumn_getDataType(column)))!=NULL)
 			{
 			//===== Set column names =====
 			M2MString_append(columnDefinition, M2MString_QUOTATION);
@@ -209,7 +209,7 @@ static M2MString *this_getColumnDefinition (const M2MColumnList *columnList, M2M
 				//===== Set primary key =====
 				M2MString_append(columnDefinition, (M2MString *)"PRIMARY KEY ");
 				//===== When the data type is an integer and auto increment is set =====
-				if (dataType==M2MDataType_INTEGER
+				if (dataType==M2MSQLiteDataType_INTEGER
 						&& M2MColumn_getAutoIncrement(column)==true)
 					{
 					//===== Set auto increment =====

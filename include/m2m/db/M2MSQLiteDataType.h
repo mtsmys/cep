@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MLogLevel.h
+ * M2MSQLiteDataType.h
  *
- * Copyright (c) 2019, Akihisa Yasuda
+ * Copyright (c) 2014, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,12 @@
 
 #pragma once
 
-#ifndef M2M_LOG_M2MLOGLEVEL_H_
-#define M2M_LOG_M2MLOGLEVEL_H_
+#ifndef M2M_DB_M2MSQLITEDATATYPE_H_
+#define M2M_DB_M2MSQLITEDATATYPE_H_
+
+
+
+#include "m2m/lang/M2MString.h"
 
 
 
@@ -41,46 +45,43 @@ extern "C"
 
 
 
-#include "m2m/lang/M2MString.h"
-#include <string.h>
-
-
-
 /*******************************************************************************
  * Definition
  ******************************************************************************/
 /**
- * Log level denifition
+ * Enumerated object indicating the data type of the SQLite3 database<br>
  */
-#ifndef M2MLogLevel
+#ifndef M2MSQLiteDataType
 typedef enum
 	{
-	M2MLogLevel_TRACE,
-	M2MLogLevel_DEBUG,
-	M2MLogLevel_INFO,
-	M2MLogLevel_WARN,
-	M2MLogLevel_ERROR,
-	M2MLogLevel_FATAL,
-	} M2MLogLevel;
-#endif /* M2MLogLevel */
-
+	M2MSQLiteDataType_BLOB,
+	M2MSQLiteDataType_BOOL,
+	M2MSQLiteDataType_CHAR,
+	M2MSQLiteDataType_DATETIME,
+	M2MSQLiteDataType_DOUBLE,
+	M2MSQLiteDataType_ERROR,
+	M2MSQLiteDataType_FLOAT,
+	M2MSQLiteDataType_INTEGER,
+	M2MSQLiteDataType_NULL,
+	M2MSQLiteDataType_NUMERIC,
+	M2MSQLiteDataType_REAL,
+	M2MSQLiteDataType_TEXT,
+	M2MSQLiteDataType_VARCHAR
+	} M2MSQLiteDataType;
+#endif /* M2MSQLiteDataType */
 
 
 /*******************************************************************************
- * Public method
+ * Public function
  ******************************************************************************/
 /**
- * @param logLevel
- * @return
+ * Convert the argument enumerator to a string.<br>
+ *
+ * @param[in] self	Enumerator for data type
+ * @return			String indicating the name of the enumerator or NULL (In case of error)
  */
-M2MString *M2MLogLevel_toString (const M2MLogLevel logLevel);
+M2MString *M2MSQLiteDataType_toString (const M2MSQLiteDataType self);
 
-
-/**
- * @param[in] logLevelString
- * @return
- */
-M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString);
 
 
 
@@ -90,4 +91,4 @@ M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString);
 
 
 
-#endif /* M2M_LOG_M2MLOGLEVEL_H_ */
+#endif /* M2M_DB_M2MSQLITEDATATYPE_H_ */

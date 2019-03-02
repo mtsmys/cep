@@ -37,7 +37,6 @@
 #include "m2m/db/M2MSQLite.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
-#include "m2m/log/M2MLogger.h"
 #include "m2m/time/M2MDate.h"
 #include "m2m/util/list/M2MList.h"
 #include <inttypes.h>
@@ -143,10 +142,10 @@ uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name);
 
 /**
  * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating node name
+ * @param[out] idList	List object for storing ID numbers (allocation is executed in this function, so caller must release this memory)
  * @return				List object stored numbers indicating node IDs which are unique in "m2m_node" table
  */
-M2MList *M2MNode_getIDList (sqlite3 *database, const M2MString *name);
+M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList);
 
 
 /**
@@ -154,15 +153,15 @@ M2MList *M2MNode_getIDList (sqlite3 *database, const M2MString *name);
  * @param[in] name		String indicating node name
  * @return				String indicating node ID which is unique in "m2m_node" table
  */
-M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name);
+M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name, M2MString **buffer);
 
 
 /**
- * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating node name
- * @return				List object stored strings indicating node IDs which are unique in "m2m_node" table
+ * @param[in] database		SQLite3 database object
+ * @param[out] idStringList	List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
+ * @return					List object stored strings indicating node IDs which are unique in "m2m_node" table
  */
-M2MList *M2MNode_getIDStringList (sqlite3 *database, const M2MString *name);
+M2MList *M2MNode_getIDStringList (sqlite3 *database, M2MList **idStringList);
 
 
 /**

@@ -34,19 +34,6 @@
  * Declaration of private function
  ******************************************************************************/
 /**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
- *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0(means error)
- */
-static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength);
-
-
-/**
  * Initialize "errorno" variable.<br>
  */
 static void this_initErrorNumber ();
@@ -103,7 +90,7 @@ static M2MString *this_createNewLogMessage (const M2MString *functionName, const
 		//===== Initialize array =====
 		memset(time, 0, sizeof(time));
 		//===== Get current time string from local calendar ======
-		if (this_getLocalTimeString(time, sizeof(time))>0
+		if (M2MDate_getLocalTimeString(time, sizeof(time))>0
 				&& M2MSystem_getThreadIDString(threadID, sizeof(threadID))!=NULL)
 			{
 			//===== In the case of existing error number =====
@@ -266,114 +253,6 @@ static void this_deleteValue (M2MList *self)
 		{
 		}
 	return;
-	}
-
-
-/**
- * This method copies local time string into indicated "buffer" memory.<br>
- * Output string format is "yyyy/MM/dd HH:mm:ss.SSS";
- * This method doesn't allocation, so caller needs to prepare memory<br>
- * before call this method.<br>
- *
- * @param[out] buffer		memory buffer for copying local time string
- * @param[in] bufferLength	memory buffer length(max size)
- * @return					length of local time string or 0(means error)
- */
-static size_t this_getLocalTimeString (M2MString *buffer, const size_t bufferLength)
-	{
-	//========== Variable ==========
-	struct timeval currentTime;
-	struct tm *localCalendar = NULL;
-	size_t miliSecondLength = 0;
-	M2MString *miliSecond = NULL;
-	M2MString second[8];
-	const M2MString *FORMAT = (M2MString *)"%Y-%m-%d %H:%M:%S.";
-
-	//===== Check argument =====
-	if (buffer!=NULL && bufferLength>0)
-		{
-		//===== Initialize buffer =====
-		memset(buffer, 0, bufferLength);
-		//===== Get current time =====
-		if (gettimeofday(&currentTime, NULL)==0
-				&& (localCalendar=localtime(&(currentTime.tv_sec)))!=NULL)
-			{
-			//===== Convert time to string =====
-			strftime(buffer, bufferLength-1, FORMAT, localCalendar);
-			//===== Convert millisecond to string =====
-			if (M2MString_convertFromSignedLongToString((signed long)(currentTime.tv_usec/1000UL), &miliSecond)!=NULL
-					&& (miliSecondLength=M2MString_length(miliSecond))>0)
-				{
-				//===== In the case of digit number of millisecond is 1 =====
-				if (miliSecondLength==1)
-					{
-					memset(second, 0, sizeof(second));
-					//===== Convert millisecond into second format =====
-					M2MString_format(second, sizeof(second)-1, (M2MString *)"00%s", miliSecond);
-					M2MHeap_free(miliSecond);
-					}
-				//===== In the case of digit number of millisecond is 2 =====
-				else if (miliSecondLength==2)
-					{
-					memset(second, 0, sizeof(second));
-					//===== Convert millisecond into second format =====
-					M2MString_format(second, sizeof(second)-1, (M2MString *)"0%s", miliSecond);
-					M2MHeap_free(miliSecond);
-					}
-				//===== In the case of digit number of millisecond is 3 =====
-				else if (miliSecondLength==3)
-					{
-					memset(second, 0, sizeof(second));
-					//===== Convert millisecond into second format =====
-					M2MString_format(second, sizeof(second)-1, (M2MString *)"%s", miliSecond);
-					M2MHeap_free(miliSecond);
-					}
-				//===== Error handling =====
-				else
-					{
-					//===== Initialize buffer =====
-					memset(buffer, 0, bufferLength);
-					M2MHeap_free(miliSecond);
-					return 0;
-					}
-				//===== Check buffer length for copying millisecond string =====
-				if (M2MString_length(second)<(bufferLength-M2MString_length(buffer)-1))
-					{
-					//===== Copy millisecond string =====
-					memcpy(&(buffer[M2MString_length(buffer)]), second, M2MString_length(second));
-					//===== Release allocated memory =====
-					M2MHeap_free(miliSecond);
-					return M2MString_length(buffer);
-					}
-				//===== Error handling =====
-				else
-					{
-					//===== Initialize buffer =====
-					M2MHeap_free(miliSecond);
-					memset(buffer, 0, bufferLength);
-					return 0;
-					}
-				}
-			//===== Error handling =====
-			else
-				{
-				//===== Initialize buffer =====
-				M2MHeap_free(miliSecond);
-				memset(buffer, 0, bufferLength);
-				return 0;
-				}
-			}
-		//===== Error handling =====
-		else
-			{
-			return 0;
-			}
-		}
-	//===== Error handling =====
-	else
-		{
-		return 0;
-		}
 	}
 
 

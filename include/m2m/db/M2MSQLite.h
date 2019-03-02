@@ -41,7 +41,7 @@ extern "C"
 
 
 
-#include "m2m/db/M2MDataType.h"
+#include "m2m/db/M2MSQLiteDataType.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
 #include <stdbool.h>
@@ -247,7 +247,7 @@ bool M2MSQLite_setUTF8 (sqlite3 *database);
  * @param[in,out] statement	SQLite3 prepared statement object
  * @return					true: Succeed to set, false: Failed to set
  */
-bool M2MSQLite_setValueIntoPreparedStatement (const M2MDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement);
+bool M2MSQLite_setValueIntoPreparedStatement (const M2MSQLiteDataType dataType, unsigned int index, const M2MString *value, const size_t valueLength, sqlite3_stmt *statement);
 
 
 /**

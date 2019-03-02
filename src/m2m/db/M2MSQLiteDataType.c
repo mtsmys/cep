@@ -1,7 +1,7 @@
 /*******************************************************************************
- * M2MLogLevel.h
+ * M2MSQLiteDataType.c
  *
- * Copyright (c) 2019, Akihisa Yasuda
+ * Copyright (c) 2014, Akihisa Yasuda
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,67 +27,76 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#pragma once
-
-#ifndef M2M_LOG_M2MLOGLEVEL_H_
-#define M2M_LOG_M2MLOGLEVEL_H_
-
-
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
-
-
-
-#include "m2m/lang/M2MString.h"
-#include <string.h>
-
+#include "m2m/db/M2MSQLiteDataType.h"
 
 
 /*******************************************************************************
- * Definition
+ * Public function
  ******************************************************************************/
 /**
- * Log level denifition
+ * Convert the argument enumerator to a string.<br>
+ *
+ * @param[in] self	Enumerator for data type
+ * @return			String indicating the name of the enumerator or NULL (In case of error)
  */
-#ifndef M2MLogLevel
-typedef enum
+M2MString *M2MSQLiteDataType_toString (const M2MSQLiteDataType self)
 	{
-	M2MLogLevel_TRACE,
-	M2MLogLevel_DEBUG,
-	M2MLogLevel_INFO,
-	M2MLogLevel_WARN,
-	M2MLogLevel_ERROR,
-	M2MLogLevel_FATAL,
-	} M2MLogLevel;
-#endif /* M2MLogLevel */
+	if (self==M2MSQLiteDataType_BLOB)
+		{
+		return (M2MString *)"BLOB";
+		}
+	else if (self==M2MSQLiteDataType_BOOL)
+		{
+		return (M2MString *)"BOOL";
+		}
+	else if (self==M2MSQLiteDataType_CHAR)
+		{
+		return (M2MString *)"CHAR";
+		}
+	else if (self==M2MSQLiteDataType_DATETIME)
+		{
+		return (M2MString *)"DATETIME";
+		}
+	else if (self==M2MSQLiteDataType_DOUBLE)
+		{
+		return (M2MString *)"DOUBLE";
+		}
+	else if (self==M2MSQLiteDataType_ERROR)
+		{
+		return NULL;
+		}
+	else if (self==M2MSQLiteDataType_FLOAT)
+		{
+		return (M2MString *)"FLOAT";
+		}
+	else if (self==M2MSQLiteDataType_INTEGER)
+		{
+		return (M2MString *)"INTEGER";
+		}
+	else if (self==M2MSQLiteDataType_NUMERIC)
+		{
+		return (M2MString *)"NUMERIC";
+		}
+	else if (self==M2MSQLiteDataType_REAL)
+		{
+		return (M2MString *)"REAL";
+		}
+	else if (self==M2MSQLiteDataType_TEXT)
+		{
+		return (M2MString *)"TEXT";
+		}
+	else if (self==M2MSQLiteDataType_VARCHAR)
+		{
+		return (M2MString *)"VARCHAR";
+		}
+	//===== Error handling =====
+	else
+		{
+		return NULL;
+		}
+	}
 
 
 
-/*******************************************************************************
- * Public method
- ******************************************************************************/
-/**
- * @param logLevel
- * @return
- */
-M2MString *M2MLogLevel_toString (const M2MLogLevel logLevel);
 
-
-/**
- * @param[in] logLevelString
- * @return
- */
-M2MLogLevel M2MLogLevel_translateString (const M2MString *logLevelString);
-
-
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-
-
-#endif /* M2M_LOG_M2MLOGLEVEL_H_ */
+/* End Of File */

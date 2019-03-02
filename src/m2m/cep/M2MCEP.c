@@ -845,14 +845,14 @@ static M2MString *this_getDatabaseFilePath (const M2MString *databaseName, M2MSt
  * @param dataTypeArrayLength
  * @return
  */
-static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MString *columnNameCSV, M2MDataType dataTypeArray[], const size_t dataTypeArrayLength)
+static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MString *columnNameCSV, M2MSQLiteDataType dataTypeArray[], const size_t dataTypeArrayLength)
 	{
 	//========== Variable ==========
 	M2MString *columnName = NULL;
 	M2MString *index = NULL;
 	unsigned int dataTypeIndex = 0;
 	M2MColumn *column = NULL;
-	M2MDataType dataType;
+	M2MSQLiteDataType dataType;
 	const size_t COMMA_LENGTH = M2MString_length((M2MString *)M2MString_COMMA);
 
 	//===== Check argument =====
@@ -881,7 +881,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 			//===== Error handling =====
 			else
 				{
-				dataTypeArray[dataTypeIndex] = M2MDataType_ERROR;
+				dataTypeArray[dataTypeIndex] = M2MSQLiteDataType_ERROR;
 				}
 			dataTypeIndex++;
 			//===== Move the pointer by comma =====
@@ -901,7 +901,7 @@ static unsigned int this_getDataTypeArray (M2MColumnList *columnList, const M2MS
 		//===== Error handling =====
 		else
 			{
-			dataTypeArray[dataTypeIndex] = M2MDataType_ERROR;
+			dataTypeArray[dataTypeIndex] = M2MSQLiteDataType_ERROR;
 			}
 		return dataTypeIndex;
 		}
@@ -1158,7 +1158,7 @@ static void this_insertOldRecordList (sqlite3 *fileDatabase, M2MDataFrame *table
 	M2MColumnList *columnList = NULL;
 	M2MList *oldRecordList = NULL;
 	unsigned int oldRecordListLength = 0;
-	M2MDataType DATA_TYPE_ARRAY[M2MSQLite_getMaxColumnLength(fileDatabase)];
+	M2MSQLiteDataType DATA_TYPE_ARRAY[M2MSQLite_getMaxColumnLength(fileDatabase)];
 	M2MString *value = NULL;
 	M2MString *valueIndex = NULL;
 	M2MString *insertSQL = NULL;
@@ -1345,7 +1345,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 	//========== Variable ==========
 	sqlite3_stmt* statement = NULL;
 	M2MColumnList *columnList = NULL;
-	M2MDataType DATA_TYPE_ARRAY[M2MSQLite_getMaxColumnLength(database)];
+	M2MSQLiteDataType DATA_TYPE_ARRAY[M2MSQLite_getMaxColumnLength(database)];
 	M2MString *value = NULL;
 	M2MString *valueIndex = NULL;
 	M2MString *insertSQL = NULL;

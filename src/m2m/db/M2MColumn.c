@@ -184,7 +184,7 @@ unsigned char *M2MColumn_getName (const M2MColumn *self)
  *
  * @param[in] self	Column information object
  */
-M2MDataType M2MColumn_getDataType (const M2MColumn *self)
+M2MSQLiteDataType M2MColumn_getDataType (const M2MColumn *self)
 	{
 	//========== Variable ==========
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumn_getDataType()";
@@ -198,7 +198,7 @@ M2MDataType M2MColumn_getDataType (const M2MColumn *self)
 	else
 		{
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MColumn\" object is NULL");
-		return M2MDataType_ERROR;
+		return M2MSQLiteDataType_ERROR;
 		}
 	}
 
@@ -338,7 +338,7 @@ M2MColumn *M2MColumn_new ()
 		//===== Initialize column information object =====
 		if (M2MColumn_setAllowNULL(self, false)!=NULL
 				&& M2MColumn_setAutoIncrement(self, false)!=NULL
-				&& M2MColumn_setDataType(self, M2MDataType_ERROR)!=NULL
+				&& M2MColumn_setDataType(self, M2MSQLiteDataType_ERROR)!=NULL
 				&& M2MColumn_setLogger(self, this_createNewLogger())!=NULL
 				&& M2MColumn_setPrimaryKey(self, false)!=NULL
 				&& M2MColumn_setUnique(self, false)!=NULL)
@@ -423,7 +423,7 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL)
  * @param[in] dataType	Enumerator for data type
  * @return				Column information object with enumerator indicating data type or NULL (in case of error)
  */
-M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType)
+M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MSQLiteDataType dataType)
 	{
 	//========== Variable ==========
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MColumn_setDataType()";

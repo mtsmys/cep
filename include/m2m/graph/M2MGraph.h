@@ -37,7 +37,6 @@
 #include "m2m/graph/M2MNode.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
-#include "m2m/log/M2MLogger.h"
 #include "m2m/io/M2MHeap.h"
 #include <sqlite3.h>
 

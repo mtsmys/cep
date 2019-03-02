@@ -36,7 +36,7 @@
 #include "m2m/db/M2MColumn.h"
 #include "m2m/io/M2MHeap.h"
 #include "m2m/lang/M2MString.h"
-#include "m2m/log/M2MLogger.h"
+#include "m2m/log/M2MFileAppender.h"
 
 
 
@@ -85,7 +85,7 @@ typedef struct M2MColumnList
  * @param[in] unique		Flag of uniqueness validation
  * @return					Newly added information list object or NULL (in case of error)
  */
-M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnName, const M2MDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique);
+M2MColumnList *M2MColumnList_add (M2MColumnList *self, const M2MString *columnName, const M2MSQLiteDataType dataType, const bool primaryKey, const bool autoIncrement, const bool allowNULL, const bool unique);
 
 
 /**

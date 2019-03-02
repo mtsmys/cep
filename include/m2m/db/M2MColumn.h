@@ -34,10 +34,9 @@
 
 
 
-#include "m2m/db/M2MDataType.h"
+#include "m2m/db/M2MSQLiteDataType.h"
 #include "m2m/io/M2MHeap.h"
 #include "m2m/lang/M2MString.h"
-#include "m2m/log/M2MLogger.h"
 #include "m2m/log/M2MFileAppender.h"
 #include <stdbool.h>
 
@@ -68,7 +67,7 @@ extern "C"
 typedef struct
 	{
 	M2MString *name;
-	M2MDataType dataType;
+	M2MSQLiteDataType dataType;
 	bool primaryKey;
 	bool autoIncrement;
 	bool allowNULL;
@@ -105,7 +104,7 @@ unsigned char *M2MColumn_getName (const M2MColumn *self);
  *
  * @param[in] self	Column information object
  */
-M2MDataType M2MColumn_getDataType (const M2MColumn *self);
+M2MSQLiteDataType M2MColumn_getDataType (const M2MColumn *self);
 
 
 /**
@@ -185,7 +184,7 @@ M2MColumn *M2MColumn_setAllowNULL (M2MColumn *self, const bool allowNULL);
  * @param[in] dataType	Enumerator for data type
  * @return				Column information object with enumerator indicating data type or NULL (in case of error)
  */
-M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MDataType dataType);
+M2MColumn *M2MColumn_setDataType (M2MColumn *self, const M2MSQLiteDataType dataType);
 
 
 /**
