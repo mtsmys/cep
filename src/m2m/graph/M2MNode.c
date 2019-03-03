@@ -252,7 +252,7 @@ static uint32_t this_initSeedVariable (const uint32_t x)
 		this_initSeed = false;
 		//===== Get random number =====
 		srand((uint32_t)time(0));
-		random = (rand() + DIFFERENCE) / (RAND_MAX + 1);
+		random = (rand() + DIFFERENCE) / RAND_MAX;
 		//===== Return the randomized number =====
 		return (uint32_t)(random * x);
 		}
@@ -715,6 +715,7 @@ M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList)
 								{
 								id = M2MString_convertFromStringToUnsignedInteger(value, valueLength);
 								M2MList_add((*idList), &id, sizeof(uint32_t));
+								M2MHeap_free(value);
 								}
 							//===== Error handling =====
 							else
