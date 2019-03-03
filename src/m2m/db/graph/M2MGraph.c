@@ -348,6 +348,40 @@ static M2MGraph *this_setSQLiteFilePath (M2MGraph *self, const M2MString *sqlite
  * Public function
  ******************************************************************************/
 /**
+ * Set a new record as node into the "m2m_node" table.<br>
+ *
+ * @param[in] self		M2MGraph structure object
+ * @param[in] name		String indicating unique node name in "m2m_node" table
+ * @param[in] property	String indicating property belonging to the node or NULL
+ * @return				Number indicating node ID which is unique in "m2m_node" table
+ */
+uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property)
+	{
+	//========== Variable ==========
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_addNode()";
+
+	//===== Check argument =====
+	if (self!=NULL
+			&& name!=NULL && M2MString_length(name)>0)
+		{
+		//===== Add a node record into SQLite3 table =====
+		return M2MNode_add(M2MGraph_getDatabase(self), name, property);
+		}
+	//===== Argument error =====
+	else if (self==NULL)
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		return 0UL;
+		}
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"name\" string is NULL or vacant");
+		return 0UL;
+		}
+	}
+
+
+/**
  * Connect nodes specified by arguments with an edge.<br>
  * Actually maintain relationships in a "Nested Sets Model" in the table <br>
  * of SQLite 3 database.<br>

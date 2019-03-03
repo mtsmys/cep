@@ -47,8 +47,8 @@ extern "C"
 #include "m2m/log/M2MLogLevel.h"
 #include "m2m/time/M2MDate.h"
 #include <errno.h>
+#include <inttypes.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 

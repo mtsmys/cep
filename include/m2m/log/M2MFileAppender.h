@@ -49,9 +49,9 @@ extern "C"
 #include "m2m/log/M2MLogger.h"
 #include "m2m/log/M2MLogLevel.h"
 #include "m2m/util/list/M2MList.h"
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

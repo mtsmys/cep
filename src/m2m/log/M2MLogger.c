@@ -184,9 +184,9 @@ M2MString *M2MLogger_createNewLogMessage (const M2MLogLevel logLevel, const M2MS
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
 
 						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
-						&& M2MString_append(buffer, errnoMessage)!=NULL
-						&& M2MString_append(buffer, M2MString_COLON)!=NULL
-						&& M2MString_append(buffer, M2MString_SPACE)!=NULL
+//						&& M2MString_append(buffer, errnoMessage)!=NULL
+//						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+//						&& M2MString_append(buffer, M2MString_SPACE)!=NULL
 						&& M2MString_append(buffer, message)!=NULL
 						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
 						)

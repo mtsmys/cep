@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_GRAPH_M2MGRAPH_H_
-#define M2M_GRAPH_M2MGRAPH_H_
+#ifndef M2M_DB_GRAPH_M2MGRAPH_H_
+#define M2M_DB_GRAPH_M2MGRAPH_H_
 
 
 
@@ -71,6 +71,17 @@ typedef struct
 /*******************************************************************************
  * Public function
  ******************************************************************************/
+/**
+ * Set a new record as node into the "m2m_node" table.<br>
+ *
+ * @param[in] self		M2MGraph structure object
+ * @param[in] name		String indicating unique node name in "m2m_node" table
+ * @param[in] property	String indicating property belonging to the node or NULL
+ * @return				Number indicating node ID which is unique in "m2m_node" table
+ */
+uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property);
+
+
 /**
  * Connect nodes specified by arguments with an edge.<br>
  * Actually maintain relationships in a "Nested Sets Model" in the table <br>
@@ -139,4 +150,4 @@ M2MGraph *M2MGraph_new (const M2MString *sqliteFilePath);
 
 
 
-#endif /* M2M_GRAPH_M2MGRAPH_H_ */
+#endif /* M2M_DB_GRAPH_M2MGRAPH_H_ */

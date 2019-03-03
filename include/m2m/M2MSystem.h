@@ -33,7 +33,7 @@
 #define M2M_M2MSYSTEM_H_
 
 
-#include <stdint.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/syscall.h>

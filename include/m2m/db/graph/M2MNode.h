@@ -29,14 +29,15 @@
 
 #pragma once
 
-#ifndef M2M_GRAPH_M2MNODE_H_
-#define M2M_GRAPH_M2MNODE_H_
+#ifndef M2M_DB_GRAPH_M2MNODE_H_
+#define M2M_DB_GRAPH_M2MNODE_H_
 
 
 
 #include "m2m/db/M2MSQLite.h"
 #include "m2m/lang/M2MString.h"
 #include "m2m/log/M2MFileAppender.h"
+#include "m2m/security/M2MCRC32.h"
 #include "m2m/time/M2MDate.h"
 #include "m2m/util/M2MBase64.h"
 #include "m2m/util/list/M2MList.h"
@@ -68,7 +69,7 @@ extern "C"
 
 /**
  * Identifier column in m2m_node table.<br>
- * Data type of this column is hexadecimal number string because SQLite3 <br>
+ * Data type of this column is "hexadecimal number string" because SQLite3 <br>
  * doesn't allow the size of unsigned integer number. <br>
  */
 #ifndef M2MNode_COLUMN_ID
@@ -77,7 +78,8 @@ extern "C"
 
 
 /**
- * Column name of the name of node which is unique in "m2m_node" table.<br>
+ * Column "name" of the name of node which is unique in "m2m_node" table.<br>
+ * Data type of this column is string.<br>
  */
 #ifndef M2MNode_COLUMN_NAME
 #define M2MNode_COLUMN_NAME (M2MString *)"name"
@@ -85,7 +87,8 @@ extern "C"
 
 
 /**
- * Column name of the property information of node in "m2m_node" table.<br>
+ * Column name of the "property" information of node in "m2m_node" table.<br>
+ * Data type of this column is string.<br>
  */
 #ifndef M2MNode_COLUMN_PROPERTY
 #define M2MNode_COLUMN_PROPERTY (M2MString *)"property"
@@ -94,6 +97,7 @@ extern "C"
 
 /**
  * Column name of the Nested Set Model information of node in "m2m_node" table.<br>
+ * Data type of this column is "NUMERIC" which is defined in SQLite3.<br>
  */
 #ifndef M2MNode_COLUMN_LEFT
 #define M2MNode_COLUMN_LEFT (M2MString *)"left"
@@ -102,6 +106,7 @@ extern "C"
 
 /**
  * Column name of the Nested Set Model information of node in "m2m_node" table.<br>
+ * Data type of this column is "NUMERIC" which is defined in SQLite3.<br>
  */
 #ifndef M2MNode_COLUMN_RIGHT
 #define M2MNode_COLUMN_RIGHT (M2MString *)"right"
@@ -130,23 +135,7 @@ uint32_t M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString 
  * @param[in] database	SQLite3 database object
  * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
  */
-void M2MNode_delete (sqlite3 *database, const uint32_t nodeID);
-
-
-/**
- * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating node name
- * @return				Number indicating node ID which is unique in "m2m_node" table
- */
-uint32_t M2MNode_getID (sqlite3 *database, const M2MString *name);
-
-
-/**
- * @param[in] database	SQLite3 database object
- * @param[out] idList	List object for storing ID numbers (allocation is executed in this function, so caller must release this memory)
- * @return				List object stored numbers indicating node IDs which are unique in "m2m_node" table
- */
-M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList);
+void M2MNode_delete (sqlite3 *database, const M2MString *nodeID);
 
 
 /**
@@ -154,7 +143,7 @@ M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList);
  * @param[in] name		String indicating node name
  * @return				String indicating node ID which is unique in "m2m_node" table
  */
-M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name, M2MString **buffer);
+M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, M2MString **buffer);
 
 
 /**
@@ -162,7 +151,7 @@ M2MString *M2MNode_getIDString (sqlite3 *database, const M2MString *name, M2MStr
  * @param[out] idStringList	List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
  * @return					List object stored strings indicating node IDs which are unique in "m2m_node" table
  */
-M2MList *M2MNode_getIDStringList (sqlite3 *database, M2MList **idStringList);
+M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idStringList);
 
 
 /**
@@ -171,7 +160,7 @@ M2MList *M2MNode_getIDStringList (sqlite3 *database, M2MList **idStringList);
  * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
  * @return				String indicating node name or NULL (in case of error)
  */
-M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString **name);
+M2MString *M2MNode_getName (sqlite3 *database, const M2MString *nodeID, M2MString **name);
 
 
 /**
@@ -180,7 +169,7 @@ M2MString *M2MNode_getName (sqlite3 *database, const uint32_t nodeID, M2MString 
  * @param[out] property	Pointer to copying property belonging to the node
  * @return				String indicating node name or NULL (in case of error)
  */
-M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MString **property);
+M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *nodeID, M2MString **property);
 
 
 /**
@@ -191,9 +180,9 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const uint32_t nodeID, M2MStr
  * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
  * @param[in] left		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
  * @param[in] right		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
- * @return				Number indicating node ID which was set Nested Sets Model parameter or 0 (in case of error)
+ * @return				String indicating node ID which was set Nested Sets Model parameter or NULL (in case of error)
  */
-uint32_t M2MNode_setNestedSetsModel (sqlite3 *database, const uint32_t nodeID, const uint32_t left, const uint32_t right);
+M2MString *M2MNode_setNestedSetsModel (sqlite3 *database, M2MString *nodeID, const uint32_t left, const uint32_t right);
 
 
 
@@ -203,4 +192,4 @@ uint32_t M2MNode_setNestedSetsModel (sqlite3 *database, const uint32_t nodeID, c
 
 
 
-#endif /* M2M_GRAPH_M2MNODE_H_ */
+#endif /* M2M_DB_GRAPH_M2MNODE_H_ */

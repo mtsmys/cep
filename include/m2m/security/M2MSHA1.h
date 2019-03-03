@@ -41,9 +41,9 @@ extern "C"
 
 
 
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 
 /*******************************************************************************
