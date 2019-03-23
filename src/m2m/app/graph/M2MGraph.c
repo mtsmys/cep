@@ -391,18 +391,24 @@ uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MStrin
  * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
  * @return					M2MGraph structure object relationships updated or NULL (in case of error)
  */
-M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const uint32_t anotherNodeID)
+M2MGraph *M2MGraph_connect (const M2MGraph *self, const M2MString *nodeID, const M2MString *anotherNodeID)
 	{
 	//========== Variable ==========
 	sqlite3 *database = NULL;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_connect()";
 
 	//===== Check argument =====
-	if (self!=NULL && nodeID>0 && anotherNodeID>0)
+	if (self!=NULL 
+			&& nodeID!=NULL && M2MString_length(nodeID)>0
+			&& anotherNodeID!=NULL && M2MString_length(anotherNodeID)>0)
 		{
 		//===== Get SQLite3 object =====
 		if ((database=M2MGraph_getDatabase((M2MGraph *)self))!=NULL)
 			{
+			//=====  =====
+			//=====  =====
+			//=====  =====
+			//=====  =====
 			return (M2MGraph *)self;
 			}
 		//===== Error handling =====
@@ -418,14 +424,14 @@ M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const u
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" object is NULL");
 		return NULL;
 		}
-	else if (nodeID<=0)
+	else if (nodeID==NULL || M2MString_length(nodeID)<=0)
 		{
-		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"oneNodeID\" isn't positive");
+		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"nodeID\" string is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" isn't positive");
+		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"anotherNodeID\" string is NULL or vacant");
 		return NULL;
 		}
 	}

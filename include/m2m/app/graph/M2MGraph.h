@@ -92,7 +92,7 @@ uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MStrin
  * @param[in] anotherNodeID	Node ID of connection destination to be connected by edge
  * @return					M2MGraph structure object relationships updated or NULL (in case of error)
  */
-M2MGraph *M2MGraph_connect (const M2MGraph *self, const uint32_t nodeID, const uint32_t anotherNodeID);
+M2MGraph *M2MGraph_connect (const M2MGraph *self, const M2MString *nodeID, const M2MString *anotherNodeID);
 
 
 /**

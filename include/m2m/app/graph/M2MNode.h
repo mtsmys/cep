@@ -100,7 +100,7 @@ extern "C"
  * Data type of this column is "NUMERIC" which is defined in SQLite3.<br>
  */
 #ifndef M2MNode_COLUMN_LEFT
-#define M2MNode_COLUMN_LEFT (M2MString *)"left"
+#define M2MNode_COLUMN_LEFT (M2MString *)"lft"
 #endif /* M2MNode_COLUMN_LEFT */
 
 
@@ -109,7 +109,7 @@ extern "C"
  * Data type of this column is "NUMERIC" which is defined in SQLite3.<br>
  */
 #ifndef M2MNode_COLUMN_RIGHT
-#define M2MNode_COLUMN_RIGHT (M2MString *)"right"
+#define M2MNode_COLUMN_RIGHT (M2MString *)"rgt"
 #endif /* M2MNode_COLUMN_RIGHT */
 
 
