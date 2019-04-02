@@ -67,7 +67,7 @@ static bool this_createNewTable (sqlite3 *database)
 	//========== Variable ==========
 	M2MString buffer[512];
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode.this_createNewTable()";
-	const M2MString *SQL_FORMAT = (M2MString *)"CREATE TABLE %s (%s TEXT PRIMARY KEY  NOT NULL  UNIQUE, %s TEXT NOT NULL UNIQUE, %s TEXT, %s NUMERIC, %s NUMERIC) ";
+	const M2MString *SQL_FORMAT = (M2MString *)"CREATE TABLE %s (%s TEXT PRIMARY KEY NOT NULL UNIQUE, %s TEXT, %s TEXT, %s NUMERIC NOT NULL UNIQUE, %s NUMERIC NOT NULL UNIQUE) ";
 
 	//===== Check argument =====
 	if (database!=NULL)
