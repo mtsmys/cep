@@ -37,7 +37,7 @@
 #include "m2m/lib/db/M2MSQLite.h"
 #include "m2m/lib/lang/M2MString.h"
 #include "m2m/lib/log/M2MFileAppender.h"
-#include "m2m/lib/security/M2MCRC32.h"
+#include "m2m/lib/security/MersenneTwister.h"
 #include "m2m/lib/time/M2MDate.h"
 #include "m2m/lib/util/M2MBase64.h"
 #include "m2m/lib/util/list/M2MList.h"

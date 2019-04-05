@@ -41,20 +41,12 @@
 static uint32_t this_createNewNodeID ()
 	{
 	//========== Variable ==========
-	M2MString src[1024];
 	const uint32_t CURRENT_TIME = M2MDate_getCurrentTimeMillis();
 
-	//===== Get hexadecimal number string =====
-	if (M2MString_convertFromUnsignedLongToHexadecimalString(CURRENT_TIME, src, sizeof(src))!=NULL)
-		{
-		//===== Get CRC-32 digest value =====
-		return M2MCRC32_getValue(src, M2MString_length(src));
-		}
-	//===== Error handling =====
-	else
-		{
-		return CURRENT_TIME;
-		}
+	//===== Initialize with seed =====
+	MersenneTwister_init_genrand(CURRENT_TIME);
+	//===== Get random number =====
+	return MersenneTwister_genrand_int32();
 	}
 
 
@@ -329,6 +321,7 @@ static uint32_t this_setRecord (sqlite3 *database, const M2MString *name, const 
 	if (database!=NULL
 			&& name!=NULL && (nameLength=M2MString_length(name))>0)
 		{
+		//===== Initialize buffer =====
 		memset(hexadecimalString, 0, sizeof(hexadecimalString));
 		//===== Create new node ID =====
 		if ((nodeID=this_createNewNodeID())>0
