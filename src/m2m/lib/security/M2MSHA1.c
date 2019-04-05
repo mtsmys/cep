@@ -206,4 +206,3 @@ uint32_t M2MSHA1_getDigest (const unsigned char *src, size_t srcLength, unsigned
 
 
 /* End Of File */
-
