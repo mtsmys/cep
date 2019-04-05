@@ -679,6 +679,80 @@ M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2M
 
 
 /**
+ * 
+ * @param binary
+ * @param binaryLength
+ * @param buffer
+ * @return								Pointer of converted hexadecimal string or NULL (in case of error)
+ */
+M2MString *M2MString_convertFromBinaryToHexadecimalString (unsigned char *binary, const size_t binaryLength, M2MString **buffer)
+	{
+	//========== Variable ==========
+	size_t i = 0;
+	size_t bufferLength = 0;
+	const size_t HEXADECIMAL_SIZE = 2;
+	unsigned char HEXADECIMAL_STRING[HEXADECIMAL_SIZE+1];
+	const M2MString *FORMAT = (M2MString *)"%02x";
+
+	//===== Check argument =====
+	if (binary!=NULL && binaryLength>0 && buffer!=NULL)
+		{
+		//===== Get heap memory for storing converted string =====
+		if ((bufferLength=(binaryLength*HEXADECIMAL_SIZE)+1)>0 
+				&& ((*buffer)=(M2MString *)M2MHeap_malloc(bufferLength))!=NULL)
+			{
+			//===== Initialize buffer =====
+			memset((*buffer), 0, bufferLength);
+			//===== Repeat conversion =====
+			for (i=0; i<binaryLength; i++)
+				{
+				memset(HEXADECIMAL_STRING, 0, sizeof(HEXADECIMAL_STRING));
+				//===== Convert from binary data into hexadecimal string =====
+				if (snprintf(HEXADECIMAL_STRING, sizeof(HEXADECIMAL_STRING), FORMAT, binary[i])>0)
+					{
+					//===== Connect strings =====
+					memcpy(&((*buffer)[i * HEXADECIMAL_SIZE]), HEXADECIMAL_STRING, HEXADECIMAL_SIZE);
+					continue;
+					}
+				//===== Error handling =====
+				else
+					{
+					//===== Release heap memory =====
+					M2MHeap_free((*buffer));
+					this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to convert from binary to hexadecimal string");
+					return NULL;
+					}
+				}
+			//===== Return the pointer of hexadecimal string =====
+			return (*buffer);
+			}
+		//===== Error handling =====
+		else
+			{
+			this_printErrorMessage(__func__, __LINE__, (M2MString *)"Failed to get heap memory for storing converted hexadecimal string");
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (binary==NULL)
+		{
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"binary\" data is NULL");
+		return NULL;
+		}
+	else if (binaryLength<=0)
+		{
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"binaryLength\" is an integer less than or equal to 0");
+		return NULL;
+		}
+	else
+		{
+		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"buffer\" pointer is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
  * @param[in] boolean
  * @param[out] buffer
  * @param[in] bufferLength
@@ -765,6 +839,65 @@ M2MString *M2MString_convertFromDoubleToString (const double number, M2MString *
 	else
 		{
 		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
+		return NULL;
+		}
+	}
+
+
+/**
+ * M2MString converter from hexadecimal string into binary data.<br>
+ *
+ * @param[in] hexadecimalString		Hexadecimal string
+ * @param[out] buffer				Buffer for storing converted binary data
+ * @return							Pointer of converted binary data or NULL (in case of error)
+ */
+unsigned char *M2MString_convertFromHexadecimalStringToBinary (const M2MString *hexadecimalString, unsigned char **buffer)
+	{
+	//========== Variable ==========
+	size_t hexadecimalStringLength = 0;
+	size_t bufferLength = 0;
+	size_t i = 0;
+	unsigned int binary = 0;
+	const size_t HEXADECIMAL_SIZE = 2;
+	M2MString tmpString[HEXADECIMAL_SIZE+1];
+	const M2MString *FORMAT = (M2MString *)"%02hhx";
+
+	//=====  =====
+	if (hexadecimalString!=NULL 
+			&& (hexadecimalStringLength=M2MString_length(hexadecimalString))>0 
+			&& (hexadecimalStringLength%HEXADECIMAL_SIZE)==0 
+			&& buffer!=NULL)
+		{
+		//=====  =====
+		bufferLength = hexadecimalStringLength / 2;
+		//=====  =====
+		if (((*buffer)=(M2MString *)M2MHeap_malloc(bufferLength))!=NULL)
+			{
+			//=====  =====
+			for (i=0; i<bufferLength; i++)
+				{
+				//=====  =====
+				binary = 0;
+				memset(tmpString, 0, sizeof(tmpString));
+				//=====  =====
+				memcpy(tmpString, &(hexadecimalString[i * HEXADECIMAL_SIZE]), HEXADECIMAL_SIZE);
+				//=====  =====
+				sscanf(tmpString, FORMAT, &binary);
+				//=====  =====
+				memcpy(&((*buffer)[i]), &binary, 1);
+				}
+			//=====  =====
+			return (*buffer);
+			}
+		//=====  =====
+		else
+			{
+			return NULL;
+			}
+		}
+	//=====  =====
+	else
+		{
 		return NULL;
 		}
 	}

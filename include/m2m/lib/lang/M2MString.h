@@ -311,6 +311,16 @@ M2MString *M2MString_convertCharacterSet (const M2MString *fromString, const M2M
 
 
 /**
+ * 
+ * @param binary
+ * @param binaryLength
+ * @param buffer
+ * @return
+ */
+M2MString *M2MString_convertFromBinaryToHexadecimalString (unsigned char *binary, const size_t binaryLength, M2MString **buffer);
+
+
+/**
  * @param[in] boolean
  * @param[out] buffer
  * @param[in] bufferLength
@@ -329,6 +339,16 @@ M2MString *M2MString_convertFromBooleanToString (const bool boolean, M2MString *
  * @return				Copied string or NULL (in case of error)
  */
 M2MString *M2MString_convertFromDoubleToString (const double number, M2MString **string);
+
+
+/**
+ * M2MString converter from hexadecimal string into binary data.<br>
+ *
+ * @param[in] hexadecimalString		Hexadecimal string
+ * @param[out] buffer				Buffer for storing converted binary data
+ * @return							Pointer of converted binary data or NULL (in case of error)
+ */
+unsigned char *M2MString_convertFromHexadecimalStringToBinary (const M2MString *hexadecimalString, unsigned char **buffer);
 
 
 /**
