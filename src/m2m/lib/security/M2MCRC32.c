@@ -131,7 +131,7 @@ uint32_t M2MCRC32_getValue (const unsigned char *src, const size_t srcLength)
 			//=====  =====
 			checkSum = M2MCRC32_TABLE[(checkSum ^ src[i]) & 0xff] ^ (checkSum >> 8);
 			}
-		return checkSum ^ 0xffffffff;
+		return (checkSum ^ 0xffffffff);
 		}
 	//===== Argument error =====
 	else if (src==NULL)
