@@ -41,12 +41,15 @@
 static uint32_t this_createNewNodeID ()
 	{
 	//========== Variable ==========
+	uint32_t nodeID = 0UL;
+	TinyMT32 tinymt;
 	const uint32_t CURRENT_TIME = M2MDate_getCurrentTimeMillis();
 
 	//===== Initialize with seed =====
-	MersenneTwister_init_genrand(CURRENT_TIME);
+	TinyMT32_init(&tinymt, CURRENT_TIME);
 	//===== Get random number =====
-	return MersenneTwister_genrand_int32();
+	nodeID = TinyMT32_generate_uint32(&tinymt);
+	return nodeID;
 	}
 
 
