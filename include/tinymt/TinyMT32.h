@@ -22,6 +22,8 @@
 
 
 #include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <inttypes.h>
 
 
@@ -98,7 +100,7 @@ typedef struct
  * @param self		tinymt state vector.
  * @param seed		a 32-bit unsigned integer used as a seed.
  */
-void TinyMT32_init (TinyMT32 *self, uint32_t seed);
+void TinyMT32_init (TinyMT32 *self, const uint32_t seed);
 
 
 /**

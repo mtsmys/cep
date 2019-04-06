@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file tinymt32.c
+ * @file TinyMT32.c
  *
  * @brief Tiny Mersenne Twister only 127 bit internal state
  *
@@ -77,21 +77,39 @@ static void this_period_certification (TinyMT32 *self)
  * @param self		tinymt state vector.
  * @param seed		a 32-bit unsigned integer used as a seed.
  */
-void TinyMT32_init (TinyMT32 *self, uint32_t seed)
+void TinyMT32_init (TinyMT32 *self, const uint32_t seed)
 	{
-	self->status[0] = seed;
-	self->status[1] = self->mat1;
-	self->status[2] = self->mat2;
-	self->status[3] = self->tmat;
-	for (int i = 1; i < TINYMT32_MIN_LOOP; i++)
+	//===== Check argument =====
+	if (self!=NULL && seed>0)
 		{
-		self->status[i & 3] ^= i + UINT32_C(1812433253) * (self->status[(i - 1) & 3] ^ (self->status[(i - 1) & 3] >> 30));
+		//===== Initialize structure =====
+		memset(self, 0, sizeof(TinyMT32));
+		//=====  =====
+		self->status[0] = seed;
+		self->status[1] = self->mat1;
+		self->status[2] = self->mat2;
+		self->status[3] = self->tmat;
+		//=====  =====
+		for (int i = 1; i < TINYMT32_MIN_LOOP; i++)
+			{
+			self->status[i & 3] ^= i + UINT32_C(1812433253) * (self->status[(i - 1) & 3] ^ (self->status[(i - 1) & 3] >> 30));
+			}
+		//=====  =====
+		this_period_certification(self);
+		//=====  =====
+		for (int i = 0; i < TINYMT32_PRE_LOOP; i++)
+			{
+			TinyMT32_next_state(self);
+			}
 		}
-	this_period_certification(self);
-	for (int i = 0; i < TINYMT32_PRE_LOOP; i++)
+	//===== Argument error =====
+	else if (self==NULL)
 		{
-		TinyMT32_next_state(self);
 		}
+	else
+		{
+		}
+	return;
 	}
 
 
