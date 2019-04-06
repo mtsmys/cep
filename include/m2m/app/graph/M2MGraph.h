@@ -77,9 +77,11 @@ typedef struct
  * @param[in] self		M2MGraph structure object
  * @param[in] name		String indicating unique node name in "m2m_node" table
  * @param[in] property	String indicating property belonging to the node or NULL
+ * @param[out] id		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
+ * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
  * @return				Number indicating node ID which is unique in "m2m_node" table
  */
-uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property);
+M2MString *M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property, M2MString id[], const size_t idLength);
 
 
 /**

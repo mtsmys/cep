@@ -113,19 +113,32 @@ extern "C"
 #endif /* M2MNode_COLUMN_RIGHT */
 
 
+/**
+ * Length of node ID which is hexadecimal string indicating unsigned integer (=32[bit]).<br>
+ * Hexadecimal string is 2[Byte] in 1[Byte] data, so this variable is twice of 4[Byte].<br>
+ */
+#ifndef M2MNode_ID_LENGTH
+#define M2MNode_ID_LENGTH 8
+#endif /* M2MNode_ID_LENGTH */
+
+
+
 
 /*******************************************************************************
  * Public function
  ******************************************************************************/
 /**
- * Set a new record as node into the "m2m_node" table.<br>
+ * Constructor.<br>
+ * Set a new record as 1 node into the "m2m_node" table.<br>
  *
  * @param[in] database	SQLite3 database object
  * @param[in] name		String indicating unique node name in "m2m_node" table
  * @param[in] property	String indicating property belonging to the node or NULL
- * @return				Number indicating node ID which is unique in "m2m_node" table
+ * @param[out] id		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
+ * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
+ * @return				Pointer of stored node ID or NULL (in case of error)
  */
-uint32_t M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString *property);
+M2MString *M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString *property, M2MString id[], const size_t idLength);
 
 
 /**
@@ -133,25 +146,27 @@ uint32_t M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString 
  * Delete a record indicated with ID in the "m2m_node" table.
  *
  * @param[in] database	SQLite3 database object
- * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] id		Node ID string which is unique in "m2m_node" table
  */
-void M2MNode_delete (sqlite3 *database, const M2MString *nodeID);
+void M2MNode_delete (sqlite3 *database, const M2MString *id);
 
 
 /**
  * @param[in] database	SQLite3 database object
  * @param[in] name		String indicating node name
- * @return				String indicating node ID which is unique in "m2m_node" table
+ * @param[out] id		Buffer for storing node ID string
+ * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
+ * @return				Pointer of stored node ID or NULL (in case of error)
  */
-M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, M2MString **buffer);
+M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, M2MString id[], const size_t idLength);
 
 
 /**
  * @param[in] database		SQLite3 database object
- * @param[out] idStringList	List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
+ * @param[out] idList		List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
  * @return					List object stored strings indicating node IDs which are unique in "m2m_node" table
  */
-M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idStringList);
+M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList);
 
 
 /**
@@ -167,7 +182,7 @@ M2MString *M2MNode_getName (sqlite3 *database, const M2MString *nodeID, M2MStrin
  * @param[in] database	SQLite3 database object
  * @param[in] nodeID	Number indicating node ID which is unique inside "m2m_node" table
  * @param[out] property	Pointer to copying property belonging to the node
- * @return				String indicating node name or NULL (in case of error)
+ * @return				Pointer of stored node property string
  */
 M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *nodeID, M2MString **property);
 
@@ -177,12 +192,12 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *nodeID, M2MS
  * If initialize them, set 0 as their arguments in the same time.<br>
  *
  * @param[in] database	SQLite3 database object
- * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] id		Node ID string which is unique in "m2m_node" table
  * @param[in] left		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
  * @param[in] right		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
  * @return				String indicating node ID which was set Nested Sets Model parameter or NULL (in case of error)
  */
-M2MString *M2MNode_setNestedSetsModel (sqlite3 *database, M2MString *nodeID, const uint32_t left, const uint32_t right);
+M2MString *M2MNode_setNestedSetsModel (sqlite3 *database, const M2MString *id, const uint32_t left, const uint32_t right);
 
 
 

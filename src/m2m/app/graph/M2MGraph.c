@@ -353,9 +353,11 @@ static M2MGraph *this_setSQLiteFilePath (M2MGraph *self, const M2MString *sqlite
  * @param[in] self		M2MGraph structure object
  * @param[in] name		String indicating unique node name in "m2m_node" table
  * @param[in] property	String indicating property belonging to the node or NULL
+ * @param[out] id		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
+ * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
  * @return				Number indicating node ID which is unique in "m2m_node" table
  */
-uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property)
+M2MString *M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MString *property, M2MString id[], const size_t idLength)
 	{
 	//========== Variable ==========
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph_addNode()";
@@ -365,18 +367,18 @@ uint32_t M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MStrin
 			&& name!=NULL && M2MString_length(name)>0)
 		{
 		//===== Add a node record into SQLite3 table =====
-		return M2MNode_add(M2MGraph_getDatabase(self), name, property);
+		return M2MNode_add(M2MGraph_getDatabase(self), name, property, id, idLength);
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
-		return 0UL;
+		return NULL;
 		}
 	else
 		{
 		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"name\" string is NULL or vacant");
-		return 0UL;
+		return NULL;
 		}
 	}
 
