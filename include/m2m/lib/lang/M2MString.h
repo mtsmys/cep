@@ -33,7 +33,7 @@
 #define M2M_LIB_LANG_M2MSTRING_H_
 
 
-#include "m2m/lib/M2MSystem.h"
+#include "m2m/M2MSystem.h"
 #include "m2m/lib/io/M2MHeap.h"
 #include <ctype.h>
 #include <errno.h>

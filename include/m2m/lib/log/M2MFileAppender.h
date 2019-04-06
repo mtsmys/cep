@@ -41,7 +41,7 @@ extern "C"
 
 
 
-#include "m2m/lib/M2MSystem.h"
+#include "m2m/M2MSystem.h"
 #include "m2m/lib/io/M2MDirectory.h"
 #include "m2m/lib/io/M2MFile.h"
 #include "m2m/lib/io/M2MHeap.h"

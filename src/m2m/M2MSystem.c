@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "m2m/lib/M2MSystem.h"
+#include "m2m/M2MSystem.h"
 
 
 
