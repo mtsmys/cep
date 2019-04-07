@@ -367,17 +367,17 @@ M2MString *M2MGraph_addNode (M2MGraph *self, const M2MString *name, const M2MStr
 			&& name!=NULL && M2MString_length(name)>0)
 		{
 		//===== Add a node record into SQLite3 table =====
-		return M2MNode_add(M2MGraph_getDatabase(self), name, property, id, idLength);
+		return M2MNode_add(M2MGraph_getDatabase(self), name, property, M2MGraph_getLogger(self), id, idLength);
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
+		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"name\" string is NULL or vacant");
+		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"name\" string is NULL or vacant");
 		return NULL;
 		}
 	}

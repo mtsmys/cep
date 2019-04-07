@@ -38,7 +38,6 @@
 #include "m2m/lib/lang/M2MString.h"
 #include "m2m/lib/log/M2MFileAppender.h"
 #include "m2m/lib/time/M2MDate.h"
-#include "m2m/lib/util/M2MBase64.h"
 #include "m2m/lib/util/list/M2MList.h"
 #include "tinymt/TinyMT32.h"
 #include <inttypes.h>
@@ -134,11 +133,12 @@ extern "C"
  * @param[in] database	SQLite3 database object
  * @param[in] name		String indicating unique node name in "m2m_node" table
  * @param[in] property	String indicating property belonging to the node or NULL
+ * @param[in] logger	Logging object
  * @param[out] id		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
  * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
  * @return				Pointer of stored node ID or NULL (in case of error)
  */
-M2MString *M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString *property, M2MString id[], const size_t idLength);
+M2MString *M2MNode_add (sqlite3 *database, const M2MString *name, const M2MString *property, const M2MFileAppender *logger, M2MString id[], const size_t idLength);
 
 
 /**
@@ -147,44 +147,49 @@ M2MString *M2MNode_add (sqlite3 *database, const M2MString *name, const M2MStrin
  *
  * @param[in] database	SQLite3 database object
  * @param[in] id		Node ID string which is unique in "m2m_node" table
+ * @param[in] logger	Logging object
  */
-void M2MNode_delete (sqlite3 *database, const M2MString *id);
+void M2MNode_delete (sqlite3 *database, const M2MString *id, const M2MFileAppender *logger);
 
 
 /**
  * @param[in] database	SQLite3 database object
  * @param[in] name		String indicating node name
+ * @param[in] logger	Logging object
  * @param[out] id		Buffer for storing node ID string
  * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
  * @return				Pointer of stored node ID or NULL (in case of error)
  */
-M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, M2MString id[], const size_t idLength);
-
-
-/**
- * @param[in] database		SQLite3 database object
- * @param[out] idList		List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
- * @return					List object stored strings indicating node IDs which are unique in "m2m_node" table
- */
-M2MList *M2MNode_getIDList (sqlite3 *database, M2MList **idList);
+M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, const M2MFileAppender *logger, M2MString id[], const size_t idLength);
 
 
 /**
  * @param[in] database	SQLite3 database object
- * @param[in] nodeID	Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] logger	Logging object
+ * @param[out] idList	List object for storing ID number strings (allocation is executed in this function, so caller must release this memory)
+ * @return				List object stored strings indicating node IDs which are unique in "m2m_node" table
+ */
+M2MList *M2MNode_getIDList (sqlite3 *database, const M2MFileAppender *logger, M2MList **idList);
+
+
+/**
+ * @param[in] database	SQLite3 database object
+ * @param[in] id		Number indicating node ID which is unique in "m2m_node" table
+ * @param[in] logger	Logging object
  * @param[out] name		Pointer to copying the node name (buffering is executed inside this function)
  * @return				String indicating node name or NULL (in case of error)
  */
-M2MString *M2MNode_getName (sqlite3 *database, const M2MString *nodeID, M2MString **name);
+M2MString *M2MNode_getName (sqlite3 *database, const M2MString *id, const M2MFileAppender *logger, M2MString **name);
 
 
 /**
  * @param[in] database	SQLite3 database object
- * @param[in] nodeID	Number indicating node ID which is unique inside "m2m_node" table
+ * @param[in] id		Number indicating node ID which is unique inside "m2m_node" table
+ * @param[in] logger	Logging object
  * @param[out] property	Pointer to copying property belonging to the node
  * @return				Pointer of stored node property string
  */
-M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *nodeID, M2MString **property);
+M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *id, const M2MFileAppender *logger, M2MString **property);
 
 
 /**
@@ -195,9 +200,10 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *nodeID, M2MS
  * @param[in] id		Node ID string which is unique in "m2m_node" table
  * @param[in] left		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
  * @param[in] right		Nested Sets Model parameter (>=1) or 0 (in case of initialization)
+ * @param[in] logger	Logging object
  * @return				String indicating node ID which was set Nested Sets Model parameter or NULL (in case of error)
  */
-M2MString *M2MNode_setNestedSetsModel (sqlite3 *database, const M2MString *id, const uint32_t left, const uint32_t right);
+M2MString *M2MNode_setNestedSetsModel (sqlite3 *database, M2MString *id, const uint32_t left, const uint32_t right, const M2MFileAppender *logger);
 
 
 
