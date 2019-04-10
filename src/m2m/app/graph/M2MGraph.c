@@ -524,13 +524,10 @@ sqlite3 *M2MGraph_getDatabase (M2MGraph *self)
  * Get logging object owned by the argument M2MGraph structure object.<br>
  *
  * @param[in] self	M2MGraph structure object
- * @return			Logging object owned by M2MGraph structure object
+ * @return			Logging object owned by M2MGraph structure object or NULL (in case of error)
  */
 M2MFileAppender *M2MGraph_getLogger (const M2MGraph *self)
 	{
-	//========== Variable ==========
-	const M2MString *FUNCTION_NAME = (M2MString *)"M2MGraph.M2MGraph_getLogger()";
-
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -539,7 +536,6 @@ M2MFileAppender *M2MGraph_getLogger (const M2MGraph *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" structure object is NULL");
 		return NULL;
 		}
 	}
@@ -564,7 +560,7 @@ M2MString *M2MGraph_getSQLiteFilePath (const M2MGraph *self)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
+		M2MLogger_error(M2MGraph_getLogger(self), FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MGraph\" object is NULL");
 		return NULL;
 		}
 	}

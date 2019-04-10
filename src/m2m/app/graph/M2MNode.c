@@ -47,6 +47,7 @@ static uint32_t this_getRandomNumber ();
  * Private function
  ******************************************************************************/
 /**
+ * @param[in] logger		Logging object
  * @param[out] buffer		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
  * @param[in] bufferLength	Size of buffer for storing 8[Byte] node ID
  * @return					Pointer of stored node ID or NULL (in case of error)
@@ -54,6 +55,7 @@ static uint32_t this_getRandomNumber ();
 static M2MString *this_createNewNodeID (const M2MFileAppender *logger, M2MString buffer[], const size_t bufferLength)
 	{
 	//========== Variable ==========
+	M2MString message[64];
 	const uint32_t RANDOM_NUMBER = this_getRandomNumber();
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode.this_createNewNodeID()";
 
@@ -65,6 +67,9 @@ static M2MString *this_createNewNodeID (const M2MFileAppender *logger, M2MString
 		//===== Convert from 32bit integer to hexadecimal string =====
 		if (M2MString_convertFromUnsignedLongToHexadecimalString(RANDOM_NUMBER, buffer, bufferLength)!=NULL)
 			{
+			memset(message, 0, sizeof(message));
+			snprintf(message, sizeof(message)-1, (M2MString *)"Created new M2M node ID (=\"%s\")", buffer);
+			M2MLogger_info(logger, FUNCTION_NAME, __LINE__, message);
 			return buffer;
 			}
 		//===== Error handling =====
@@ -90,6 +95,7 @@ static M2MString *this_createNewNodeID (const M2MFileAppender *logger, M2MString
 
 /**
  * @param[in] database	SQLite3 database object
+ * @param[in] logger	Logging object
  * @return				true: , false:
  */
 static bool this_createNewTable (sqlite3 *database, const M2MFileAppender *logger)
@@ -105,6 +111,7 @@ static bool this_createNewTable (sqlite3 *database, const M2MFileAppender *logge
 		//===== Check the existence of the table =====
 		if (M2MSQLite_isExistingTable(database, M2MNode_TABLE_NAME)==true)
 			{
+			M2MLogger_debug(logger, FUNCTION_NAME, __LINE__, (M2MString *)"There is the table for storing records already");
 			return true;
 			}
 		//===== In case of not existing the table =====
@@ -130,6 +137,7 @@ static bool this_createNewTable (sqlite3 *database, const M2MFileAppender *logge
 					{
 					//===== Shutdown transaction =====
 					M2MSQLite_commitTransaction(database);
+					M2MLogger_info(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Created new table for storing records as nodes");
 					return true;
 					}
 				//===== Error handling =====
@@ -159,183 +167,6 @@ static bool this_createNewTable (sqlite3 *database, const M2MFileAppender *logge
 
 
 /**
- * @param[in] database	SQLite3 database object
- * @param[in] name		String indicating node name
- * @return				Number indicating node ID which is unique in "m2m_node" table
- *
-static uint32_t this_getID (sqlite3 *database, const M2MString *name)
-	{
-	//========== Variable ==========
-	M2MString *buffer = NULL;
-	uint32_t nodeID = 0UL;
-	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode_getID()";
-
-	//===== Check argument =====
-	if (database!=NULL
-			&& name!=NULL && M2MString_length(name)>0)
-		{
-		//===== Get prepared statement =====
-		if (M2MNode_getID(database, name, &buffer)!=NULL
-				&& (nodeID=M2MString_convertFromHexadecimalStringToUnsignedLong(buffer, M2MString_length(buffer)))>0UL)
-			{
-			//===== Release allocated heap memory =====
-			M2MHeap_free(buffer);
-			return nodeID;
-			}
-		//===== Error handling =====
-		else if (buffer==NULL)
-			{
-			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get node ID string from SQLite table");
-			return 0UL;
-			}
-		else
-			{
-			//===== Release allocated heap memory =====
-			M2MHeap_free(buffer);
-			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to convert from node ID string into unsigned long number");
-			return 0UL;
-			}
-		}
-	//===== Argument error =====
-	else if (database==NULL)
-		{
-		M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL");
-		return 0UL;
-		}
-	else
-		{
-		M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"name\" string is NULL or vacant");
-		return 0UL;
-		}
-	}
-*/
-
-
-/**
- * @param[in] database	SQLite3 database object
- * @param[out] idList	List object for storing ID numbers (allocation is executed in this function, so caller must release this memory)
- * @return				List object stored numbers indicating node IDs which are unique in "m2m_node" table
- *
-static M2MList *this_getIDList (sqlite3 *database, M2MList **idList)
-	{
-	//========== Variable ==========
-	M2MString sql[1024];
-	sqlite3_stmt *statement = NULL;
-	int32_t resultCode = 0;
-	int32_t columnLength = -1;
-	uint32_t i = 0;
-	M2MString *value = NULL;
-	size_t valueLength = 0;
-	uint32_t id = 0;
-	int32_t sqliteColumnType = 0;
-	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode_getIDList()";
-	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s ORDER BY %s ";
-
-	//===== Check argument =====
-	if (database!=NULL && idList!=NULL)
-		{
-		//===== Prepare buffer for storing ID numbers =====
-		if (((*idList)=M2MList_new())!=NULL)
-			{
-			//===== Prepare SQL statement =====
-			memset(sql, 0, sizeof(sql));
-			snprintf(sql, sizeof(sql)-1, SQL_FORMAT, M2MNode_COLUMN_ID, M2MNode_TABLE_NAME, M2MNode_COLUMN_NAME);
-			//===== Get prepared statement object =====
-			if ((statement=M2MSQLite_getPreparedStatement(database, sql))!=NULL)
-				{
-				//===== Execute SQL (repeat until the result row reaches the end) =====
-				while ((resultCode=sqlite3_step(statement))==SQLITE_ROW)
-					{
-					//===== When the number of columns of the SELECT result has not been acquired yet =====
-					if (columnLength<0)
-						{
-						//===== Get number of columns of SELECT result =====
-						columnLength = sqlite3_column_count(statement);
-						}
-					//===== When acquiring the number of columns of the SELECT result =====
-					else
-						{
-						// do nothing
-						}
-					//===== Repeat the output of SELECT result data by the number of columns =====
-					for (i=0; i<columnLength; i++)
-						{
-						//===== When the data type of the SELECT result column is an integer =====
-						if ((sqliteColumnType=sqlite3_column_type(statement, i))==SQLITE_INTEGER)
-							{
-							}
-						//===== When the data type of the SELECT result column is a floating point number =====
-						else if (sqliteColumnType==SQLITE_FLOAT)
-							{
-							}
-						//===== When the data type of the SELECT result column is a character string =====
-						else if (sqliteColumnType==SQLITE_TEXT)
-							{
-							if ((valueLength=(size_t)sqlite3_column_bytes(statement, i))>0
-									&& (value=(M2MString *)M2MHeap_malloc(valueLength+1))!=NULL
-									&& memset(value, 0, valueLength+1)!=NULL
-									&& memcpy(value, sqlite3_column_text(statement, i), valueLength)!=NULL)
-								{
-								id = M2MString_convertFromStringToUnsignedInteger(value, valueLength);
-								M2MList_add((*idList), &id, sizeof(uint32_t));
-								M2MHeap_free(value);
-								}
-							//===== Error handling =====
-							else
-								{
-								M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get character string data of SELECT result");
-								}
-							}
-						//===== When the data type of the SELECT result column is byte data =====
-						else if (sqliteColumnType==SQLITE_BLOB)
-							{
-							}
-						//===== When the data type of the SELECT result column is NULL =====
-						else if (sqliteColumnType==SQLITE_NULL)
-							{
-							}
-						//===== In other cases =====
-						else
-							{
-							M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"SQLite internal error! (The data type of the SELECT result differs from the value of the rule)");
-							}
-						}
-					}
-				//===== Close SQLite3 statement object =====
-				M2MSQLite_closeStatement(statement);
-				return (*idList);
-				}
-			//===== Error handling =====
-			else
-				{
-				M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get prepared statement object depending on indicated \"sql\" string");
-				M2MList_delete((*idList));
-				return NULL;
-				}
-			}
-		//===== Error handling =====
-		else
-			{
-			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to allocate heap memory for constructing \"M2MList\" structure object");
-			return NULL;
-			}
-		}
-	//===== Argument error =====
-	else if (database==NULL)
-		{
-		M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"sqlite3\" structure object is NULL");
-		return NULL;
-		}
-	else
-		{
-		M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"M2MList\" object pointer is NULL");
-		return NULL;
-		}
-	}
-*/
-
-
-/**
  * Get randomized 32[bit] unsigned integer number.<br>
  *
  * @return	Randomized 32[bit] unsigned integer number
@@ -343,8 +174,8 @@ static M2MList *this_getIDList (sqlite3 *database, M2MList **idList)
 static uint32_t this_getRandomNumber ()
 	{
 	//========== Variable ==========
-	uint32_t randomNumber = 0UL;
 	TinyMT32 tinyMT;
+	uint32_t randomNumber = 0UL;
 	const uint32_t CURRENT_TIME = M2MDate_getCurrentTimeMillis();
 
 	//===== Initialize with seed =====
@@ -356,9 +187,12 @@ static uint32_t this_getRandomNumber ()
 
 
 /**
+ * Insert a new record into indicated database as an expression of one node in a graph.<br>
+ * 
  * @param[in] database	SQLite3 database object
  * @param[in] name		String indicating node name
  * @param[in] property	String indicating property belonging to the node or NULL
+ * @param[in] logger	Logging object
  * @param[out] id		Buffer for storing 8[Byte] node ID string which is unique in "m2m_node" table
  * @param[in] idLength	Size of buffer for storing 8[Byte] node ID
  * @return				Pointer of stored node ID or NULL (in case of error)
@@ -368,7 +202,8 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 	//========== Variable ==========
 	size_t nameLength = 0;
 	size_t propertyLength = 0;
-	M2MString buffer[4096];
+	M2MString *sql = NULL;
+	size_t sqlLength = 0;
 	M2MString message[1024];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
@@ -380,6 +215,8 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 			&& name!=NULL && (nameLength=M2MString_length(name))>0 
 			&& idLength>0)
 		{
+		//===== Get length of property string =====
+		propertyLength = M2MString_length(property);
 		//===== Check the existence of table =====
 		if (M2MSQLite_isExistingTable(database, M2MNode_TABLE_NAME)==false)
 			{
@@ -401,11 +238,32 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 		//===== Create new node ID =====
 		if (this_createNewNodeID(logger, id, idLength)!=NULL)
 			{
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create new node ID string");
+			return NULL;
+			}
+		//===== Allocate heap memory for SQL string =====
+		if ((sqlLength=M2MString_length(SQL_FORMAT) 
+				+ M2MString_length(M2MNode_TABLE_NAME) 
+				+ M2MString_length(M2MNode_COLUMN_ID) 
+				+ M2MString_length(M2MNode_COLUMN_NAME) 
+				+ M2MString_length(M2MNode_COLUMN_PROPERTY) 
+				+ M2MString_length(M2MNode_COLUMN_LEFT) 
+				+ M2MString_length(M2MNode_COLUMN_RIGHT) 
+				+ M2MString_length(id) 
+				+ nameLength
+				+ propertyLength 
+				+ 1)>0 
+				&& (sql=(M2MString *)M2MHeap_malloc(sqlLength))!=NULL)
+			{
 			//===== Initialize buffer =====
-			memset(buffer, 0, sizeof(buffer));
+			memset(sql, 0, sqlLength);
 			//===== Prepare INSERT SQL =====
-			snprintf(buffer,
-					sizeof(buffer)-1,
+			snprintf(sql,
+					sqlLength-1,
 					SQL_FORMAT,
 					M2MNode_TABLE_NAME,
 					M2MNode_COLUMN_ID,
@@ -418,13 +276,13 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 			if (M2MSQLite_beginTransaction(database)==true)
 				{
 				//===== Create new prepared statement =====
-				if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
+				if ((statement=M2MSQLite_getPreparedStatement(database, sql))!=NULL)
 					{
 					//===== Set value into statement =====
 					M2MSQLite_setValueIntoPreparedStatement(M2MSQLiteDataType_TEXT, 1, id, M2MString_length(id), statement);
 					M2MSQLite_setValueIntoPreparedStatement(M2MSQLiteDataType_TEXT, 2, name, nameLength, statement);
 					//===== In the case of existing node property information =====
-					if (property!=NULL && (propertyLength=M2MString_length(property))>0)
+					if (property!=NULL && propertyLength>0)
 						{
 						//===== Set value into statement =====
 						M2MSQLite_setValueIntoPreparedStatement(M2MSQLiteDataType_TEXT, 3, property, propertyLength, statement);
@@ -443,6 +301,8 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 						M2MSQLite_commitTransaction(database);
 						//===== Release prepared statement object =====
 						M2MSQLite_closeStatement(statement);
+						//===== Release heap memory area of SQL string =====
+						M2MHeap_free(sql);
 						return id;
 						}
 					//===== Error handling =====
@@ -455,6 +315,8 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 						M2MSQLite_rollbackTransaction(database);
 						//===== Release prepared statement object =====
 						M2MSQLite_closeStatement(statement);
+						//===== Release heap memory area of SQL string =====
+						M2MHeap_free(sql);
 						return NULL;
 						}
 					}
@@ -462,6 +324,8 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 				else
 					{
 					M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create the prepared statement object");
+					//===== Release heap memory area of SQL string =====
+					M2MHeap_free(sql);
 					return NULL;
 					}
 				}
@@ -469,13 +333,15 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 			else
 				{
 				M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to startup transaction for SQL execution");
+				//===== Release heap memory area of SQL string =====
+				M2MHeap_free(sql);
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to create new node ID string");
+			M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to allocate heap memory for creating INSERT SQL string");
 			return NULL;
 			}
 		}
@@ -495,9 +361,10 @@ static M2MString *this_setRecord (sqlite3 *database, const M2MString *name, cons
 
 /**
  * @param[in] database	SQLite3 database object
- * @param[in] id	Hexadecimal string indicating node ID number
+ * @param[in] id		Hexadecimal string indicating node ID number
  * @param[in] left
  * @param[in] right
+ * @param[in] logger	Logging object
  * @return
  */
 static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *id, const M2MString *left, const M2MString *right, const M2MFileAppender *logger)
@@ -506,7 +373,7 @@ static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *id, 
 	size_t idLength = 0;
 	size_t leftLength = 0;
 	size_t rightLength = 0;
-	M2MString buffer[512];
+	M2MString sql[512];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode.this_updateNestedSetsModel()";
@@ -515,17 +382,18 @@ static bool this_updateNestedSetsModel (sqlite3 *database, const M2MString *id, 
 	//===== Check argument =====
 	if (database!=NULL && id!=NULL && (idLength=M2MString_length(id))>0)
 		{
-		//=====  =====
-		memset(buffer, 0, sizeof(buffer));
-		snprintf(buffer,
-				sizeof(buffer)-1,
+		//===== Initialize buffer for SQL =====
+		memset(sql, 0, sizeof(sql));
+		//===== Prepare UPDATE SQL string =====
+		snprintf(sql,
+				sizeof(sql)-1,
 				SQL_FORMAT,
 				M2MNode_TABLE_NAME,
 				M2MNode_COLUMN_LEFT,
 				M2MNode_COLUMN_RIGHT,
 				M2MNode_COLUMN_ID);
 		//=====  =====
-		if ((statement=M2MSQLite_getPreparedStatement(database, buffer))!=NULL)
+		if ((statement=M2MSQLite_getPreparedStatement(database, sql))!=NULL)
 			{
 			//===== In case of setting Nested Sets Model values =====
 			if (left!=NULL && (leftLength=M2MString_length(left))>0
@@ -649,7 +517,7 @@ void M2MNode_delete (sqlite3 *database, const M2MString *id, const M2MFileAppend
 	{
 	//========== Variable ==========
 	size_t idLength = 0;
-	M2MString sql[1024];
+	M2MString sql[128];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
 	M2MString message[1024];
@@ -659,7 +527,7 @@ void M2MNode_delete (sqlite3 *database, const M2MString *id, const M2MFileAppend
 	//===== Check argument =====
 	if (database!=NULL && id!=NULL && (idLength=M2MString_length(id))>0)
 		{
-		//===== Create SQL =====
+		//===== Create DELETE SQL =====
 		memset(sql, 0, sizeof(sql));
 		snprintf(sql,
 				sizeof(sql)-1,
@@ -753,6 +621,13 @@ M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, const M2MFil
 				return id;
 				}
 			//===== Error handling =====
+			else if (valueLength>=idLength)
+				{
+				//===== Release prepared statement object =====
+				M2MSQLite_closeStatement(statement);
+				M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"");
+				return NULL;
+				}
 			else
 				{
 				//===== Release prepared statement object =====
@@ -791,7 +666,7 @@ M2MString *M2MNode_getID (sqlite3 *database, const M2MString *name, const M2MFil
 M2MList *M2MNode_getIDList (sqlite3 *database, const M2MFileAppender *logger, M2MList **idList)
 	{
 	//========== Variable ==========
-	M2MString sql[256];
+	M2MString sql[128];
 	sqlite3_stmt *statement = NULL;
 	int32_t resultCode = 0;
 	int32_t columnLength = -1;
@@ -932,6 +807,7 @@ M2MList *M2MNode_getIDList (sqlite3 *database, const M2MFileAppender *logger, M2
 			else
 				{
 				M2MLogger_error(logger, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get prepared statement object depending on indicated \"sql\" string");
+				//===== Release allocated memory =====
 				M2MList_delete((*idList));
 				return NULL;
 				}
@@ -968,7 +844,7 @@ M2MString *M2MNode_getName (sqlite3 *database, const M2MString *id, const M2MFil
 	{
 	//========== Variable ==========
 	size_t idLength = 0;
-	M2MString sql[1024];
+	M2MString sql[128];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
 	M2MString message[1024];
@@ -1044,7 +920,7 @@ M2MString *M2MNode_getProperty (sqlite3 *database, const M2MString *id, const M2
 	M2MString sql[1024];
 	sqlite3_stmt *statement = NULL;
 	int result = 0;
-	M2MString message[1024];
+	M2MString message[128];
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MNode_getProperty()";
 	const M2MString *SQL_FORMAT = (M2MString *)"SELECT %s FROM %s WHERE %s = ? ";
 
