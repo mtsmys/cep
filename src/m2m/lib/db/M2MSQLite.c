@@ -33,6 +33,13 @@
 /*******************************************************************************
  * Private function
  ******************************************************************************/
+/**
+ * This function returns SQL statement object got from indicated database & sql.<br>
+ *
+ * @param[in] database	SQLite3 database manager object
+ * @param[in] sql		SQL string
+ * @return				SQL statement object
+ */
 static sqlite3_stmt *this_getStatement (sqlite3 *database, const M2MString *sql)
 	{
 	//========== Variable ==========
@@ -169,8 +176,9 @@ void M2MSQLite_closeDatabase (sqlite3 *database)
 
 
 /**
+ * Close & release allocated memory of indicated SQL statement object.<br>
  *
- * @param[in,out] statement
+ * @param[in,out] statement	SQL statement object to be closed
  */
 void M2MSQLite_closeStatement (sqlite3_stmt *statement)
 	{
