@@ -571,16 +571,17 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 int32_t M2MString_compareTo (const M2MString *self, const M2MString *string)
 	{
 	//========== Variable ==========
-	size_t selfLength = 0;
+	size_t stringLength = 0;
 
 	//===== Check argument =====
-	if (self!=NULL && (selfLength=M2MString_length(self))>0
-			&& string!=NULL)
+	if (self!=NULL && M2MString_length(self)>0
+			&& string!=NULL && (stringLength=M2MString_length(string))>0)
 		{
-		return memcmp(self, string, selfLength);
+		//===== Return the result of comparison =====
+		return memcmp(self, string, stringLength);
 		}
 	//===== Argument error =====
-	else if (self==NULL || selfLength<=0)
+	else if (self==NULL)
 		{
 		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"self\" string is NULL or vacant");
 		return -1;
