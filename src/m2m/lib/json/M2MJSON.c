@@ -50,6 +50,14 @@ static void this_deleteObjectTable (M2MJSONObject *object);
 
 
 /**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ();
+
+
+/**
  * This method returns number of index of indicated hash table.<br>
  *
  * @param[in] table	hash table for immediate JSON Object access
@@ -196,19 +204,19 @@ static M2MJSONObjectTable *this_createNewJSONObjectTable ()
 	{
 	//========== Variable ==========
 	M2MJSONObjectTable *table = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_createNewJSONObjectTable()";
 
 	//===== Allocate new memory for creating JSONObjectTable =====
 	if ((table=(M2MJSONObjectTable *)M2MHeap_malloc(sizeof(M2MJSONObjectTable)))!=NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_createNewJSONObjectTable()", __LINE__, (M2MString *)"Created new \"JSONObjectTable\" object as a hash table");
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Created new \"JSONObjectTable\" object as a hash table");
 		return table;
 		}
 	//===== Error handling =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_createNewJSONObjectTable()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObjectTable\" object");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObjectTable\" object");
 		return NULL;
 		}
 	}
@@ -222,24 +230,22 @@ static M2MJSONObjectTable *this_createNewJSONObjectTable ()
 static void this_decreaseObjectTableCounter (M2MJSONObjectTable *table)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[64];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_decreaseObjectTableCounter()";
 
 	//===== Check argument =====
 	if (table!=NULL)
 		{
 		table->counter = table->counter - 1;
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Decreased counter number into %u", table->counter);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_decreaseObjectTableCounter()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_decreaseObjectTableCounter()", __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
 		}
 	return;
 	}
@@ -252,6 +258,8 @@ static void this_deleteArray (M2MJSONArray **array)
 	{
 	//========== Variable ==========
 	M2MJSON *json = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_deleteArray()";
 
 	//===== Check argument =====
 	if (array!=NULL && (*array)!=NULL)
@@ -267,9 +275,7 @@ static void this_deleteArray (M2MJSONArray **array)
 			}
 		//===== Delete JSOn Array =====
 		M2MHeap_free((*array));
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteArray()", __LINE__, (M2MString *)"Released allocated memory for \"M2MJSONArray\" object");
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Released allocated memory for \"M2MJSONArray\" object");
 		}
 	//===== Argument error =====
 	else
@@ -293,6 +299,8 @@ static void this_deleteObject (M2MJSONObject **object)
 	M2MJSONObject *sameIndexPrevious = NULL;
 	M2MJSONObject *sameIndexNext = NULL;
 	M2MJSON *json = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_deleteObject()";
 
 	//===== Check argument =====
 	if (object!=NULL && (*object)!=NULL)
@@ -322,9 +330,7 @@ static void this_deleteObject (M2MJSONObject **object)
 							{
 							this_setSameIndexNext(sameIndexPrevious, sameIndexNext);
 							this_setSameIndexPrevious(sameIndexNext, sameIndexPrevious);
-#ifdef DEBUG
-							NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObject()", __LINE__, (M2MString *)"Removed indicated \"JSONObject\" from closed addressing table");
-#endif // DEBUG
+							M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Removed indicated \"JSONObject\" from closed addressing table");
 							}
 						//=====  =====
 						else
@@ -335,20 +341,20 @@ static void this_deleteObject (M2MJSONObject **object)
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_deleteObject()", __LINE__, (M2MString *)"Internal error! Previous node of same index is NULL");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Internal error! Previous node of same index is NULL");
 						}
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_deleteObject()", __LINE__, (M2MString *)"Internal error! Index position of hash table is NULL");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Internal error! Index position of hash table is NULL");
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObject()", __LINE__, (M2MString *)"There is no hash table for immediate JSON Object access");
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"There is no hash table for immediate JSON Object access");
 			}
 		//===== Delete hash table =====
 		this_deleteObjectTable((*object));
@@ -365,9 +371,7 @@ static void this_deleteObject (M2MJSONObject **object)
 			}
 		//===== Delete JSOn Object =====
 		M2MHeap_free((*object));
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObject()", __LINE__, (M2MString *)"Released allocated memory for \"JSONObject\" object");
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Released allocated memory for \"JSONObject\" object");
 		}
 	//===== Argument error =====
 	else
@@ -384,6 +388,10 @@ static void this_deleteObject (M2MJSONObject **object)
  */
 static void this_deleteObjectKey (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_deleteObjectKey()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -391,9 +399,7 @@ static void this_deleteObjectKey (M2MJSONObject *object)
 		if (M2MJSON_getKey(object)!=NULL)
 			{
 			M2MHeap_free(object->key);
-#ifdef DEBUG
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObjectKey()", __LINE__, (M2MString *)"Released allocated memory for \"JSONObject\" key string");
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Released allocated memory for \"JSONObject\" key string");
 			}
 		//===== In the case of not existing key =====
 		else
@@ -419,9 +425,9 @@ static void this_deleteObjectTable (M2MJSONObject *object)
 	//========== Variable ==========
 	M2MJSONObjectTable *table = NULL;
 	uint32_t counter = 0;
-#ifdef DEBUG
 	M2MString MESSAGE[128];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_deleteObjectTable()";
 
 	//===== Check argument =====
 	if (object!=NULL)
@@ -433,24 +439,20 @@ static void this_deleteObjectTable (M2MJSONObject *object)
 			if ((counter=this_getObjectTableCounter(table))==0)
 				{
 				M2MHeap_free(table);
-#ifdef DEBUG
-				NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObjectTable()", __LINE__, (M2MString *)"Released allocated memory for \"JSONObjectTable\" object");
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Released allocated memory for \"JSONObjectTable\" object");
 				}
 			//===== In the case of not releasing hash table =====
 			else
 				{
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Not releases allocated memory because there are %u \"JSONObject\" nodes", counter);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_deleteObjectTable()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_deleteObjectTable()", __LINE__, (M2MString *)"Argument \"JSONObject\" doesn't have a \"JSONObjectTable\" object as member variable");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" doesn't have a \"JSONObjectTable\" object as member variable");
 			}
 		}
 	//===== Argument error =====
@@ -462,6 +464,17 @@ static void this_deleteObjectTable (M2MJSONObject *object)
 
 
 /**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ()
+	{
+	return NULL;
+	}
+
+
+/**
  * This method returns number of index of indicated hash table.<br>
  *
  * @param[in] table	hash table for immediate JSON Object access
@@ -469,6 +482,10 @@ static void this_deleteObjectTable (M2MJSONObject *object)
  */
 static uint32_t this_getObjectTableCounter (const M2MJSONObjectTable *table)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getObjectTableCounter()";
+
 	//===== Check argument =====
 	if (table!=NULL)
 		{
@@ -477,7 +494,7 @@ static uint32_t this_getObjectTableCounter (const M2MJSONObjectTable *table)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_getObjectTableCounter()", __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
 		return 0;
 		}
 	}
@@ -493,17 +510,15 @@ static uint32_t this_getObjectTableIndex (const uint32_t hash)
 	{
 	//========== Variable ==========
 	uint32_t index = 0;
-#ifdef DEBUG
 	M2MString MESSAGE[64];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getObjectTableIndex()";
 
 	//===== Get index of hash table =====
 	index = ((hash & 0xFFFFFFFF) % this_getObjectTableLength());
-#ifdef DEBUG
 	memset(MESSAGE, 0, sizeof(MESSAGE));
 	M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Get index(=\"%u\") for hash table", index);
-	NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_getObjectTableIndex()", __LINE__, MESSAGE);
-#endif // DEBUG
+	M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 	return index;
 	}
 
@@ -527,6 +542,10 @@ static uint32_t this_getObjectTableLength ()
  */
 static M2MJSONObjectTable *this_getObjectTable (const M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getObjectTable()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -535,7 +554,7 @@ static M2MJSONObjectTable *this_getObjectTable (const M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_getObjectTable()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -551,6 +570,8 @@ static M2MJSONObject *this_getSameIndexEnd (M2MJSONObject *object)
 	{
 	//========== Variable ==========
 	M2MJSONObject *sameIndexNext = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getSameIndexEnd()";
 
 	//===== Check argument =====
 	if (object!=NULL)
@@ -565,7 +586,7 @@ static M2MJSONObject *this_getSameIndexEnd (M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_getSameIndexEnd()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -579,13 +600,19 @@ static M2MJSONObject *this_getSameIndexEnd (M2MJSONObject *object)
  */
 static M2MJSONObject *this_getSameIndexNext (const M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getSameIndexNext()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		return (object->sameIndexNext);
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_getSameIndexNext()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -599,13 +626,19 @@ static M2MJSONObject *this_getSameIndexNext (const M2MJSONObject *object)
  */
 static M2MJSONObject *this_getSameIndexPrevious (const M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_getSameIndexPrevious()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		return (object->sameIndexPrevios);
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_getSameIndexPrevious()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -619,22 +652,22 @@ static M2MJSONObject *this_getSameIndexPrevious (const M2MJSONObject *object)
 static void this_increaseObjectTableCounter (M2MJSONObjectTable *table)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[64];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_increaseObjectTableCounter()";
 
+	//===== Check argument =====
 	if (table!=NULL)
 		{
 		table->counter = table->counter + 1;
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Increased counter number(=\"%u\")", table->counter);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_increaseObjectTableCounter()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_increaseObjectTableCounter()", __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObjectTable\" is NULL");
 		}
 	return;
 	}
@@ -648,6 +681,10 @@ static void this_increaseObjectTableCounter (M2MJSONObjectTable *table)
  */
 static bool this_isEmpty (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_isEmpty()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -675,7 +712,7 @@ static bool this_isEmpty (M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_isEmpty()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return true;
 		}
 	}
@@ -693,9 +730,9 @@ static M2MJSONObject *this_searchObjectTable (M2MJSONObject *object, const M2MSt
 	{
 	//========== Variable ==========
 	M2MJSONObjectTable *table = NULL;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_searchObjectTable()";
 
 	//===== Check argument =====
 	if (object!=NULL && key!=NULL && keyLength>0)
@@ -704,43 +741,39 @@ static M2MJSONObject *this_searchObjectTable (M2MJSONObject *object, const M2MSt
 		if ((table=this_getObjectTable(object))!=NULL
 				&& (object=table->table[this_getObjectTableIndex(M2MJSON_calculateHash(key, keyLength))])!=NULL)
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected \"JSONObject\" which correspond with indicated key(= \"%s\" )", key);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return object;
 			}
 		//===== Error handling =====
 		else if (table==NULL)
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, (M2MString *)"Argument \"JSONObject\" hasn't hash table");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" hasn't hash table");
 			return NULL;
 			}
 		else
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"There is no \"JSONObject\" which correspond with indicated key(= \"%s\" )", key);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObjectTable()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -757,36 +790,34 @@ static M2MJSONObject *this_searchObjectTable (M2MJSONObject *object, const M2MSt
 static M2MJSONObject *this_setHash (M2MJSONObject *object, const M2MString *key, const size_t keyLength)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_setHash()";
 
 	//===== Check argument =====
 	if (object!=NULL && key!=NULL && keyLength>0)
 		{
 		//===== Set hash digest =====
 		object->hash = M2MJSON_calculateHash(key, keyLength);
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set hash number(=\"%u\") into \"JSONObject\" which correspond with indicated key(= \"%s\" )", object->hash, key);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_setHash()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		return object;
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setHash()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setHash()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setHash()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -803,9 +834,9 @@ static M2MJSONObject *this_setHash (M2MJSONObject *object, const M2MString *key,
 static M2MJSONObject *this_setKey (M2MJSONObject *object, const M2MString *key, const size_t keyLength)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_setKey()";
 
 	//===== Check argument =====
 	if (object!=NULL && key!=NULL && 0<keyLength)
@@ -819,35 +850,33 @@ static M2MJSONObject *this_setKey (M2MJSONObject *object, const M2MString *key, 
 			memcpy(object->key, key, keyLength);
 			//===== Set hash digest =====
 			this_setHash(object, key, keyLength);
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set the key string(=\"%s\") in JSON Object", key);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_setKey()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			//===== Termination =====
 			return object;
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setKey()", __LINE__, (M2MString *)"Failed to allocate new memory for copying argument \"key\" string");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying argument \"key\" string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setKey()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setKey()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setKey()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -889,14 +918,20 @@ static M2MJSONObject *this_setObjectTable (M2MJSONObject *object, M2MJSONObjectT
  */
 static M2MJSONObject *this_setSameIndexNext (M2MJSONObject *object, M2MJSONObject *next)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_setSameIndexNext()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		object->sameIndexNext = next;
 		return object;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setSameIndexNext()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -911,14 +946,20 @@ static M2MJSONObject *this_setSameIndexNext (M2MJSONObject *object, M2MJSONObjec
  */
 static M2MJSONObject *this_setSameIndexPrevious (M2MJSONObject *object, M2MJSONObject *previous)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_setSameIndexPrevious()";
+
+	//===== Check argument =====
 	if (object!=NULL && previous!=NULL)
 		{
 		object->sameIndexPrevios = previous;
 		return object;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_setSameIndexPrevious()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -942,6 +983,8 @@ static unsigned char *this_toM2MStringFromArray (M2MJSONArray *array, M2MString 
 	size_t jsonM2MStringLength = 0;
 	const size_t LEFT_SQUARE_BRACKET_LENGTH = M2MString_length(M2MString_LEFT_SQUARE_BRACKET);
 	const size_t COMMA_LENGTH = M2MString_length(M2MString_COMMA);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_toM2MStringFromArray()";
 
 	//===== Check argument =====
 	if (array!=NULL && buffer!=NULL)
@@ -1259,12 +1302,12 @@ static unsigned char *this_toM2MStringFromArray (M2MJSONArray *array, M2MString 
 	//===== Argument error =====
 	else if (array==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"this_toM2MStringFromArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"this_toM2MStringFromArray()", __LINE__, (M2MString *)"");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"");
 		return NULL;
 		}
 	}
@@ -1281,6 +1324,8 @@ static M2MString *this_toM2MStringFromBoolean (M2MJSON *self, M2MString **buffer
 	{
 	//========== Variable ==========
 	M2MString boolean[8];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_toM2MStringFromBoolean()";
 
 	//===== Check argument =====
 	if (self!=NULL && buffer!=NULL)
@@ -1294,19 +1339,19 @@ static M2MString *this_toM2MStringFromBoolean (M2MJSON *self, M2MString **buffer
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromBoolean()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_BOOLEAN\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_BOOLEAN\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromBoolean()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromBoolean()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return NULL;
 		}
 	}
@@ -1321,6 +1366,10 @@ static M2MString *this_toM2MStringFromBoolean (M2MJSON *self, M2MString **buffer
  */
 static M2MString *this_toM2MStringFromNumber (M2MJSON *self, M2MString **buffer)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_toM2MStringFromNumber()";
+
 	//===== Check argument =====
 	if (self!=NULL && buffer!=NULL)
 		{
@@ -1333,19 +1382,19 @@ static M2MString *this_toM2MStringFromNumber (M2MJSON *self, M2MString **buffer)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromNumber()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_NUMBER\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_NUMBER\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromNumber()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromNumber()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return NULL;
 		}
 	}
@@ -1705,6 +1754,8 @@ static unsigned char *this_toStringFromString (M2MJSON *self, M2MString **string
 	M2MString *value = NULL;
 	size_t valueLength = 0;
 	const unsigned int DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON.this_toStringFromString()";
 
 	//===== Check argument =====
 	if (self!=NULL && string!=NULL)
@@ -1728,38 +1779,38 @@ static unsigned char *this_toStringFromString (M2MJSON *self, M2MString **string
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Failed to allocate new memory for copying string value");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying string value");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else if (value==NULL)
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Failed to get string value from JSON");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get string value from JSON");
 				return NULL;
 				}
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Failed to get length of string value from JSON");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get length of string value from JSON");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_STRING\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_STRING\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_toM2MStringFromM2MString()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return NULL;
 		}
 	}
@@ -1778,7 +1829,7 @@ static unsigned char *this_toStringFromString (M2MJSON *self, M2MString **string
  */
 uint32_t M2MJSON_calculateHash (const M2MString *key, const size_t keyLength)
 	{
-	return CRC32_getValue(key, keyLength);
+	return M2MCRC32_getValue(key, keyLength);
 	}
 
 
@@ -1796,6 +1847,8 @@ M2MJSON *M2MJSON_clearArray (M2MJSON *self)
 	M2MJSON *tmpJSON = NULL;
 	M2MJSONArray *array = NULL;
 	M2MJSONArray *iterator = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_clearArray()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -1839,19 +1892,19 @@ M2MJSON *M2MJSON_clearArray (M2MJSON *self)
 		//===== Error handling =====
 		else if (array==NULL)
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearArray()", __LINE__, (M2MString *)"Failed to get \"JSONArray\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get \"JSONArray\" object");
 			return self;
 			}
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearArray()", __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
 			return self;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearArray()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -1869,6 +1922,8 @@ M2MJSON *M2MJSON_clearObject (M2MJSON *self)
 	//========== Variable ==========
 	M2MJSONObject *object = NULL;
 	M2MJSONObject *next = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_clearObject()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -1896,19 +1951,19 @@ M2MJSON *M2MJSON_clearObject (M2MJSON *self)
 		//===== Error handling =====
 		else if (object==NULL)
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearObject()", __LINE__, (M2MString *)"Failed to get \"JSONObject\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get \"JSONObject\" object");
 			return self;
 			}
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearObject()", __LINE__, (M2MString *)"Failed to get root node of \"JSONObject\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONObject\" object");
 			return self;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearObject()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -1920,6 +1975,10 @@ M2MJSON *M2MJSON_clearObject (M2MJSON *self)
  */
 M2MJSON *M2MJSON_clearString (M2MJSON *self)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_clearString()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -1935,7 +1994,7 @@ M2MJSON *M2MJSON_clearString (M2MJSON *self)
 		//===== Argument error =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearM2MString()", __LINE__, (M2MString *)"Argument \"JSON\" hasn't string value");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" hasn't string value");
 			}
 		//===== Return initialized JSON =====
 		return self;
@@ -1943,7 +2002,7 @@ M2MJSON *M2MJSON_clearString (M2MJSON *self)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_clearM2MString()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -1958,6 +2017,8 @@ M2MJSONArray *M2MJSON_createNewArray ()
 	{
 	//========== Variable ==========
 	M2MJSONArray *array = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_createNewArray()";
 
 	//===== Allocate new memory for JSON Array =====
 	if ((array=(M2MJSONArray *)M2MHeap_malloc(sizeof(M2MJSONArray)))!=NULL)
@@ -1965,15 +2026,13 @@ M2MJSONArray *M2MJSON_createNewArray ()
 		//===== Initialization =====
 		M2MJSON_setPreviousArray(array, array);
 		M2MJSON_setNextArray(array, NULL);
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON_createNewArray()", __LINE__, (M2MString *)"Created new \"JSONArray\" object");
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Created new \"JSONArray\" object");
 		return array;
 		}
 	//===== Error handling =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_createNewArray()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONArray\" object");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONArray\" object");
 		return NULL;
 		}
 	}
@@ -1988,6 +2047,8 @@ M2MJSONObject *M2MJSON_createNewObject ()
 	{
 	//========== Variable ==========
 	M2MJSONObject *object = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_createNewObject()";
 
 	//===== Allocate new memory for JSON Object =====
 	if ((object=(M2MJSONObject *)M2MHeap_malloc(sizeof(M2MJSONObject)))!=NULL)
@@ -1997,15 +2058,13 @@ M2MJSONObject *M2MJSON_createNewObject ()
 		M2MJSON_setNextObject(object, NULL);
 		this_setSameIndexPrevious(object, object);
 		this_setSameIndexNext(object, NULL);
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSON_createNewObject()", __LINE__, (M2MString *)"Created new \"JSONObject\" object");
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Created new \"JSONObject\" object");
 		return object;
 		}
 	//===== Error handling =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_createNewObject()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObject\" object");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObject\" object");
 		return NULL;
 		}
 	}
@@ -2292,6 +2351,8 @@ M2MJSONArray *M2MJSON_getArray (const M2MJSON *self)
 	{
 	//========== Variable ==========
 	M2MJSONValue *value = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getArray()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2313,14 +2374,14 @@ M2MJSONArray *M2MJSON_getArray (const M2MJSON *self)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getArray()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_ARRAY\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_ARRAY\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getArray()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -2335,6 +2396,8 @@ uint32_t M2MJSON_getArraySize (M2MJSONArray *array)
 	//========== Variable ==========
 	uint32_t size = 0;
 	M2MJSONArray *next = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getArraySize()";
 
 	//===== Check argument =====
 	if (array!=NULL)
@@ -2358,14 +2421,14 @@ uint32_t M2MJSON_getArraySize (M2MJSONArray *array)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getArraySize()", __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getArraySize()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return 0;
 		}
 	}
@@ -2379,6 +2442,8 @@ bool M2MJSON_getBoolean (const M2MJSON *self)
 	{
 	//========== Variable ==========
 	M2MJSONValue *value = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getBoolean()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2394,21 +2459,21 @@ bool M2MJSON_getBoolean (const M2MJSON *self)
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON_getBoolean()", __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
 				return false;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getBoolean()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_BOOLEAN\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_BOOLEAN\"");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getBoolean()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return false;
 		}
 	}
@@ -2420,6 +2485,10 @@ bool M2MJSON_getBoolean (const M2MJSON *self)
  */
 uint32_t M2MJSON_getHash (const M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getHash()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -2428,7 +2497,7 @@ uint32_t M2MJSON_getHash (const M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getHash()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return 0;
 		}
 	}
@@ -2444,6 +2513,8 @@ M2MJSON *M2MJSON_getJSONFromArray (M2MJSONArray *array, const uint32_t index)
 	//========== Variable ==========
 	M2MJSON *json = NULL;
 	uint32_t i = 0;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getJSONFromArray()";
 
 	//===== Check argument =====
 	if (array!=NULL && M2MJSON_getArraySize(array)>index)
@@ -2463,7 +2534,7 @@ M2MJSON *M2MJSON_getJSONFromArray (M2MJSONArray *array, const uint32_t index)
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromArray()", __LINE__, (M2MString *)"Indicated index number is invalid");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Indicated index number is invalid");
 					return NULL;
 					}
 				}
@@ -2472,19 +2543,19 @@ M2MJSON *M2MJSON_getJSONFromArray (M2MJSONArray *array, const uint32_t index)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromArray()", __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (array==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromArray()", __LINE__, (M2MString *)"Argument \"index\" number overs the size of \"JSONArray\"");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"index\" number overs the size of \"JSONArray\"");
 		return NULL;
 		}
 	}
@@ -2499,9 +2570,9 @@ M2MJSON *M2MJSON_getJSONFromArray (M2MJSONArray *array, const uint32_t index)
 M2MJSON *M2MJSON_getJSONFromObject (M2MJSONObject *object, const M2MString *key, const size_t keyLength)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getJSONFromObject()";
 
 	//===== Check argument =====
 	if ((object=M2MJSON_getRootObject(object))!=NULL && key!=NULL && keyLength>0)
@@ -2514,28 +2585,26 @@ M2MJSON *M2MJSON_getJSONFromObject (M2MJSONObject *object, const M2MString *key,
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to search JSON object with indicated key(= \"%s\" )", key);
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromObject()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getJSONFromObject()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -2547,13 +2616,19 @@ M2MJSON *M2MJSON_getJSONFromObject (M2MJSONObject *object, const M2MString *key,
  */
 unsigned char *M2MJSON_getKey (const M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getKey()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		return object->key;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getKey()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -2565,6 +2640,11 @@ unsigned char *M2MJSON_getKey (const M2MJSONObject *object)
  */
 M2MJSONArray *M2MJSON_getLastArray (M2MJSONArray *array)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getLastArray()";
+
+	//===== Check argument =====
 	if (array!=NULL)
 		{
 		while (M2MJSON_getNextArray(array)!=NULL)
@@ -2573,9 +2653,10 @@ M2MJSONArray *M2MJSON_getLastArray (M2MJSONArray *array)
 			}
 		return array;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getLastArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	}
@@ -2587,6 +2668,11 @@ M2MJSONArray *M2MJSON_getLastArray (M2MJSONArray *array)
  */
 M2MJSONObject *M2MJSON_getLastObject (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getLastObject()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		while (M2MJSON_getNextObject(object)!=NULL)
@@ -2595,9 +2681,10 @@ M2MJSONObject *M2MJSON_getLastObject (M2MJSONObject *object)
 			}
 		return object;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getLastObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -2609,13 +2696,19 @@ M2MJSONObject *M2MJSON_getLastObject (M2MJSONObject *object)
  */
 M2MJSONArray *M2MJSON_getNextArray (M2MJSONArray *array)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getNextArray()";
+
+	//===== Check argument =====
 	if (array!=NULL)
 		{
 		return array->next;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getNextArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	}
@@ -2627,13 +2720,19 @@ M2MJSONArray *M2MJSON_getNextArray (M2MJSONArray *array)
  */
 M2MJSONObject *M2MJSON_getNextObject (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getNextObject()";
+
+	//===== Check argument =====
 	if (object!=NULL)
 		{
 		return object->next;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getNextObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -2647,6 +2746,8 @@ double M2MJSON_getNumber (const M2MJSON *self)
 	{
 	//========== Variable ==========
 	M2MJSONValue *value = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getNumber()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2662,21 +2763,21 @@ double M2MJSON_getNumber (const M2MJSON *self)
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON_getNumber()", __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
 				return 0.0;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getNumber()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_NUMBER\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_NUMBER\"");
 			return 0.0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getNumber()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return 0.0;
 		}
 	}
@@ -2690,6 +2791,8 @@ M2MJSONObject *M2MJSON_getObject (const M2MJSON *self)
 	{
 	//========== Variable ==========
 	M2MJSONValue *value = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getObject()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2705,21 +2808,21 @@ M2MJSONObject *M2MJSON_getObject (const M2MJSON *self)
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON_getObject()", __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getObject()", __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_OBJECT\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" isn't \"M2MJSONType_OBJECT\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getObject()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -2733,9 +2836,9 @@ uint32_t M2MJSON_getObjectSize (M2MJSONObject *object)
 	{
 	//========== Variable ==========
 	uint32_t size = 0;
-#ifdef DEBUG
 	M2MString MESSAGE[64];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getObjectSize()";
 
 	//===== Check argument =====
 	if (object!=NULL)
@@ -2753,25 +2856,23 @@ uint32_t M2MJSON_getObjectSize (M2MJSONObject *object)
 				//===== Go to next node =====
 				object = M2MJSON_getNextObject(object);
 				}
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Number of \"JSONObject\" is %d", size);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON_getObjectSize()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			//===== Return number of nodes =====
 			return size;
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getObjectSize()", __LINE__, (M2MString *)"Root node of \"JSONObject\" is NULL");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Root node of \"JSONObject\" is NULL");
 			return 0;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getObjectSize()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return 0;
 		}
 	}
@@ -2783,13 +2884,19 @@ uint32_t M2MJSON_getObjectSize (M2MJSONObject *object)
  */
 M2MJSONArray *M2MJSON_getPreviousArray (M2MJSONArray *array)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getPreviousArray()";
+
+	//===== Check argument =====
 	if (array!=NULL)
 		{
 		return array->previous;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getPreviousArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	}
@@ -2801,6 +2908,10 @@ M2MJSONArray *M2MJSON_getPreviousArray (M2MJSONArray *array)
  */
 M2MJSONObject *M2MJSON_getPreviousObject (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getPreviousObject()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -2809,7 +2920,7 @@ M2MJSONObject *M2MJSON_getPreviousObject (M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getPreviousObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -2821,6 +2932,10 @@ M2MJSONObject *M2MJSON_getPreviousObject (M2MJSONObject *object)
  */
 M2MJSONArray *M2MJSON_getRootArray (M2MJSONArray *array)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getRootArray()";
+
 	//===== Check argument =====
 	if (array!=NULL)
 		{
@@ -2834,7 +2949,7 @@ M2MJSONArray *M2MJSON_getRootArray (M2MJSONArray *array)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getRootArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	}
@@ -2846,6 +2961,10 @@ M2MJSONArray *M2MJSON_getRootArray (M2MJSONArray *array)
  */
 M2MJSONObject *M2MJSON_getRootObject (M2MJSONObject *object)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getRootObject()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -2859,7 +2978,7 @@ M2MJSONObject *M2MJSON_getRootObject (M2MJSONObject *object)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getRootObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	}
@@ -2874,6 +2993,8 @@ unsigned char *M2MJSON_getString (const M2MJSON *self)
 	//========== Variable ==========
 	M2MJSONValue *value = NULL;
 	M2MString MESSAGE[64];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getString()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -2889,7 +3010,7 @@ unsigned char *M2MJSON_getString (const M2MJSON *self)
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON_getM2MString()", __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
 				return NULL;
 				}
 			}
@@ -2898,14 +3019,14 @@ unsigned char *M2MJSON_getString (const M2MJSON *self)
 			{
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument \"JSON\" type(=\"%s\") isn't \"%s\"", M2MJSONType_toString(M2MJSON_getType(self)), M2MJSONType_toString(M2MJSONType_STRING));
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getM2MString()", __LINE__, MESSAGE);
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getM2MString()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -2917,6 +3038,10 @@ unsigned char *M2MJSON_getString (const M2MJSON *self)
  */
 M2MJSONType M2MJSON_getType (const M2MJSON *self)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getType()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -2925,7 +3050,7 @@ M2MJSONType M2MJSON_getType (const M2MJSON *self)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getType()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return M2MJSONType_NULL;
 		}
 	}
@@ -2937,6 +3062,10 @@ M2MJSONType M2MJSON_getType (const M2MJSON *self)
  */
 M2MJSONValue *M2MJSON_getValue (const M2MJSON *self)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_getValue()";
+
 	//===== Check argument =====
 	if (self!=NULL)
 		{
@@ -2948,14 +3077,14 @@ M2MJSONValue *M2MJSON_getValue (const M2MJSON *self)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_getValue()", __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Value of Argument \"JSON\" is NULL");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_getValue()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -2971,6 +3100,8 @@ M2MJSON *M2MJSON_new ()
 	{
 	//========== Variable ==========
 	M2MJSON *self = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_new()";
 
 	//===== Allocate new memory for JSON object =====
 	if ((self=(M2MJSON *)M2MHeap_malloc(sizeof(M2MJSON)))!=NULL)
@@ -2985,7 +3116,7 @@ M2MJSON *M2MJSON_new ()
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_new()", __LINE__, (M2MString *)"Failed to allocate new memory for creating JSONValue structure object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating JSONValue structure object");
 			M2MJSON_delete(&self);
 			return NULL;
 			}
@@ -2993,7 +3124,7 @@ M2MJSON *M2MJSON_new ()
 	//===== Error handling =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_new()", __LINE__, (M2MString *)"Failed to allocate new memory for creating JSON structure object");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating JSON structure object");
 		return NULL;
 		}
 	}
@@ -3011,6 +3142,8 @@ M2MJSONObject *M2MJSON_searchObject (M2MJSONObject *object, const M2MString *key
 	{
 	//========== Variable ==========
 	M2MString MESSAGE[256];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_searchObject()";
 
 	//===== Check argument =====
 	if (object!=NULL && key!=NULL && keyLength>0)
@@ -3043,35 +3176,33 @@ M2MJSONObject *M2MJSON_searchObject (M2MJSONObject *object, const M2MString *key
 				{
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"There is no \"JSONObject\" which corresponds with indicated key(= \"%s\" )", key);
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObject()", __LINE__, MESSAGE);
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"There is no \"JSONObject\" which corresponds with indicated key(= \"%s\" )", key);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSON.this_searchObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObject()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON.this_searchObject()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -3088,6 +3219,8 @@ M2MJSONArray *M2MJSON_setJSONToArray (M2MJSONArray *array, M2MJSON *json)
 	//========== Variable ==========
 	M2MJSONArray *node = NULL;
 	M2MJSONArray *iterator = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setJSONToArray()";
 
 	//===== Check argument =====
 	if (array!=NULL && json!=NULL)
@@ -3132,7 +3265,7 @@ M2MJSONArray *M2MJSON_setJSONToArray (M2MJSONArray *array, M2MJSON *json)
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToArray()", __LINE__, (M2MString *)"Failed to create new JSONArray structure object");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new JSONArray structure object");
 					return NULL;
 					}
 				}
@@ -3140,19 +3273,19 @@ M2MJSONArray *M2MJSON_setJSONToArray (M2MJSONArray *array, M2MJSON *json)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToArray()", __LINE__, (M2MString *)"Failed to get root node of JSON array");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of JSON array");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (array==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToArray()", __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONArray\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToArray()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -3178,9 +3311,9 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 	M2MJSONObject *newNode = NULL;
 	M2MJSONObjectTable *table = NULL;
 	uint32_t index = 0;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setJSONToObject()";
 
 	//===== Check argument =====
 	if (object!=NULL && key!=NULL && keyLength>0 && json!=NULL)
@@ -3199,11 +3332,9 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 				//===== In the case of not existing hash table =====
 				else
 					{
-#ifdef DEBUG
 					memset(MESSAGE, 0, sizeof(MESSAGE));
 					M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument \"JSONObject\"(whose key is \"%s\") hasn't \"JSONObjectTable\" object", M2MJSON_getKey(object));
-					NGLogger_printDebugMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+					M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 					//===== Create new hash table =====
 					if ((table=this_createNewJSONObjectTable())!=NULL)
 						{
@@ -3212,7 +3343,7 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObjectTable\" object");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObjectTable\" object");
 						return NULL;
 						}
 					}
@@ -3224,17 +3355,15 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 				index = this_getObjectTableIndex(M2MJSON_getHash(object));
 				table->table[index] = object;
 				this_increaseObjectTableCounter(table);
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set hash table in index(=%d) generated with key(= \"%s\" )", index, key);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return object;
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Failed to get root node of \"JSONObject\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONObject\"");
 				return NULL;
 				}
 			}
@@ -3269,11 +3398,9 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 				this_setSameIndexNext(existingNode, newNode);
 				this_setSameIndexPrevious(newNode, existingNode);
 				this_setSameIndexNext(newNode, NULL);
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set hash table in same index(=%d) generated with key(= \"%s\" )", this_getObjectTableIndex(M2MJSON_getHash(newNode)), key);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return newNode;
 				}
 			//=====  =====
@@ -3295,40 +3422,38 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
 				index = this_getObjectTableIndex(M2MJSON_getHash(newNode));
 				table->table[index] = newNode;
 				this_increaseObjectTableCounter(table);
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Set hash table in index(=%d) generated with key(= \"%s\" )", index, key);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return newNode;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" hasn't \"JSONObjectTable\" object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" hasn't \"JSONObjectTable\" object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSONObject\" is NULL");
 		return NULL;
 		}
 	else if (key==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	else if (keyLength<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setJSONToObject()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -3341,6 +3466,10 @@ M2MJSONObject *M2MJSON_setJSONToObject (M2MJSONObject *object, const M2MString *
  */
 M2MJSONArray *M2MJSON_setNextArray (M2MJSONArray *array, M2MJSONArray *next)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setNextArray()";
+
 	//===== Check argument =====
 	if (array!=NULL)
 		{
@@ -3349,7 +3478,7 @@ M2MJSONArray *M2MJSON_setNextArray (M2MJSONArray *array, M2MJSONArray *next)
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setNextArray()", __LINE__, (M2MString *)"Argument \"array\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"array\" is NULL");
 		}
 	return array;
 	}
@@ -3362,6 +3491,10 @@ M2MJSONArray *M2MJSON_setNextArray (M2MJSONArray *array, M2MJSONArray *next)
  */
 M2MJSONObject *M2MJSON_setNextObject (M2MJSONObject *object, M2MJSONObject *next)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setNextObject()";
+
 	//===== Check argument =====
 	if (object!=NULL)
 		{
@@ -3370,7 +3503,7 @@ M2MJSONObject *M2MJSON_setNextObject (M2MJSONObject *object, M2MJSONObject *next
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setNextObject()", __LINE__, (M2MString *)"Argument \"object\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"object\" is NULL");
 		}
 	return object;
 	}
@@ -3383,6 +3516,10 @@ M2MJSONObject *M2MJSON_setNextObject (M2MJSONObject *object, M2MJSONObject *next
  */
 M2MJSONArray *M2MJSON_setPreviousArray (M2MJSONArray *array, M2MJSONArray *previous)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setPreviousArray()";
+
 	//===== Check argument =====
 	if (array!=NULL && previous!=NULL)
 		{
@@ -3391,11 +3528,11 @@ M2MJSONArray *M2MJSON_setPreviousArray (M2MJSONArray *array, M2MJSONArray *previ
 	//===== Argument error =====
 	else if (array==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setPreviousArray()", __LINE__, (M2MString *)"Argument \"array\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"array\" is NULL");
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setPreviousArray()", __LINE__, (M2MString *)"Argument \"previous\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"previous\" is NULL");
 		}
 	return array;
 	}
@@ -3408,6 +3545,10 @@ M2MJSONArray *M2MJSON_setPreviousArray (M2MJSONArray *array, M2MJSONArray *previ
  */
 M2MJSONObject *M2MJSON_setPreviousObject (M2MJSONObject *object, M2MJSONObject *previous)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setPreviousObject()";
+
 	//===== Check argument =====
 	if (object!=NULL && previous!=NULL)
 		{
@@ -3416,11 +3557,11 @@ M2MJSONObject *M2MJSON_setPreviousObject (M2MJSONObject *object, M2MJSONObject *
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setPreviousObject()", __LINE__, (M2MString *)"Argument \"object\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"object\" is NULL");
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setPreviousObject()", __LINE__, (M2MString *)"Argument \"previous\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"previous\" is NULL");
 		}
 	return object;
 	}
@@ -3433,14 +3574,20 @@ M2MJSONObject *M2MJSON_setPreviousObject (M2MJSONObject *object, M2MJSONObject *
  */
 M2MJSON *M2MJSON_setType (M2MJSON *self, const M2MJSONType type)
 	{
+	//========== Variable ==========
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_setType()";
+
+	//===== Check argument =====
 	if (self!=NULL)
 		{
 		self->type = type;
 		return self;
 		}
+	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_setType()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -3457,6 +3604,8 @@ M2MString *M2MJSON_toString (M2MJSON *self, M2MString **buffer)
 	{
 	//========== Variable ==========
 	M2MJSONType type;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSON_toString()";
 
 	//===== Check argument =====
 	if (self!=NULL)
@@ -3472,7 +3621,7 @@ M2MString *M2MJSON_toString (M2MJSON *self, M2MString **buffer)
 			}
 		else if (type==M2MJSONType_NULL)
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_toM2MString()", __LINE__, (M2MString *)"Type of Argument \"JSON\" is \"M2MJSONType_NULL\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" is \"M2MJSONType_NULL\"");
 			return NULL;
 			}
 		else if (type==M2MJSONType_NUMBER)
@@ -3490,14 +3639,14 @@ M2MString *M2MJSON_toString (M2MJSON *self, M2MString **buffer)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSON_toM2MString()", __LINE__, (M2MString *)"Type of Argument \"JSON\" is invalid");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Type of Argument \"JSON\" is invalid");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSON_toM2MString()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}

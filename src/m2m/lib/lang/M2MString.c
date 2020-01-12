@@ -563,6 +563,7 @@ M2MString *M2MString_appendLength (M2MString **self, const M2MString *string, co
 
 /**
  * Compares the two strings specified by the argument and returns the result.<br>
+ * The comparing length of text is defined by the "string" data.<br>
  *
  * @param[in] self		The original string to be compared
  * @param[in] string	Another string to be compared

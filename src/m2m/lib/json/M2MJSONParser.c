@@ -34,6 +34,14 @@
  * Declaration
  ******************************************************************************/
 /**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ();
+
+
+/**
  * @param[in] string	JSON string
  * @param[out] object
  * @return
@@ -61,11 +69,11 @@ static unsigned char *this_setArray (M2MString *string, M2MJSONArray **array);
 static unsigned char *this_createNewJSONBoolean (unsigned char *string, M2MJSON **json)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	unsigned char MESSAGE[128];
-#endif // DEBUG
 	const size_t TRUE_LENGTH = M2MString_length((M2MString *)"true");
 	const size_t FALSE_LENGTH = M2MString_length((M2MString *)"false");
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONBoolean()";
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -76,15 +84,15 @@ static unsigned char *this_createNewJSONBoolean (unsigned char *string, M2MJSON 
 			//===== Set JSON data type =====
 			M2MJSON_setType((*json), M2MJSONType_BOOLEAN);
 			//=====  =====
-			if (M2MString_compare(string, (M2MString *)"true", TRUE_LENGTH)==0
-					|| M2MString_compare(string, (M2MString *)"TRUE", TRUE_LENGTH)==0)
+			if (M2MString_compareTo(string, (M2MString *)"true")==0
+					|| M2MString_compareTo(string, (M2MString *)"TRUE")==0)
 				{
 				(*json)->value->boolean = true;
 				string += TRUE_LENGTH;
 				}
 			//=====  =====
-			else if (M2MString_compare(string, (M2MString *)"false", FALSE_LENGTH)==0
-					|| M2MString_compare(string, (M2MString *)"FALSE", FALSE_LENGTH)==0)
+			else if (M2MString_compareTo(string, (M2MString *)"false")==0
+					|| M2MString_compareTo(string, (M2MString *)"FALSE")==0)
 				{
 				(*json)->value->boolean = false;
 				string += FALSE_LENGTH;
@@ -92,27 +100,21 @@ static unsigned char *this_createNewJSONBoolean (unsigned char *string, M2MJSON 
 			//=====  =====
 			else
 				{
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Indicated string doesn't start with \"true\" or \"false\"(=\"%s\")", string);
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewBooleanJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewBooleanJSON()", __LINE__, (M2MString *)"Failed to allocate new structure object for JSON Boolean");
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new structure object for JSON Boolean");
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewBooleanJSON()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		}
 	//=====  =====
 	return string;
@@ -129,6 +131,8 @@ static unsigned char *this_createNewJSONNumber (M2MString *numberM2MString, cons
 	{
 	//========== Variable ==========
 	M2MString number[numberM2MStringLength+1];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONNumber()";
 
 	//===== Check argument =====
 	if (numberM2MString!=NULL && 0<numberM2MStringLength && numberM2MStringLength<=M2MString_length(numberM2MString) && json!=NULL)
@@ -149,32 +153,24 @@ static unsigned char *this_createNewJSONNumber (M2MString *numberM2MString, cons
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONNumber()", __LINE__, (M2MString *)"Failed to create new \"JSON\" structure object");
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new \"JSON\" structure object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (numberM2MString==NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONNumber()", __LINE__, (M2MString *)"Argument \"numberM2MString\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MString\" is NULL");
 		return NULL;
 		}
 	else if (numberM2MStringLength<=0 || M2MString_length(numberM2MString)<numberM2MStringLength)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONNumber()", __LINE__, (M2MString *)"Argument \"numberM2MStringLength\" is invalid");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MStringLength\" is invalid");
 		return NULL;
 		}
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONNumber()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -190,12 +186,14 @@ static M2MString *this_createNewJSONString (M2MString *string, const size_t stri
 	{
 	//========== Variable ==========
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONString()";
 
 	//===== Check argument =====
 	if (string!=NULL && stringLength>0 && json!=NULL)
 		{
 		//===== Remove "\"" from string =====
-		if (M2MString_compare(string, M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0)
+		if (M2MString_compareTo(string, M2MString_DOUBLE_QUOTATION)==0)
 			{
 			string += DOUBLE_QUOTATION_LENGTH;
 			}
@@ -208,14 +206,14 @@ static M2MString *this_createNewJSONString (M2MString *string, const size_t stri
 			//===== Set data type =====
 			M2MJSON_setType((*json), M2MJSONType_STRING);
 			//===== Allocate new memory for copying value data =====
-			if (((*json)->value->string=(M2MString *)NGHeap_malloc(stringLength+1))!=NULL)
+			if (((*json)->value->string=(M2MString *)M2MHeap_malloc(stringLength+1))!=NULL)
 				{
 				//===== Set data value =====
 				memcpy((*json)->value->string, string, stringLength);
 				//===== Proceed string position =====
 				string += stringLength;
 				//=====  =====
-				if (M2MString_compare(string, M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0)
+				if (M2MString_compareTo(string, M2MString_DOUBLE_QUOTATION)==0)
 					{
 					string += DOUBLE_QUOTATION_LENGTH;
 					}
@@ -227,38 +225,28 @@ static M2MString *this_createNewJSONString (M2MString *string, const size_t stri
 			//===== Error handling =====
 			else
 				{
-#ifdef DEBUG
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONM2MString()", __LINE__, (M2MString *)"Failed to allocate new memory for copying string");
-#endif // DEBUG
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying string");
 				M2MJSON_delete(json);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONM2MString()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSON\" structure object");
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSON\" structure object");
 			}
 		}
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONM2MString()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		}
 	else if (stringLength<=0)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONM2MString()", __LINE__, (M2MString *)"Argument \"stringLength\" isn't positive");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"stringLength\" isn't positive");
 		}
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_createNewJSONM2MString()", __LINE__, (M2MString *)"Argument \"M2MJSON **\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON **\" is NULL");
 		}
 	return string;
 	}
@@ -272,36 +260,26 @@ static size_t this_detectNumberM2MStringLength (M2MString *string)
 	{
 	//========== Variable ==========
 	M2MString *index = NULL;
-	const size_t ZERO_LENGTH	= M2MString_length((M2MString *)"0");
-	const size_t ONE_LENGTH		= M2MString_length((M2MString *)"1");
-	const size_t TWO_LENGTH		= M2MString_length((M2MString *)"2");
-	const size_t THREE_LENGTH	= M2MString_length((M2MString *)"3");
-	const size_t FOUR_LENGTH	= M2MString_length((M2MString *)"4");
-	const size_t FIVE_LENGTH	= M2MString_length((M2MString *)"5");
-	const size_t SIX_LENGTH		= M2MString_length((M2MString *)"6");
-	const size_t SEVEN_LENGTH	= M2MString_length((M2MString *)"7");
-	const size_t EIGHT_LENGTH	= M2MString_length((M2MString *)"8");
-	const size_t NINE_LENGTH	= M2MString_length((M2MString *)"9");
-	const size_t MINUS_LENGTH	= M2MString_length((M2MString *)"-");
-	const size_t DOT_LENGTH		= M2MString_length(M2MString_DOT);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_detectNumberM2MStringLength()";
 
 	//===== Check argument =====
 	if ((index=string)!=NULL)
 		{
 		//=====  =====
 		while (index!=NULL
-				&& (M2MString_compare(index, (M2MString *)"0", ZERO_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"1", ONE_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"2", TWO_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"3", THREE_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"4", FOUR_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"5", FIVE_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"6", SIX_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"7", SEVEN_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"8", EIGHT_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"9", NINE_LENGTH)==0
-						|| M2MString_compare(index, (M2MString *)"-", MINUS_LENGTH)==0
-						|| M2MString_compare(index, M2MString_DOT, DOT_LENGTH)==0))
+				&& (M2MString_compareTo(index, (M2MString *)"0")==0
+						|| M2MString_compareTo(index, (M2MString *)"1")==0
+						|| M2MString_compareTo(index, (M2MString *)"2")==0
+						|| M2MString_compareTo(index, (M2MString *)"3")==0
+						|| M2MString_compareTo(index, (M2MString *)"4")==0
+						|| M2MString_compareTo(index, (M2MString *)"5")==0
+						|| M2MString_compareTo(index, (M2MString *)"6")==0
+						|| M2MString_compareTo(index, (M2MString *)"7")==0
+						|| M2MString_compareTo(index, (M2MString *)"8")==0
+						|| M2MString_compareTo(index, (M2MString *)"9")==0
+						|| M2MString_compareTo(index, (M2MString *)"-")==0
+						|| M2MString_compareTo(index, M2MString_DOT)==0))
 			{
 			index++;
 			}
@@ -310,11 +288,20 @@ static size_t this_detectNumberM2MStringLength (M2MString *string)
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_detectNumberM2MString()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return 0;
 		}
+	}
+
+
+/**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ()
+	{
+	return NULL;
 	}
 
 
@@ -334,6 +321,8 @@ static M2MString *this_getObjectKey (const M2MString *string, M2MString **key)
 	M2MString *end = NULL;
 	size_t keyLength = 0;
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_getObjectKey()";
 
 	//===== Get start point of key =====
 	if (string!=NULL && M2MString_length(string)>0 && key!=NULL)
@@ -348,7 +337,7 @@ static M2MString *this_getObjectKey (const M2MString *string, M2MString **key)
 					&& (keyLength=M2MString_length(start)-M2MString_length(end))>0)
 				{
 				//===== Get key =====
-				if (((*key)=(M2MString *)NGHeap_malloc(keyLength+1))!=NULL)
+				if (((*key)=(M2MString *)M2MHeap_malloc(keyLength+1))!=NULL)
 					{
 					//===== Copy key data =====
 					memcpy((*key), start, keyLength);
@@ -359,50 +348,38 @@ static M2MString *this_getObjectKey (const M2MString *string, M2MString **key)
 				//===== Error handling =====
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Failed to allocate new memory for copying key data");
-#endif // DEBUG
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying key data");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-#ifdef DEBUG
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Failed to detect end position of key data");
-#endif // DEBUG
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect end position of key data");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Failed to detect start position of key data");
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect start position of key data");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Argument \"string\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return NULL;
 		}
 	else if (M2MString_length(string)<=0)
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Length of argument \"string\" isn't positive");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Length of argument \"string\" isn't positive");
 		return NULL;
 		}
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser.this_getObjectKey()", __LINE__, (M2MString *)"Argument \"key\" is NULL");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	}
@@ -427,7 +404,7 @@ static bool this_isDecimalNumber (const M2MString *string, const size_t length)
 			if (i==0)
 				{
 				if (isdigit(string[i])!=0
-						|| M2MString_compare(&string[i], MINUS_SIGN, M2MString_length(MINUS_SIGN))==0)
+						|| M2MString_compareTo(&string[i], MINUS_SIGN)==0)
 					{
 					continue;
 					}
@@ -439,7 +416,7 @@ static bool this_isDecimalNumber (const M2MString *string, const size_t length)
 			else if (i==1)
 				{
 				if (isdigit(string[i])!=0
-						|| M2MString_compare(string, DECIMAL_NUMBER, M2MString_length(DECIMAL_NUMBER))==0)
+						|| M2MString_compareTo(string, DECIMAL_NUMBER)==0)
 					{
 					continue;
 					}
@@ -451,7 +428,7 @@ static bool this_isDecimalNumber (const M2MString *string, const size_t length)
 			else if (i==2)
 				{
 				if (isdigit(string[i])!=0
-						|| M2MString_compare(string, MINUS_DECIMAL_NUMBER, M2MString_length(MINUS_DECIMAL_NUMBER))==0)
+						|| M2MString_compareTo(string, MINUS_DECIMAL_NUMBER)==0)
 					{
 					continue;
 					}
@@ -502,7 +479,7 @@ static unsigned char *this_proceedString (const M2MString *string)
 		index = (M2MString *)string;
 		//===== Loop while existing standard space =====
 		while (isspace(*index)!=0
-						|| (M2MString_length(index)>=ZENKAKU_SPACE_LENGTH && (zenkakuSpace=M2MString_compare(index, M2MString_ZENKAKU_SPACE, ZENKAKU_SPACE_LENGTH))==0))
+						|| (M2MString_length(index)>=ZENKAKU_SPACE_LENGTH && (zenkakuSpace=M2MString_compareTo(index, M2MString_ZENKAKU_SPACE))==0))
 			{
 			//===== In the case of zenkakuspace =====
 			if (zenkakuSpace==0)
@@ -550,7 +527,6 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 	M2MString *index = NULL;
 	M2MString *end = NULL;
 	unsigned int numberLength = 0;
-	const size_t RIGHT_SQUARE_BRACKET_LENGTH = M2MString_length(M2MString_RIGHT_SQUARE_BRACKET);
 
 	//===== Check argument =====
 	if (string!=NULL && ((*array)=M2MJSON_createNewArray())!=NULL)
@@ -561,12 +537,12 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 		index = this_proceedString(index);
 
 		//===== Loop while arrived at end character(="}") =====
-		while (index!=NULL && M2MString_compare(index, M2MString_RIGHT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET_LENGTH)!=0)
+		while (index!=NULL && M2MString_compareTo(index, M2MString_RIGHT_SQUARE_BRACKET)!=0)
 			{
 			//===== Remove space =====
 			index = this_proceedString(index);
 			//===== In the case of Array =====
-			if (M2MString_compare(index, M2MString_LEFT_SQUARE_BRACKET, M2MString_length(M2MString_LEFT_SQUARE_BRACKET))==0)
+			if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 				{
 				//===== Get value(=Array) =====
 				index = this_setArray(index, &childArray);
@@ -584,8 +560,8 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 					}
 				}
 			//===== In the case of Boolean =====
-			else if (M2MString_compare(index, (M2MString *)"true", M2MString_length((M2MString *)"true"))==0 || M2MString_compare(index, (M2MString *)"TRUE", M2MString_length((M2MString *)"TRUE"))==0
-					|| M2MString_compare(index, (M2MString *)"false", M2MString_length((M2MString *)"false"))==0 || M2MString_compare(index, (M2MString *)"FALSE", M2MString_length((M2MString *)"FALSE"))==0)
+			else if (M2MString_compareTo(index, (M2MString *)"true")==0 || M2MString_compareTo(index, (M2MString *)"TRUE")==0
+					|| M2MString_compareTo(index, (M2MString *)"false")==0 || M2MString_compareTo(index, (M2MString *)"FALSE")==0)
 				{
 				index = this_createNewJSONBoolean(index, &json);
 				M2MJSON_setJSONToArray((*array), json);
@@ -598,7 +574,7 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 				M2MJSON_setJSONToArray((*array), json);
 				}
 			//===== In the case of Object =====
-			else if (M2MString_compare(index, M2MString_LEFT_CURLY_BRACKET, M2MString_length(M2MString_LEFT_CURLY_BRACKET))==0)
+			else if (M2MString_compareTo(index, M2MString_LEFT_CURLY_BRACKET)==0)
 				{
 				//===== Get value(=Object) =====
 				index = this_setObject(index, &object);
@@ -616,7 +592,7 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 					}
 				}
 			//===== In the case of M2MString =====
-			else if (M2MString_compare(index, M2MString_DOUBLE_QUOTATION, M2MString_length(M2MString_DOUBLE_QUOTATION))==0)
+			else if (M2MString_compareTo(index, M2MString_DOUBLE_QUOTATION)==0)
 				{
 				//===== Get end position of M2MString =====
 				if ((index=M2MString_indexOf(index, M2MString_DOUBLE_QUOTATION))!=NULL
@@ -639,13 +615,13 @@ static M2MString *this_setArray (M2MString *string, M2MJSONArray **array)
 				}
 			//=====  =====
 			while (index!=NULL
-					&& M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))!=0
-					&& M2MString_compare(index, M2MString_RIGHT_SQUARE_BRACKET, M2MString_length(M2MString_RIGHT_SQUARE_BRACKET))!=0)
+					&& M2MString_compareTo(index, M2MString_COMMA)!=0
+					&& M2MString_compareTo(index, M2MString_RIGHT_SQUARE_BRACKET)!=0)
 				{
 				index++;
 				}
 			//=====  =====
-			if (M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))==0)
+			if (M2MString_compareTo(index, M2MString_COMMA)==0)
 				{
 				index++;
 				}
@@ -679,7 +655,6 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 	M2MString *end = NULL;
 	M2MString *key = NULL;
 	unsigned int numberLength = 0;
-	const size_t RIGHT_CURLY_BRACKET_LENGTH = M2MString_length(M2MString_RIGHT_CURLY_BRACKET);
 
 	//===== Check argument =====
 	if (string!=NULL)
@@ -696,7 +671,7 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 		//===== Set start position of key string =====
 		index = M2MString_indexOf(string, M2MString_DOUBLE_QUOTATION);
 		//===== Loop while arrived at end character(="}") =====
-		while (index!=NULL && M2MString_compare(index, M2MString_RIGHT_CURLY_BRACKET, RIGHT_CURLY_BRACKET_LENGTH)!=0)
+		while (index!=NULL && M2MString_compareTo(index, M2MString_RIGHT_CURLY_BRACKET)!=0)
 			{
 			//========== Get key ==========
 			if (index!=NULL && (index=this_getObjectKey(index, &key))!=NULL)
@@ -708,7 +683,7 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 
 				//========== Get value data ==========
 				//===== In the case of Array =====
-				if (M2MString_compare(index, M2MString_LEFT_SQUARE_BRACKET, M2MString_length(M2MString_LEFT_SQUARE_BRACKET))==0)
+				if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 					{
 					//===== Get value(=Array) =====
 					index = this_setArray(index, &array);
@@ -726,8 +701,8 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 						}
 					}
 				//===== In the case of Boolean =====
-				else if (M2MString_compare(index, (M2MString *)"true", M2MString_length((M2MString *)"true"))==0 || M2MString_compare(index, (M2MString *)"TRUE", M2MString_length((M2MString *)"TRUE"))==0
-						|| M2MString_compare(index, (M2MString *)"false", M2MString_length((M2MString *)"false"))==0 || M2MString_compare(index, (M2MString *)"FALSE", M2MString_length((M2MString *)"FALSE"))==0)
+				else if (M2MString_compareTo(index, (M2MString *)"true")==0 || M2MString_compareTo(index, (M2MString *)"TRUE")==0
+						|| M2MString_compareTo(index, (M2MString *)"false")==0 || M2MString_compareTo(index, (M2MString *)"FALSE")==0)
 					{
 					index = this_createNewJSONBoolean(index, &json);
 					(*object) = M2MJSON_setJSONToObject((*object), key, M2MString_length(key), json);
@@ -740,7 +715,7 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 					(*object) = M2MJSON_setJSONToObject((*object), key, M2MString_length(key), json);
 					}
 				//===== In the case of Object =====
-				else if (M2MString_compare(index, M2MString_LEFT_CURLY_BRACKET, M2MString_length(M2MString_LEFT_CURLY_BRACKET))==0)
+				else if (M2MString_compareTo(index, M2MString_LEFT_CURLY_BRACKET)==0)
 					{
 					//===== Get value(=Object) =====
 					index = this_setObject(index, &childObject);
@@ -758,7 +733,7 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 						}
 					}
 				//===== In the case of M2MString =====
-				else if (M2MString_compare(index, M2MString_DOUBLE_QUOTATION, M2MString_length(M2MString_DOUBLE_QUOTATION))==0)
+				else if (M2MString_compareTo(index, M2MString_DOUBLE_QUOTATION)==0)
 					{
 					//===== Get end position of M2MString =====
 					if ((index=M2MString_indexOf(index, M2MString_DOUBLE_QUOTATION))!=NULL
@@ -780,7 +755,7 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 					{
 					}
 				//===== Release allocated memory for key string =====
-				NGHeap_free(key);
+				M2MHeap_free(key);
 				}
 			//===== Error handling =====
 			else
@@ -789,14 +764,14 @@ static M2MString *this_setObject (const M2MString *string, M2MJSONObject **objec
 				}
 			//===== Loop while not existing "," or "}" or NULL =====
 			while (index!=NULL
-					&& M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))!=0
-					&& M2MString_compare(index, M2MString_RIGHT_CURLY_BRACKET, M2MString_length(M2MString_RIGHT_CURLY_BRACKET))!=0)
+					&& M2MString_compareTo(index, M2MString_COMMA)!=0
+					&& M2MString_compareTo(index, M2MString_RIGHT_CURLY_BRACKET)!=0)
 				{
 				//===== Go to next character =====
 				index++;
 				}
 			//===== In the case of including ","  =====
-			if (M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))==0)
+			if (M2MString_compareTo(index, M2MString_COMMA)==0)
 				{
 				//===== Set start position of key string for next Object node =====
 				index = M2MString_indexOf(index, M2MString_DOUBLE_QUOTATION);
@@ -927,6 +902,8 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 	M2MFile *file = NULL;
 	M2MString *string = NULL;
 	size_t stringLength = 0;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_parseFile()";
 
 	//===== Check argument =====
 	if (filePath!=NULL && M2MString_length(filePath)>0)
@@ -942,7 +919,7 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 						&& (json=M2MJSONParser_parseString(string))!=NULL)
 					{
 					//===== Release allocated memory =====
-					NGHeap_free(string);
+					M2MHeap_free(string);
 					//===== Close file =====
 					M2MFile_delete(&file);
 					return json;
@@ -950,20 +927,16 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 				//===== Error handling =====
 				else if (stringLength<=0)
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_parseFile()", __LINE__, (M2MString *)"Failed to read file");
-#endif // DEBUG
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to read file");
 					//===== Close file =====
 					M2MFile_delete(&file);
 					return NULL;
 					}
 				else
 					{
-#ifdef DEBUG
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_parseFile()", __LINE__, (M2MString *)"Failed to parse JSON string");
-#endif // DEBUG
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to parse JSON string");
 					//===== Release allocated memory =====
-					NGHeap_free(string);
+					M2MHeap_free(string);
 					//===== Close file =====
 					M2MFile_delete(&file);
 					return NULL;
@@ -972,9 +945,7 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 			//===== Error handling =====
 			else
 				{
-#ifdef DEBUG
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_parseFile()", __LINE__, (M2MString *)"Failed to open file");
-#endif // DEBUG
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to open file");
 				//===== Close file =====
 				M2MFile_delete(&file);
 				return NULL;
@@ -983,16 +954,14 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_parseFile()", __LINE__, (M2MString *)"Failed to create new File object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new File object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_parseFile()", __LINE__, (M2MString *)"Argument \"filePath\" is NULL or vacant");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"filePath\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -1018,7 +987,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 	if ((index=this_proceedString(string))!=NULL && (json=M2MJSON_new())!=NULL)
 		{
 		//===== In the case of Object =====
-		if (M2MString_compare(index, M2MString_LEFT_CURLY_BRACKET, M2MString_length(M2MString_LEFT_CURLY_BRACKET))==0
+		if (M2MString_compareTo(index, M2MString_LEFT_CURLY_BRACKET)==0
 				&& this_validateObjectSyntax(index)==true)
 			{
 			//===== Create new JSON Object =====
@@ -1032,7 +1001,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 			while (index!=NULL && (*index)!=M2MString_NTBS)
 				{
 				//===== Detect "\"" for start point of key =====
-				if (M2MString_compare(index, M2MString_DOUBLE_QUOTATION, M2MString_length(M2MString_DOUBLE_QUOTATION))==0)
+				if (M2MString_compareTo(index, M2MString_DOUBLE_QUOTATION)==0)
 					{
 					//===== Create new JSON Object =====
 					index = this_setObject(index, &object);
@@ -1045,7 +1014,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 					index = this_proceedString(index);
 					}
 				//===== In the case of having next Object yet =====
-				else if (M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))==0)
+				else if (M2MString_compareTo(index, M2MString_COMMA)==0)
 					{
 					index += M2MString_length(M2MString_COMMA);
 					index = this_proceedString(index);
@@ -1059,7 +1028,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 			return json;
 			}
 		//===== In the case of Array =====
-		else if (M2MString_compare(index, M2MString_LEFT_SQUARE_BRACKET, M2MString_length(M2MString_LEFT_SQUARE_BRACKET))==0)
+		else if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 			{
 			//===== Create new JSON Array =====
 			index = this_setArray(index, &array);
@@ -1071,7 +1040,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 			//===== (*index)!=NTBS is very important condition! =====
 			while (index!=NULL && (*index)!=M2MString_NTBS)
 				{
-				if (M2MString_compare(index, M2MString_LEFT_SQUARE_BRACKET, M2MString_length(M2MString_LEFT_SQUARE_BRACKET))==0)
+				if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 					{
 					//===== Create new JSON Array =====
 					index = this_setArray(index, &array);
@@ -1083,7 +1052,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 					//===== Get rid of trash =====
 					index = this_proceedString(index);
 					}
-				else if (M2MString_compare(index, M2MString_COMMA, M2MString_length(M2MString_COMMA))==0)
+				else if (M2MString_compareTo(index, M2MString_COMMA)==0)
 					{
 					index += M2MString_length(M2MString_COMMA);
 					index = this_proceedString(index);
@@ -1123,6 +1092,8 @@ bool M2MJSONParser_validateJSONSyntax (const M2MString *string)
 	{
 	//========== Variable ==========
 	M2MJSON *json = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_validateJSONSyntax()";
 
 	//===== Check argument =====
 	if (string!=NULL && M2MString_length(string)>0)
@@ -1137,18 +1108,14 @@ bool M2MJSONParser_validateJSONSyntax (const M2MString *string)
 		//===== Error handling =====
 		else
 			{
-#ifdef DEBUG
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_validateJSONSyntax()", __LINE__, (M2MString *)"Argument \"string\" is invalid JSON form");
-#endif // DEBUG
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is invalid JSON form");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONParser_validateJSONSyntax()", __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
-#endif // DEBUG
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
 		return false;
 		}
 	}

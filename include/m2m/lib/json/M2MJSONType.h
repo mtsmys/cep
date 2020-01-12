@@ -41,6 +41,7 @@ extern "C"
 
 
 
+#include <m2m/lib/lang/M2MString.h>
 #include <stdio.h>
 
 
@@ -80,7 +81,7 @@ typedef enum
  * @param self	JSON type
  * @return		JSON type name string
  */
-unsigned char *M2MJSONType_toString (const M2MJSONType self);
+M2MString *M2MJSONType_toString (const M2MJSONType self);
 
 
 

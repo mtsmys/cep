@@ -46,6 +46,7 @@ extern "C"
 #include "m2m/lib/security/M2MCRC32.h"
 #include "m2m/lib/lang/M2MString.h"
 #include "m2m/lib/log/M2MLogger.h"
+#include "m2m/lib/log/M2MFileAppender.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

@@ -39,31 +39,31 @@
  * @param self	JSON type
  * @return		JSON type name string
  */
-unsigned char *M2MJSONType_toString (const M2MJSONType self)
+M2MString *M2MJSONType_toString (const M2MJSONType self)
 	{
 	if (self==M2MJSONType_ARRAY)
 		{
-		return (unsigned char *)"JSON array";
+		return (M2MString *)"JSON array";
 		}
 	else if (self==M2MJSONType_BOOLEAN)
 		{
-		return (unsigned char *)"JSON boolean";
+		return (M2MString *)"JSON boolean";
 		}
 	else if (self==M2MJSONType_NULL)
 		{
-		return (unsigned char *)"JSON null";
+		return (M2MString *)"JSON null";
 		}
 	else if (self==M2MJSONType_NUMBER)
 		{
-		return (unsigned char *)"JSON number";
+		return (M2MString *)"JSON number";
 		}
 	else if (self==M2MJSONType_OBJECT)
 		{
-		return (unsigned char *)"JSON object";
+		return (M2MString *)"JSON object";
 		}
 	else if (self==M2MJSONType_STRING)
 		{
-		return (unsigned char *)"JSON string";
+		return (M2MString *)"JSON string";
 		}
 	else
 		{
