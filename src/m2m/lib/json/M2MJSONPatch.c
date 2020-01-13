@@ -34,6 +34,14 @@
  * Declaration
  ******************************************************************************/
 /**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ();
+
+
+/**
  * This method removes indicated node with path from JSON object.<br>
  *
  * @param[in,out] json		JSON object
@@ -66,18 +74,16 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 	M2MJSON *json = NULL;
 	M2MString *index = NULL;
 	const size_t SLASH_LENGTH = M2MString_length(M2MString_SLASH);
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_detectJSONObject()";
 
 	//===== Check argument =====
 	if ((object=M2MJSON_getRootObject(object))!=NULL && decodedPath!=NULL && M2MString_length(decodedPath)>0)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to detect JSON Object with pathname(=\"%s\")", decodedPath);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Loop while existing expression =====
 		while ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
@@ -90,7 +96,7 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, (M2MString *)"Failed to detect M2MJSON with argument \"decodedPath\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON with argument \"decodedPath\"");
 				return NULL;
 				}
 			//===== Proceed string position for next key =====
@@ -101,29 +107,27 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 		//===== Get JSON Object with last key =====
 		if ((object=M2MJSON_searchObject(object, decodedPath, M2MString_length(decodedPath)))!=NULL)
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected M2MJSON Object with the last key(=\"%s\")", M2MJSON_getKey(object));
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return object;
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, (M2MString *)"Failed to detect M2MJSON Object with the last key string");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON Object with the last key string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, (M2MString *)"Failed to get root of M2MJSONObject by argument \"M2MJSONObject\"");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root of M2MJSONObject by argument \"M2MJSONObject\"");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_detectJSONObject()", __LINE__, (M2MString *)"Argument \"expression\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"expression\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -143,9 +147,9 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 	M2MString *op = NULL;
 	size_t opLength = 0;
 	M2MString *path = NULL;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_executeOperation()";
 
 	//===== Check argument =====
 	if (json!=NULL && patch!=NULL)
@@ -159,42 +163,40 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 				&& M2MJSON_getType(object)==M2MJSONType_STRING
 				&& (path=M2MJSON_getString(object))!=NULL)
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"JSON Patch operation name = \"%s\"", op);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, MESSAGE);
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"JSON Patch path = \"%s\"", path);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			//===== In the case of "add" operation =====
-			if (M2MString_compare(op, M2MJSONPatch_ADD, opLength)==0)
+			if (M2MString_compareTo(op, M2MJSONPatch_ADD)==0)
 				{
 				return M2MJSONPatch_add(json, path, M2MJSONPointer_evaluate((M2MJSON *)patch, M2MJSONPatch_VALUE));
 				}
 			//===== In the case of "copy" operation =====
-			else if (M2MString_compare(op, M2MJSONPatch_COPY, opLength)==0)
+			else if (M2MString_compareTo(op, M2MJSONPatch_COPY)==0)
 				{
 				return M2MJSONPatch_copy(json, M2MJSON_getString(M2MJSONPointer_evaluate((M2MJSON *)patch, M2MJSONPatch_FROM)), path);
 				}
 			//===== In the case of "move" operation =====
-			else if (M2MString_compare(op, M2MJSONPatch_MOVE, opLength)==0)
+			else if (M2MString_compareTo(op, M2MJSONPatch_MOVE)==0)
 				{
 				return M2MJSONPatch_move(json, M2MJSON_getString(M2MJSONPointer_evaluate((M2MJSON *)patch, M2MJSONPatch_FROM)), path);
 				}
 			//===== In the case of "remove" operation =====
-			else if (M2MString_compare(op, M2MJSONPatch_REMOVE, opLength)==0)
+			else if (M2MString_compareTo(op, M2MJSONPatch_REMOVE)==0)
 				{
 				M2MJSONPatch_remove(json, path);
 				return json;
 				}
 			//===== In the case of "replace" operation =====
-			else if (M2MString_compare(op, M2MJSONPatch_REPLACE, opLength)==0)
+			else if (M2MString_compareTo(op, M2MJSONPatch_REPLACE)==0)
 				{
 				return M2MJSONPatch_replace(json, path, M2MJSONPointer_evaluate((M2MJSON *)patch, M2MJSONPatch_VALUE));
 				}
 			//===== In the case of "test" operation =====
-			else if (M2MString_compare(op, M2MJSONPatch_TEST, opLength)==0)
+			else if (M2MString_compareTo(op, M2MJSONPatch_TEST)==0)
 				{
 				if (M2MJSONPatch_test(json, path, M2MJSONPointer_evaluate((M2MJSON *)patch, M2MJSONPatch_VALUE))==true)
 					{
@@ -203,35 +205,46 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, (M2MString *)"Failed to execute \"test\" operation");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to execute \"test\" operation");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, (M2MString *)"Argument \"json\" object is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_executeOperation()", __LINE__, (M2MString *)"Argument \"patch\" object is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"patch\" object is NULL");
 		return NULL;
 		}
+	}
+
+
+/**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ()
+	{
+	return NULL;
 	}
 
 
@@ -246,9 +259,9 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 	//========== Variable ==========
 	size_t decodedPathLength = 0;
 	M2MJSONType type = M2MJSONType_NULL;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_remove()";
 
 	//===== Check argument =====
 	if (json!=NULL && decodedPath!=NULL)
@@ -258,27 +271,23 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 			{
 			//===== Delete whole JSON object =====
 			M2MJSON_delete(&json);
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed whole \"JSON\" object belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return;
 			}
 		//===== In the case of single data equals "/" =====
 		else if (decodedPathLength==1
-				&& M2MString_compare(M2MString_SLASH, decodedPath, decodedPathLength)==0)
+				&& M2MString_compareTo(decodedPath, M2MString_SLASH)==0)
 			{
 			//===== In the case of boolean =====
 			if ((type=M2MJSON_getType(json))==M2MJSONType_BOOLEAN)
 				{
 				M2MJSON_setType(json, M2MJSONType_NULL);
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON boolean belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of null =====
@@ -286,11 +295,9 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				{
 				M2MJSON_setType(json, M2MJSONType_NULL);
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON null belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of number =====
@@ -298,28 +305,24 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				{
 				M2MJSON_setType(json, M2MJSONType_NULL);
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON number belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of string =====
 			else if (type==M2MJSONType_STRING)
 				{
 				M2MJSON_clearString(json);
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON string belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
 				return;
 				}
 			}
@@ -340,7 +343,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				}
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
 				return;
 				}
 			}
@@ -348,12 +351,12 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, (M2MString *)"Argument \"json\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
 		return;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_remove()", __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL");
 		return;
 		}
 	}
@@ -376,33 +379,33 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 	uint32_t number = 0;
 	uint32_t i = 0;
 	M2MString MESSAGE[128];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_removeJSONArray()";
 
 	//===== Check argument =====
 	if (json!=NULL && (array=M2MJSON_getArray(json))!=NULL
 			&& decodedPath!=NULL && M2MString_length(decodedPath)>0
-			&& M2MString_compare(decodedPath, M2MString_SLASH, M2MString_length(M2MString_SLASH))==0
+			&& M2MString_compareTo(decodedPath, M2MString_SLASH)==0
 			&& (decodedPath+=M2MString_length(M2MString_SLASH))!=NULL)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to remove a JSON Array with argument \"decodedPath\"(=\"%s\")", decodedPath);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== In the case of stripping with slash =====
 		if ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
 			//=====  =====
-			if (M2MString_appendWithLength(&key, decodedPath, M2MString_length(decodedPath)-M2MString_length(index))!=NULL)
+			if (M2MString_appendLength(&key, decodedPath, M2MString_length(decodedPath)-M2MString_length(index))!=NULL)
 				{
 				//===== Get index number of JSON array =====
 				number = M2MString_convertFromStringToUnsignedInteger(key, M2MString_length(key));
-				NGHeap_free(key);
+				M2MHeap_free(key);
 				this_remove(M2MJSON_getJSONFromArray(array, number), index);
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Failed to fetch index number of array from \"decodedPath\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to fetch index number of array from \"decodedPath\"");
 				return;
 				}
 			}
@@ -425,7 +428,7 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Indicated index number of \"decodedPath\" is invalid");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Indicated index number of \"decodedPath\" is invalid");
 						return;
 						}
 					}
@@ -451,14 +454,14 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Internal error! Root node of \"JSONArray\" is NULL");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Internal error! Root node of \"JSONArray\" is NULL");
 					return;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
 				return;
 				}
 			}
@@ -466,19 +469,19 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return;
 		}
 	else if (array==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONArray\" object");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONArray\" object");
 		return;
 		}
 	else
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Format of argument \"decodedPath\"(=\"%s\") is invalid", decodedPath);
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONArray()", __LINE__, MESSAGE);
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		return;
 		}
 	}
@@ -496,19 +499,19 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 	M2MJSONObject *object = NULL;
 	M2MString *index = NULL;
 	M2MString MESSAGE[128];
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_removeJSONObject()";
 
 	//===== Check argument =====
 	if (json!=NULL
 			&& (object=M2MJSON_getObject(json))!=NULL && (object=M2MJSON_getRootObject(object))!=NULL
 			&& decodedPath!=NULL && M2MString_length(decodedPath)>0
-			&& M2MString_compare(decodedPath, M2MString_SLASH, M2MString_length(M2MString_SLASH))==0
+			&& M2MString_compareTo(decodedPath, M2MString_SLASH)==0
 			&& (decodedPath+=M2MString_length(M2MString_SLASH))!=NULL)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to remove a JSON Object with argument \"decodedPath\"(=\"%s\")", decodedPath);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch.this_removeJSONObject()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//=====  =====
 		if ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
@@ -532,7 +535,7 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeM2MJSONObject()", __LINE__, (M2MString *)"Unknown error has happened!");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Unknown error has happened!");
 					return;
 					}
 				}
@@ -548,24 +551,24 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONObject()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return;
 		}
 	else if (object==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONObject()", __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"M2MJSONObject\" object as \"JSONValue\"");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"M2MJSONObject\" object as \"JSONValue\"");
 		return;
 		}
 	else if (decodedPath==NULL || M2MString_length(decodedPath)<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONObject()", __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL or vacant");
 		return;
 		}
 	else
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Format of argument \"decodedPath\"(=\"%s\") is invalid", decodedPath);
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch.this_removeJSONObject()", __LINE__, MESSAGE);
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		return;
 		}
 	}
@@ -597,18 +600,16 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 	M2MString *lastIndex = NULL;
 	M2MString parentPath[PATH_LENGTH];
 	size_t parentPathLength = 0;
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_add()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0 && value!=NULL)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"add\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Initialize copy buffer =====
 		memset(parentPath, 0, sizeof(parentPath));
 		//===== Decode JSON Pointer path =====
@@ -616,7 +617,7 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 			{
 			//===== In the case of exchange of root node =====
 			if (M2MString_length(decodedPath)==0
-					|| (M2MString_length(decodedPath)==1 && M2MString_compare(decodedPath, M2MString_SLASH, M2MString_length(M2MString_SLASH))==0))
+					|| (M2MString_length(decodedPath)==1 && M2MString_compareTo(decodedPath, M2MString_SLASH)==0))
 				{
 				return (json=(M2MJSON *)value);
 				}
@@ -629,31 +630,31 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, (M2MString *)"The decode path based on argument \"path\" is invalid style");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"The decode path based on argument \"path\" is invalid style");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, (M2MString *)"Argument \"json\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
 		return NULL;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_add()", __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return NULL;
 		}
 	}
@@ -672,18 +673,16 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_copy()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"copy\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_copy()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -691,19 +690,19 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_copy()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_copy()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_copy()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -724,53 +723,45 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 	M2MJSONArray *array = NULL;
 	uint32_t arraySize = 0;
 	uint32_t i = 0;
-#ifdef DEBUG
 	M2MString *jsonString = NULL;
 	M2MString MESSAGE[512];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_evaluate()";
 
 	//===== Check argument =====
 	if (json!=NULL && operation!=NULL && (operationLength=M2MString_length(operation))>0)
 		{
-#ifdef DEBUG
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"===== Start-up JSON Evaluation =====");
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"===== Start-up JSON Evaluation =====");
 		M2MJSON_toString(json, &jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument: \"json\"(=%s)", jsonString);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, MESSAGE);
-		NGHeap_free(jsonString);
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		M2MHeap_free(jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument: \"operation\"(=%s)", operation);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Parse operation string and create new JSON patch object =====
 		if ((patch=M2MJSONParser_parseString(operation))!=NULL)
 			{
-#ifdef DEBUG
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Now execute JSON Patch operation");
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Now execute JSON Patch operation");
 			//===== In the case of JSON Array(=any operations) =====
 			if (M2MJSON_getType(patch)==M2MJSONType_ARRAY
 					&& (array=M2MJSON_getRootArray(M2MJSON_getArray(patch)))!=NULL
 					&& (arraySize=M2MJSON_getArraySize(array))>0)
 				{
-#ifdef DEBUG
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"JSON Patch format is JSON Array(= any operations)");
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Array(= any operations)");
 				//===== Execute all operation =====
 				for (i=0; i<arraySize; i++)
 					{
 					//===== Execute a operation =====
 					if ((json=this_executeOperation(json, M2MJSON_getJSONFromArray(array, i)))!=NULL)
 						{
-#ifdef DEBUG
-						NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
-#endif // DEBUG
+						M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
 						}
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Failed to operate JSON Patch command");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
 						break;
 						}
 					}
@@ -781,20 +772,16 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 			//===== In the case of JSON Object(=1 operation) =====
 			else if (M2MJSON_getType(patch)==M2MJSONType_OBJECT)
 				{
-#ifdef DEBUG
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"JSON Patch format is JSON Object(= 1 operation)");
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Object(= 1 operation)");
 				//===== Execute a operation =====
 				if ((json=this_executeOperation(json, patch))!=NULL)
 					{
-#ifdef DEBUG
-					NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
-#endif // DEBUG
+					M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
 					}
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Failed to operate JSON Patch command");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
 					}
 				//===== Release allocated memory =====
 				M2MJSON_delete(&patch);
@@ -803,7 +790,7 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 				//===== Release allocated memory =====
 				M2MJSON_delete(&patch);
 				return NULL;
@@ -812,19 +799,19 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Failed to create new M2MJSON object from argument \"operation\" string");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new M2MJSON object from argument \"operation\" string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_evaluate()", __LINE__, (M2MString *)"Argument \"operation\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -842,18 +829,16 @@ M2MJSON *M2MJSONPatch_move (M2MJSON *json, const M2MString *from, const M2MStrin
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_move()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"move\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_move()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -861,19 +846,19 @@ M2MJSON *M2MJSONPatch_move (M2MJSON *json, const M2MString *from, const M2MStrin
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_move()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_move()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_move()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -890,18 +875,16 @@ void M2MJSONPatch_remove (M2MJSON *json, const M2MString *path)
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_remove()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"remove\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_remove()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -911,19 +894,19 @@ void M2MJSONPatch_remove (M2MJSON *json, const M2MString *path)
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_remove()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for removing object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for removing object");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_remove()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_remove()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return;
 		}
 	}
@@ -941,18 +924,16 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString DECODED_PATH[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_replace()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0 && value!=NULL)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"replace\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_replace()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
@@ -960,24 +941,24 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_replace()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_replace()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_replace()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_replace()", __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return NULL;
 		}
 	}
@@ -995,18 +976,16 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString DECODED_PATH[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_test()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0 && value!=NULL)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"test\" operation");
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPatch_test()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
@@ -1014,24 +993,24 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_test()", __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_test()", __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return false;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_test()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return false;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPatch_test()", __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return false;
 		}
 	}

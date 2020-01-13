@@ -982,6 +982,8 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 	M2MJSONArray *array = NULL;
 	M2MJSONArray *lastArray = NULL;
 	M2MString *index = NULL;
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_parseString()";
 
 	//===== Check argument =====
 	if ((index=this_proceedString(string))!=NULL && (json=M2MJSON_new())!=NULL)
@@ -990,6 +992,8 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 		if (M2MString_compareTo(index, M2MString_LEFT_CURLY_BRACKET)==0
 				&& this_validateObjectSyntax(index)==true)
 			{
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Object");
+
 			//===== Create new JSON Object =====
 			index = this_setObject(index, &object);
 			//===== Connect Object into new network =====
@@ -1030,6 +1034,8 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 		//===== In the case of Array =====
 		else if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 			{
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Array");
+
 			//===== Create new JSON Array =====
 			index = this_setArray(index, &array);
 			//===== Connect Array into new network =====

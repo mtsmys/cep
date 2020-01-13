@@ -34,6 +34,14 @@
  * Declaration
  ******************************************************************************/
 /**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ();
+
+
+/**
  * This method fetches key string from indicated JSON Pointer path string.<br>
  *
  * @param[in] path			JSON Pointer expression path string
@@ -66,27 +74,25 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 	M2MString MESSAGE[256];
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString key[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString *jsonString = NULL;
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPointer.this_detectJSON()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0)
 		{
-#ifdef DEBUG
 		M2MJSON_toString(json, &jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now starts to detect a JSON from this JSON(=\"%s\")", jsonString);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-		NGHeap_free(jsonString);
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		M2MHeap_free(jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now starts to detect a JSON with indicated path(=\"%s\")", path);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Initialization =====
 		memset(key, 0, sizeof(key));
 		//===== Increment position =====
-		if (M2MString_compare(path, M2MString_SLASH, M2MString_length(M2MString_SLASH))==0
+		if (M2MString_compareTo(path, M2MString_SLASH)==0
 				&& (path+=M2MString_length(M2MString_SLASH))!=NULL)
 			{
 			//===== Loop while existing a value =====
@@ -104,18 +110,16 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 						//===== Select JSON value from JSON Array =====
 						if ((json=M2MJSON_getJSONFromArray(array, number))!=NULL)
 							{
-#ifdef DEBUG
 							memset(MESSAGE, 0, sizeof(MESSAGE));
 							M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected JSONArray with indicated key(=\"%d\")", number);
-							NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+							M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 							}
 						//===== Error handling =====
 						else
 							{
 							memset(MESSAGE, 0, sizeof(MESSAGE));
 							M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to detect JSON with indicated expression(=\"%s\")", path);
-							NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
+							M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 							return NULL;
 							}
 						}
@@ -126,25 +130,23 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 						//===== Get value(=JSON) from key =====
 						if ((json=M2MJSON_getJSONFromObject(object, key, M2MString_length(key)))!=NULL)
 							{
-#ifdef DEBUG
 							memset(MESSAGE, 0, sizeof(MESSAGE));
 							M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected JSONObject with indicated key(=\"%s\")", key);
-							NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+							M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 							}
 						//===== Error handling =====
 						else
 							{
 							memset(MESSAGE, 0, sizeof(MESSAGE));
 							M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to detect JSON with indicated expression(=\"%s\")", path);
-							NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
+							M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 							return NULL;
 							}
 						}
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONObject\" or \"JSONArray\" as \"JSONValue\"");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONObject\" or \"JSONArray\" as \"JSONValue\"");
 						return NULL;
 						}
 					//===== Proceed string position for next key =====
@@ -156,7 +158,7 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 					{
 					memset(MESSAGE, 0, sizeof(MESSAGE));
 					M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to fetch key string from path(=\"%s\")", path);
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 					return NULL;
 					}
 				}
@@ -172,17 +174,15 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 					//===== Select JSON value from JSON Array =====
 					if ((json=M2MJSON_getJSONFromArray(array, number))!=NULL)
 						{
-#ifdef DEBUG
 						memset(MESSAGE, 0, sizeof(MESSAGE));
 						M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected JSONArray with indicated key(=\"%d\")", number);
-						NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+						M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 						return json;
 						}
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Failed to detect JSON by argument \"expression\"");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect JSON by argument \"expression\"");
 						return NULL;
 						}
 					}
@@ -193,24 +193,22 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 					//===== Get value(=JSON) from key =====
 					if ((json=M2MJSON_getJSONFromObject(object, key, M2MString_length(key)))!=NULL)
 						{
-#ifdef DEBUG
 						memset(MESSAGE, 0, sizeof(MESSAGE));
 						M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected JSONObject with indicated key(=\"%s\")", key);
-						NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
-#endif // DEBUG
+						M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 						return json;
 						}
 					//===== Error handling =====
 					else
 						{
-						NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Failed to detect JSON by argument \"expression\"");
+						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect JSON by argument \"expression\"");
 						return NULL;
 						}
 					}
 				//===== Error handling =====
 				else
 					{
-					NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONObject\" or \"JSONArray\" as \"JSONValue\"");
+					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONObject\" or \"JSONArray\" as \"JSONValue\"");
 					return NULL;
 					}
 				}
@@ -219,26 +217,26 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 				{
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Failed to fetch key string from path(=\"%s\")", path);
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, MESSAGE);
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Failed to detect JSON because of invalid format");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect JSON because of invalid format");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_detectJSON()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -256,9 +254,9 @@ static M2MJSON *this_detectJSON (M2MJSON *json, M2MString *path)
 static M2MString *this_fetchKeyFromPath (const M2MString *path, const size_t keyLength, M2MString *buffer, const size_t bufferLength)
 	{
 	//========== Variable ==========
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPointer.this_fetchKeyFromPath()";
 
 	//===== Check argument =====
 	if (path!=NULL
@@ -267,29 +265,38 @@ static M2MString *this_fetchKeyFromPath (const M2MString *path, const size_t key
 		{
 		memset(buffer, 0, bufferLength);
 		memcpy(buffer, path, keyLength);
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Fetched key string(=\"%s\") from path", buffer);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer.this_fetchKeyFromPath()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		return buffer;
 		}
 	//===== Argument error =====
 	else if (path==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_fetchKeyFromPath()", __LINE__, (M2MString *)"Argument \"path\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL");
 		return NULL;
 		}
 	else if (keyLength<=0 || M2MString_length(path)<keyLength)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_fetchKeyFromPath()", __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive or overs length of \"path\" string");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" isn't positive or overs length of \"path\" string");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer.this_fetchKeyFromPath()", __LINE__, (M2MString *)"Argument \"keyLength\" overs \"bufferLength\"");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"keyLength\" overs \"bufferLength\"");
 		return NULL;
 		}
+	}
+
+
+/**
+ * This method returns Logger object.<br>
+ *
+ * @return	Return file logger object
+ */
+static M2MFileAppender *this_getLogger ()
+	{
+	return NULL;
 	}
 
 
@@ -322,38 +329,34 @@ M2MString *M2MJSONPointer_decodePath (const M2MString *path, M2MString *buffer, 
 	size_t decodedTildePathLength = 0;
 	M2MString MESSAGE[256];
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPointer_decodePath()";
 
 	//===== Check argument =====
 	if (path!=NULL && PATH_LENGTH>0 && bufferLength>0)
 		{
-#ifdef DEBUG
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument \"path\" = \"%s\"", path);
-		NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, MESSAGE);
-#endif // DEBUG
+		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode pathname expression(1st: "~1"->"/", and 2nd: "~0"->"~") =====
 		if (M2MString_replace(path, M2MJSONPointer_SLASH, M2MString_SLASH, DECODED_SLASH_PATH, sizeof(DECODED_SLASH_PATH))!=NULL
 				&& M2MString_replace(DECODED_SLASH_PATH, M2MJSONPointer_TILDE, M2MString_TILDE, DECODED_TILDE_PATH, sizeof(DECODED_TILDE_PATH))!=NULL)
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Decoded pathname string = \"%s\"", DECODED_TILDE_PATH);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			//===== Remove double quotation =====
 			if ((decodedTildePathLength=M2MString_length(DECODED_TILDE_PATH))>0
-					&& M2MString_compare(DECODED_TILDE_PATH, M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0
-					&& M2MString_compare(&(DECODED_TILDE_PATH[decodedTildePathLength-1]), M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0
+					&& M2MString_compareTo(DECODED_TILDE_PATH, M2MString_DOUBLE_QUOTATION)==0
+					&& M2MString_compareTo(&(DECODED_TILDE_PATH[decodedTildePathLength-1]), M2MString_DOUBLE_QUOTATION)==0
 					&& bufferLength>(decodedTildePathLength-DOUBLE_QUOTATION_LENGTH-DOUBLE_QUOTATION_LENGTH))
 				{
 				//===== Copy decoded path =====
 				memset(buffer, 0, bufferLength);
 				memcpy(buffer, &(DECODED_TILDE_PATH[DOUBLE_QUOTATION_LENGTH]), decodedTildePathLength-DOUBLE_QUOTATION_LENGTH-DOUBLE_QUOTATION_LENGTH);
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed double quotation pathname string = \"%s\"", buffer);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return buffer;
 				}
 			//===== Remove double quotation(not including back slash) =====
@@ -370,26 +373,26 @@ M2MString *M2MJSONPointer_decodePath (const M2MString *path, M2MString *buffer, 
 				{
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Format of argument \"path\"(=\"%s\") is invalid", path);
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, MESSAGE);
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, (M2MString *)"Failed to decode escape string");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode escape string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_decodePath()", __LINE__, (M2MString *)"Argument \"bufferLength\" isn't positive");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"bufferLength\" isn't positive");
 		return NULL;
 		}
 	}
@@ -409,15 +412,15 @@ M2MJSON *M2MJSONPointer_evaluate (M2MJSON *json, const M2MString *path)
 	//========== Variable ==========
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString DECODED_PATH[PATH_LENGTH+1];
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPointer_evaluate()";
 
 	//===== Check argument =====
 	if (json!=NULL && path!=NULL && PATH_LENGTH>0)
 		{
 		//===== In the case of selected all JSON objects =====
-		if (M2MString_compare(path, M2MJSONPointer_WHOLE_SELECTION, M2MString_length(M2MJSONPointer_WHOLE_SELECTION))==0)
+		if (M2MString_compareTo(path, M2MJSONPointer_WHOLE_SELECTION)==0)
 			{
 			return json;
 			}
@@ -425,29 +428,27 @@ M2MJSON *M2MJSONPointer_evaluate (M2MJSON *json, const M2MString *path)
 		else if (M2MJSONPointer_validatePathExpression(path)==true
 				&& M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
-#ifdef DEBUG
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now evaluate indicated path(=\"%s\")", DECODED_PATH);
-			NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_evaluate()", __LINE__, MESSAGE);
-#endif // DEBUG
+			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 			return this_detectJSON(json, DECODED_PATH);
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_evaluate()", __LINE__, (M2MString *)"Argument \"path\" doesn't start with \"/\" character");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" doesn't start with \"/\" character");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_evaluate()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_evaluate()", __LINE__, (M2MString *)"Argument \"path\" is NULL");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL");
 		return NULL;
 		}
 	}
@@ -479,9 +480,7 @@ int M2MJSONPointer_isNumber (const M2MString *string)
 			//===== Error handling =====
 			else
 				{
-#ifdef DEBUG
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_isNumber()", __LINE__, (M2MString *)"Argument \"string\" includes a character which isn't number type");
-#endif // DEBUG
+				M2MLogger_debug((M2MString *)"M2MJSONPointer_isNumber()", __LINE__, (M2MString *)"Argument \"string\" includes a character which isn't number type");
 				return -1;
 				}
 			}
@@ -491,9 +490,7 @@ int M2MJSONPointer_isNumber (const M2MString *string)
 	//===== Argument error =====
 	else
 		{
-#ifdef DEBUG
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_isNumber()", __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
-#endif // DEBUG
+		M2MLogger_error((M2MString *)"M2MJSONPointer_isNumber()", __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
 		return -1;
 		}
 	}
@@ -511,46 +508,44 @@ bool M2MJSONPointer_validatePathExpression (const M2MString *path)
 	//========== Variable ==========
 	M2MString *index = NULL;
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
-#ifdef DEBUG
 	M2MString MESSAGE[256];
-#endif // DEBUG
+	const M2MFileAppender *LOGGER = this_getLogger();
+	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPointer_validatePathExpression()";
 
 	//===== Check argument =====
 	if ((index=(M2MString *)path)!=NULL && M2MString_length(index)>0)
 		{
 		//===== Check path expression starts with "\"" =====
-		if (M2MString_compare(index, M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0
+		if (M2MString_compareTo(index, M2MString_DOUBLE_QUOTATION)==0
 				&& (index+=M2MString_length(M2MString_DOUBLE_QUOTATION))!=NULL)
 			{
 			//===== Check path expression includes "/" =====
-			if (M2MString_compare(index, M2MString_SLASH, M2MString_length(M2MString_SLASH))==0
-					&& M2MString_compare(&(index[M2MString_length(index)-1]), M2MString_DOUBLE_QUOTATION, DOUBLE_QUOTATION_LENGTH)==0)
+			if (M2MString_compareTo(index, M2MString_SLASH)==0
+					&& M2MString_compareTo(&(index[M2MString_length(index)-1]), M2MString_DOUBLE_QUOTATION)==0)
 				{
-#ifdef DEBUG
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument \"path\"(=%s) is right format", path);
-				NGLogger_printDebugMessage((M2MString *)"M2MJSONPointer_validatePathExpression()", __LINE__, MESSAGE);
-#endif // DEBUG
+				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
 				return true;
 				}
 			//===== Error handling =====
 			else
 				{
-				NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_validatePathExpression()", __LINE__, (M2MString *)"Argument \"path\" doesn't starts with \"\"/\"");
+				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" doesn't starts with \"\"/\"");
 				return false;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_validatePathExpression()", __LINE__, (M2MString *)"Argument \"path\" doesn't start with \"\"\"");
+			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" doesn't start with \"\"\"");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		NGLogger_printErrorMessage((M2MString *)"M2MJSONPointer_validatePathExpression()", __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return false;
 		}
 	}

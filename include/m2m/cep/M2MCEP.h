@@ -33,7 +33,7 @@
 #define M2M_APP_CEP_M2MCEP_H_
 
 
-#include "m2m/app/cep/M2MDataFrame.h"
+#include "m2m/cep/M2MDataFrame.h"
 #include "m2m/lib/db/M2MSQLite.h"
 #include "m2m/lib/db/M2MTableManager.h"
 #include "m2m/lib/io/M2MDirectory.h"

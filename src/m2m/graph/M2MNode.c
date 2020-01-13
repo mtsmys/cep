@@ -27,7 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  ******************************************************************************/
 
-#include "m2m/app/graph/M2MNode.h"
+#include "m2m/graph/M2MNode.h"
 
 
 

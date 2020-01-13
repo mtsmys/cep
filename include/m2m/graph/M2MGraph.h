@@ -34,7 +34,7 @@
 
 
 
-#include "m2m/app/graph/M2MNode.h"
+#include "m2m/graph/M2MNode.h"
 #include "m2m/lib/lang/M2MString.h"
 #include "m2m/lib/log/M2MFileAppender.h"
 #include "m2m/lib/io/M2MHeap.h"
