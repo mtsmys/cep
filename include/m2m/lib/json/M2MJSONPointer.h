@@ -41,9 +41,10 @@ extern "C"
 
 
 
+#include "m2m/M2MSystem.h"
 #include "m2m/lib/json/M2MJSON.h"
 #include "m2m/lib/lang/M2MString.h"
-#include "m2m/lib/log/M2MLogger.h"
+#include "m2m/lib/log/M2MLogLevel.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>

@@ -41,11 +41,12 @@ extern "C"
 
 
 
+#include "m2m/M2MSystem.h"
 #include "m2m/lib/json/M2MJSON.h"
 #include "m2m/lib/json/M2MJSONParser.h"
 #include "m2m/lib/json/M2MJSONPointer.h"
 #include "m2m/lib/lang/M2MString.h"
-#include "m2m/lib/log/M2MLogger.h"
+#include "m2m/lib/log/M2MLogLevel.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>

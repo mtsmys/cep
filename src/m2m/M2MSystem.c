@@ -103,17 +103,38 @@ unsigned char *M2MSystem_getThreadIDString (unsigned char *buffer, const size_t 
 
 
 /**
- * Print out a line to the "standard" output stream.<br>
+ * Print out a line to the "standard" error output stream.<br>
  *
  * @param[in] data	Output data
  */
-void M2MSystem_println (const unsigned char *data)
+void M2MSystem_errPrintln (const unsigned char *data)
 	{
 	//===== Check argument =====
 	if (data!=NULL && this_getStringlength(data)>0)
 		{
 		//===== Print out message =====
 		fprintf(stderr, "%s\n", data);
+		}
+	//===== Argument error =====
+	else
+		{
+		}
+	return;
+	}
+
+
+/**
+ * Print out a line to the "standard" output stream.<br>
+ *
+ * @param[in] data	Output data
+ */
+void M2MSystem_outPrintln (const unsigned char *data)
+	{
+	//===== Check argument =====
+	if (data!=NULL && this_getStringlength(data)>0)
+		{
+		//===== Print out message =====
+		fprintf(stdout, "%s\n", data);
 		}
 	//===== Argument error =====
 	else

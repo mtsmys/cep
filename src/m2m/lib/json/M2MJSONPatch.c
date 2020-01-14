@@ -34,11 +34,23 @@
  * Declaration
  ******************************************************************************/
 /**
- * This method returns Logger object.<br>
+ * Display the debug level log message in standard out.
  *
- * @return	Return file logger object
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
  */
-static M2MFileAppender *this_getLogger ();
+static void this_printDebugMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message);
+
+
+/**
+ * Display the error level log message in standard out.
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message);
 
 
 /**
@@ -75,7 +87,7 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 	M2MString *index = NULL;
 	const size_t SLASH_LENGTH = M2MString_length(M2MString_SLASH);
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_detectJSONObject()";
 
 	//===== Check argument =====
@@ -83,7 +95,7 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to detect JSON Object with pathname(=\"%s\")", decodedPath);
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Loop while existing expression =====
 		while ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
@@ -96,7 +108,7 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON with argument \"decodedPath\"");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON with argument \"decodedPath\"");
 				return NULL;
 				}
 			//===== Proceed string position for next key =====
@@ -109,25 +121,25 @@ static M2MJSONObject *this_detectJSONObject (M2MJSONObject *object, M2MString *d
 			{
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Detected M2MJSON Object with the last key(=\"%s\")", M2MJSON_getKey(object));
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+			this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 			return object;
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON Object with the last key string");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to detect M2MJSON Object with the last key string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (object==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root of M2MJSONObject by argument \"M2MJSONObject\"");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get root of M2MJSONObject by argument \"M2MJSONObject\"");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"expression\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"expression\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -148,7 +160,7 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 	size_t opLength = 0;
 	M2MString *path = NULL;
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_executeOperation()";
 
 	//===== Check argument =====
@@ -165,10 +177,10 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 			{
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"JSON Patch operation name = \"%s\"", op);
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+			this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"JSON Patch path = \"%s\"", path);
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+			this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 			//===== In the case of "add" operation =====
 			if (M2MString_compareTo(op, M2MJSONPatch_ADD)==0)
 				{
@@ -205,46 +217,91 @@ static M2MJSON *this_executeOperation (M2MJSON *json, const M2MJSON *patch)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to execute \"test\" operation");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to execute \"test\" operation");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" object is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" object is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"patch\" object is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"patch\" object is NULL");
 		return NULL;
 		}
 	}
 
 
 /**
- * This method returns Logger object.<br>
+ * Display the debug level log message in standard out.
  *
- * @return	Return file logger object
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
  */
-static M2MFileAppender *this_getLogger ()
+static void this_printDebugMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
 	{
-	return NULL;
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (M2MLogger_createNewLogMessage(M2MLogLevel_DEBUG, functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_outPrintln(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
+		}
+	return;
+	}
+
+
+/**
+ * Display the error level log message in standard out.
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_errPrintln(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
+		}
+	return;
 	}
 
 
@@ -260,7 +317,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 	size_t decodedPathLength = 0;
 	M2MJSONType type = M2MJSONType_NULL;
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_remove()";
 
 	//===== Check argument =====
@@ -273,7 +330,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 			M2MJSON_delete(&json);
 			memset(MESSAGE, 0, sizeof(MESSAGE));
 			M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed whole \"JSON\" object belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+			this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 			return;
 			}
 		//===== In the case of single data equals "/" =====
@@ -287,7 +344,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON boolean belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+				this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of null =====
@@ -297,7 +354,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON null belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+				this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of number =====
@@ -307,7 +364,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				memset(M2MJSON_getValue(json), 0, sizeof(M2MJSONValue));
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON number belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+				this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== In the case of string =====
@@ -316,13 +373,13 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				M2MJSON_clearString(json);
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Removed a JSON string belonging with argument \"decodedPath\"(=\"%s\")", decodedPath);
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+				this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 				return;
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
 				return;
 				}
 			}
@@ -343,7 +400,7 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 				}
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" expression doesn't match with \"JSONType\" of argument \"JSON *\"");
 				return;
 				}
 			}
@@ -351,12 +408,12 @@ static void this_remove (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL");
 		return;
 		}
 	}
@@ -379,7 +436,7 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 	uint32_t number = 0;
 	uint32_t i = 0;
 	M2MString MESSAGE[128];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_removeJSONArray()";
 
 	//===== Check argument =====
@@ -390,7 +447,7 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to remove a JSON Array with argument \"decodedPath\"(=\"%s\")", decodedPath);
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== In the case of stripping with slash =====
 		if ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
@@ -405,7 +462,7 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to fetch index number of array from \"decodedPath\"");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to fetch index number of array from \"decodedPath\"");
 				return;
 				}
 			}
@@ -428,7 +485,7 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Indicated index number of \"decodedPath\" is invalid");
+						this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Indicated index number of \"decodedPath\" is invalid");
 						return;
 						}
 					}
@@ -454,14 +511,14 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Internal error! Root node of \"JSONArray\" is NULL");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Internal error! Root node of \"JSONArray\" is NULL");
 					return;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to get root node of \"JSONArray\" object");
 				return;
 				}
 			}
@@ -469,19 +526,19 @@ static void this_removeJSONArray (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return;
 		}
 	else if (array==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONArray\" object");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"JSONArray\" object");
 		return;
 		}
 	else
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Format of argument \"decodedPath\"(=\"%s\") is invalid", decodedPath);
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE);
 		return;
 		}
 	}
@@ -499,7 +556,7 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 	M2MJSONObject *object = NULL;
 	M2MString *index = NULL;
 	M2MString MESSAGE[128];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch.this_removeJSONObject()";
 
 	//===== Check argument =====
@@ -511,7 +568,7 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now start to remove a JSON Object with argument \"decodedPath\"(=\"%s\")", decodedPath);
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//=====  =====
 		if ((index=M2MString_indexOf(decodedPath, M2MString_SLASH))!=NULL)
 			{
@@ -535,7 +592,7 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Unknown error has happened!");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Unknown error has happened!");
 					return;
 					}
 				}
@@ -551,24 +608,24 @@ static void this_removeJSONObject (M2MJSON *json, M2MString *decodedPath)
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return;
 		}
 	else if (object==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"M2MJSONObject\" object as \"JSONValue\"");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" doesn't own \"M2MJSONObject\" object as \"JSONValue\"");
 		return;
 		}
 	else if (decodedPath==NULL || M2MString_length(decodedPath)<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"decodedPath\" is NULL or vacant");
 		return;
 		}
 	else
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Format of argument \"decodedPath\"(=\"%s\") is invalid", decodedPath);
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE);
 		return;
 		}
 	}
@@ -601,7 +658,7 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 	M2MString parentPath[PATH_LENGTH];
 	size_t parentPathLength = 0;
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_add()";
 
 	//===== Check argument =====
@@ -609,7 +666,7 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"add\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Initialize copy buffer =====
 		memset(parentPath, 0, sizeof(parentPath));
 		//===== Decode JSON Pointer path =====
@@ -630,31 +687,31 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"The decode path based on argument \"path\" is invalid style");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"The decode path based on argument \"path\" is invalid style");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"json\" is NULL");
 		return NULL;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return NULL;
 		}
 	}
@@ -674,7 +731,7 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_copy()";
 
 	//===== Check argument =====
@@ -682,7 +739,7 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"copy\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -690,19 +747,19 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -725,43 +782,43 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 	uint32_t i = 0;
 	M2MString *jsonString = NULL;
 	M2MString MESSAGE[512];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_evaluate()";
 
 	//===== Check argument =====
 	if (json!=NULL && operation!=NULL && (operationLength=M2MString_length(operation))>0)
 		{
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"===== Start-up JSON Evaluation =====");
+		this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"===== Start-up JSON Evaluation =====");
 		M2MJSON_toString(json, &jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument: \"json\"(=%s)", jsonString);
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		M2MHeap_free(jsonString);
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Argument: \"operation\"(=%s)", operation);
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Parse operation string and create new JSON patch object =====
 		if ((patch=M2MJSONParser_parseString(operation))!=NULL)
 			{
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Now execute JSON Patch operation");
+			this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Now execute JSON Patch operation");
 			//===== In the case of JSON Array(=any operations) =====
 			if (M2MJSON_getType(patch)==M2MJSONType_ARRAY
 					&& (array=M2MJSON_getRootArray(M2MJSON_getArray(patch)))!=NULL
 					&& (arraySize=M2MJSON_getArraySize(array))>0)
 				{
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Array(= any operations)");
+				this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Array(= any operations)");
 				//===== Execute all operation =====
 				for (i=0; i<arraySize; i++)
 					{
 					//===== Execute a operation =====
 					if ((json=this_executeOperation(json, M2MJSON_getJSONFromArray(array, i)))!=NULL)
 						{
-						M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
+						this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
 						}
 					//===== Error handling =====
 					else
 						{
-						M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
+						this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
 						break;
 						}
 					}
@@ -772,16 +829,16 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 			//===== In the case of JSON Object(=1 operation) =====
 			else if (M2MJSON_getType(patch)==M2MJSONType_OBJECT)
 				{
-				M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Object(= 1 operation)");
+				this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"JSON Patch format is JSON Object(= 1 operation)");
 				//===== Execute a operation =====
 				if ((json=this_executeOperation(json, patch))!=NULL)
 					{
-					M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
+					this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Succeed to a JSON Patch operation");
 					}
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to operate JSON Patch command");
 					}
 				//===== Release allocated memory =====
 				M2MJSON_delete(&patch);
@@ -790,7 +847,7 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" string is invalid format");
 				//===== Release allocated memory =====
 				M2MJSON_delete(&patch);
 				return NULL;
@@ -799,19 +856,19 @@ M2MJSON *M2MJSONPatch_evaluate (M2MJSON *json, const M2MString *operation)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new M2MJSON object from argument \"operation\" string");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new M2MJSON object from argument \"operation\" string");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"operation\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -830,7 +887,7 @@ M2MJSON *M2MJSONPatch_move (M2MJSON *json, const M2MString *from, const M2MStrin
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_move()";
 
 	//===== Check argument =====
@@ -838,7 +895,7 @@ M2MJSON *M2MJSONPatch_move (M2MJSON *json, const M2MString *from, const M2MStrin
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"move\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -846,19 +903,19 @@ M2MJSON *M2MJSONPatch_move (M2MJSON *json, const M2MString *from, const M2MStrin
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -876,7 +933,7 @@ void M2MJSONPatch_remove (M2MJSON *json, const M2MString *path)
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString decodedPath[PATH_LENGTH+1];
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_remove()";
 
 	//===== Check argument =====
@@ -884,7 +941,7 @@ void M2MJSONPatch_remove (M2MJSON *json, const M2MString *path)
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"remove\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
@@ -894,19 +951,19 @@ void M2MJSONPatch_remove (M2MJSON *json, const M2MString *path)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for removing object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for removing object");
 			return;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return;
 		}
 	}
@@ -925,7 +982,7 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString DECODED_PATH[PATH_LENGTH+1];
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_replace()";
 
 	//===== Check argument =====
@@ -933,7 +990,7 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"replace\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
@@ -941,24 +998,24 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return NULL;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return NULL;
 		}
 	}
@@ -977,7 +1034,7 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 	const size_t PATH_LENGTH = M2MString_length(path);
 	M2MString DECODED_PATH[PATH_LENGTH+1];
 	M2MString MESSAGE[256];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONPatch_test()";
 
 	//===== Check argument =====
@@ -985,7 +1042,7 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 		{
 		memset(MESSAGE, 0, sizeof(MESSAGE));
 		M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Now execute JSON Patch \"test\" operation");
-		M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+		this_printDebugMessage(METHOD_NAME, __LINE__, MESSAGE);
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
@@ -993,24 +1050,24 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to decode argument \"path\" for adding JSON object");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else if (json==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON\" is NULL");
 		return false;
 		}
 	else if (path==NULL || PATH_LENGTH<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"path\" is NULL or vacant");
 		return false;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"value\" is NULL");
 		return false;
 		}
 	}

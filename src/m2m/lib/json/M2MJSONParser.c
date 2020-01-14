@@ -34,11 +34,23 @@
  * Declaration
  ******************************************************************************/
 /**
- * This method returns Logger object.<br>
+ * Display the debug level log message in standard out.
  *
- * @return	Return file logger object
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
  */
-static M2MFileAppender *this_getLogger ();
+static void this_printDebugMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message);
+
+
+/**
+ * Display the error level log message in standard out.
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message);
 
 
 /**
@@ -72,7 +84,7 @@ static unsigned char *this_createNewJSONBoolean (unsigned char *string, M2MJSON 
 	unsigned char MESSAGE[128];
 	const size_t TRUE_LENGTH = M2MString_length((M2MString *)"true");
 	const size_t FALSE_LENGTH = M2MString_length((M2MString *)"false");
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONBoolean()";
 
 	//===== Check argument =====
@@ -102,19 +114,19 @@ static unsigned char *this_createNewJSONBoolean (unsigned char *string, M2MJSON 
 				{
 				memset(MESSAGE, 0, sizeof(MESSAGE));
 				M2MString_format(MESSAGE, sizeof(MESSAGE)-1, (M2MString *)"Indicated string doesn't start with \"true\" or \"false\"(=\"%s\")", string);
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, MESSAGE);
+				this_printErrorMessage(METHOD_NAME, __LINE__, MESSAGE);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new structure object for JSON Boolean");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new structure object for JSON Boolean");
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		}
 	//=====  =====
 	return string;
@@ -131,7 +143,7 @@ static unsigned char *this_createNewJSONNumber (M2MString *numberM2MString, cons
 	{
 	//========== Variable ==========
 	M2MString number[numberM2MStringLength+1];
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONNumber()";
 
 	//===== Check argument =====
@@ -153,24 +165,24 @@ static unsigned char *this_createNewJSONNumber (M2MString *numberM2MString, cons
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new \"JSON\" structure object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new \"JSON\" structure object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (numberM2MString==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MString\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MString\" is NULL");
 		return NULL;
 		}
 	else if (numberM2MStringLength<=0 || M2MString_length(numberM2MString)<numberM2MStringLength)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MStringLength\" is invalid");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"numberM2MStringLength\" is invalid");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
@@ -186,7 +198,7 @@ static M2MString *this_createNewJSONString (M2MString *string, const size_t stri
 	{
 	//========== Variable ==========
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_createNewJSONString()";
 
 	//===== Check argument =====
@@ -225,28 +237,28 @@ static M2MString *this_createNewJSONString (M2MString *string, const size_t stri
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying string");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying string");
 				M2MJSON_delete(json);
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSON\" structure object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSON\" structure object");
 			}
 		}
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		}
 	else if (stringLength<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"stringLength\" isn't positive");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"stringLength\" isn't positive");
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON **\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"M2MJSON **\" is NULL");
 		}
 	return string;
 	}
@@ -260,7 +272,7 @@ static size_t this_detectNumberM2MStringLength (M2MString *string)
 	{
 	//========== Variable ==========
 	M2MString *index = NULL;
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_detectNumberM2MStringLength()";
 
 	//===== Check argument =====
@@ -288,20 +300,9 @@ static size_t this_detectNumberM2MStringLength (M2MString *string)
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return 0;
 		}
-	}
-
-
-/**
- * This method returns Logger object.<br>
- *
- * @return	Return file logger object
- */
-static M2MFileAppender *this_getLogger ()
-	{
-	return NULL;
 	}
 
 
@@ -321,7 +322,7 @@ static M2MString *this_getObjectKey (const M2MString *string, M2MString **key)
 	M2MString *end = NULL;
 	size_t keyLength = 0;
 	const size_t DOUBLE_QUOTATION_LENGTH = M2MString_length(M2MString_DOUBLE_QUOTATION);
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser.this_getObjectKey()";
 
 	//===== Get start point of key =====
@@ -348,38 +349,38 @@ static M2MString *this_getObjectKey (const M2MString *string, M2MString **key)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying key data");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for copying key data");
 					return NULL;
 					}
 				}
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect end position of key data");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to detect end position of key data");
 				return NULL;
 				}
 			}
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to detect start position of key data");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to detect start position of key data");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (string==NULL)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL");
 		return NULL;
 		}
 	else if (M2MString_length(string)<=0)
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Length of argument \"string\" isn't positive");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Length of argument \"string\" isn't positive");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"key\" is NULL");
 		return NULL;
 		}
 	}
@@ -456,6 +457,62 @@ static bool this_isDecimalNumber (const M2MString *string, const size_t length)
 		{
 		return false;
 		}
+	}
+
+
+/**
+ * Display the debug level log message in standard out.
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ */
+static void this_printDebugMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (M2MLogger_createNewLogMessage(M2MLogLevel_DEBUG, functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_outPrintln(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
+		}
+	return;
+	}
+
+
+/**
+ * Display the error level log message in standard out.
+ *
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ */
+static void this_printErrorMessage (const M2MString *functionName, const uint32_t lineNumber, const M2MString *message)
+	{
+	//========== Variable ==========
+	M2MString *logMessage = NULL;
+
+	//===== Create new log message =====
+	if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &logMessage)!=NULL)
+		{
+		//===== Print out log =====
+		M2MSystem_errPrintln(logMessage);
+		//===== Release allocated memory =====
+		M2MHeap_free(logMessage);
+		}
+	//===== Error handling =====
+	else
+		{
+		}
+	return;
 	}
 
 
@@ -902,7 +959,7 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 	M2MFile *file = NULL;
 	M2MString *string = NULL;
 	size_t stringLength = 0;
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_parseFile()";
 
 	//===== Check argument =====
@@ -927,14 +984,14 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 				//===== Error handling =====
 				else if (stringLength<=0)
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to read file");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to read file");
 					//===== Close file =====
 					M2MFile_delete(&file);
 					return NULL;
 					}
 				else
 					{
-					M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to parse JSON string");
+					this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to parse JSON string");
 					//===== Release allocated memory =====
 					M2MHeap_free(string);
 					//===== Close file =====
@@ -945,7 +1002,7 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to open file");
+				this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to open file");
 				//===== Close file =====
 				M2MFile_delete(&file);
 				return NULL;
@@ -954,14 +1011,14 @@ M2MJSON *M2MJSONParser_parseFile (const M2MString *filePath)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Failed to create new File object");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to create new File object");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"filePath\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"filePath\" is NULL or vacant");
 		return NULL;
 		}
 	}
@@ -982,7 +1039,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 	M2MJSONArray *array = NULL;
 	M2MJSONArray *lastArray = NULL;
 	M2MString *index = NULL;
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_parseString()";
 
 	//===== Check argument =====
@@ -992,7 +1049,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 		if (M2MString_compareTo(index, M2MString_LEFT_CURLY_BRACKET)==0
 				&& this_validateObjectSyntax(index)==true)
 			{
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Object");
+			this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Object");
 
 			//===== Create new JSON Object =====
 			index = this_setObject(index, &object);
@@ -1034,7 +1091,7 @@ M2MJSON *M2MJSONParser_parseString (const M2MString *string)
 		//===== In the case of Array =====
 		else if (M2MString_compareTo(index, M2MString_LEFT_SQUARE_BRACKET)==0)
 			{
-			M2MLogger_debug(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Array");
+			this_printDebugMessage(METHOD_NAME, __LINE__, (M2MString *)"Start to parse indicated JSON Array");
 
 			//===== Create new JSON Array =====
 			index = this_setArray(index, &array);
@@ -1098,7 +1155,7 @@ bool M2MJSONParser_validateJSONSyntax (const M2MString *string)
 	{
 	//========== Variable ==========
 	M2MJSON *json = NULL;
-	const M2MFileAppender *LOGGER = this_getLogger();
+
 	const M2MString *METHOD_NAME = (M2MString *)"M2MJSONParser_validateJSONSyntax()";
 
 	//===== Check argument =====
@@ -1114,14 +1171,14 @@ bool M2MJSONParser_validateJSONSyntax (const M2MString *string)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is invalid JSON form");
+			this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is invalid JSON form");
 			return false;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_error(LOGGER, METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
+		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Argument \"string\" is NULL or vacant");
 		return false;
 		}
 	}

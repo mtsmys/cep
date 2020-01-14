@@ -970,7 +970,7 @@ void M2MLogger_fatalImpl (M2MFileAppender *self, const M2MString *functionName, 
 		if (M2MLogger_createNewLogMessage(M2MLogLevel_FATAL, functionName, lineNumber, message, &log)!=NULL)
 			{
 			//===== Write log =====
-			M2MSystem_println(log);
+			M2MSystem_errPrintln(log);
 			M2MHeap_free(log);
 			}
 		//===== Error handling =====
@@ -1023,7 +1023,7 @@ void M2MLogger_errorImpl (M2MFileAppender *self, const M2MString *functionName, 
 		if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &log)!=NULL)
 			{
 			//===== Write log =====
-			M2MSystem_println(log);
+			M2MSystem_errPrintln(log);
 			M2MHeap_free(log);
 			}
 		//===== Error handling =====
