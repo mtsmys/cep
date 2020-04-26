@@ -664,6 +664,47 @@ bool M2MSQLite_setAutoVacuum (sqlite3 *database, const bool flag)
 
 
 /**
+ *
+ * @param[in] database	SQLite3 database object to set cache size
+ * @param cacheSize
+ * @return				true: success, false: failure
+ */
+bool M2MSQLite_setCacheSize (sqlite3 *database, const uint32_t cacheSize)
+	{
+	//========== Variable ==========
+	bool result = false;
+	M2MString buffer[32];
+	M2MString sql[256];
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLite_setCacheSize()";
+	const M2MString *PRAGMA_CACHE_SIZE_SQL = (M2MString *)"PRAGMA cache_size = %s ";
+
+	//===== Check argument =====
+	if (cacheSize>0 && M2MString_convertFromUnsignedIntegerToString(cacheSize, buffer, sizeof(buffer))!=NULL)
+		{
+		//===== Prepare SQL string =====
+		memset(sql, 0, sizeof(sql));
+		snprintf(sql, sizeof(sql)-1, PRAGMA_CACHE_SIZE_SQL, buffer);
+		//===== Set cache size into SQLite3 database =====
+		if ((result=M2MSQLite_executeUpdate(database, sql))==true)
+			{
+			}
+		//===== Error handling =====
+		else
+			{
+			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set cache size");
+			}
+		return result;
+		}
+	//===== Argument error =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! indicated \"cacheSize\" is 0 or failed to convert into string");
+		return false;
+		}
+	}
+
+
+/**
  * Set the synchronous mode of the SQLite 3 database.<br>
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
@@ -703,6 +744,31 @@ bool M2MSQLite_setSynchronous (sqlite3 *database, const bool synchronous)
 			{
 			M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set the synchronous mode into \"OFF\"");
 			}
+		}
+	return result;
+	}
+
+
+/**
+ *
+ * @param[in] database		SQLite3 database object to be set temporary store
+ * @return					true: success, false: failure
+ */
+bool M2MSQLite_setTempStore (sqlite3 *database)
+	{
+	//========== Variable ==========
+	bool result = false;
+	const M2MString *FUNCTION_NAME = (M2MString *)"M2MSQLite_setTempStore()";
+	const M2MString *PRAGMA_TEMP_STORE_SQL = (M2MString *)"PRAGMA temp_store = MEMORY";
+
+	//===== Set UTF-8 to SQLite3 database =====
+	if ((result=M2MSQLite_executeUpdate(database, PRAGMA_TEMP_STORE_SQL))==true)
+		{
+		}
+	//===== Error handling =====
+	else
+		{
+		M2MLogger_error(NULL, FUNCTION_NAME, __LINE__, (M2MString *)"Failed to set temp store");
 		}
 	return result;
 	}

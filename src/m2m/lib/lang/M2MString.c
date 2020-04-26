@@ -1351,6 +1351,7 @@ uint32_t M2MString_convertFromStringToUnsignedLong (const M2MString *string, con
  * @param[in] number		conversion target number
  * @param[out] buffer		Buffer for copying unsigned integer string
  * @param[in] bufferLength	Length of Buffer[Byte]
+ * @return					Converted number string or NULL (in case of error)
  */
 M2MString *M2MString_convertFromUnsignedIntegerToString (const uint32_t number, M2MString *buffer, const size_t bufferLength)
 	{
