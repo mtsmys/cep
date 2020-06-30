@@ -46,6 +46,7 @@ extern "C"
 #include "m2m/lib/log/M2MFileAppender.h"
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <sqlite3.h>
 
@@ -63,7 +64,12 @@ extern "C"
 
 
 /**
- * String indicating SQLite3 database directory permission(="0755")
+ * String indicating SQLite3 database directory permission(="0755").
+ * "0755" means below.
+ *
+ * owner : available all
+ * group : available read and execute
+ * others: available read and execute
  */
 #ifndef M2MSQLite_DATABASE_DIRECTORY_PERMISSION
 #define M2MSQLite_DATABASE_DIRECTORY_PERMISSION (M2MString *)"0755"
@@ -219,6 +225,15 @@ bool M2MSQLite_setAutoVacuum (sqlite3 *database, const bool flag);
 
 
 /**
+ *
+ * @param[in] database	SQLite3 database object to set cache size
+ * @param cacheSize
+ * @return				true: success, false: failure
+ */
+bool M2MSQLite_setCacheSize (sqlite3 *database, const uint32_t cacheSize);
+
+
+/**
  * Set the synchronous mode of the SQLite 3 database.<br>
  *
  * @param[in] database		SQLite3 database object to be set synchronous mode
@@ -226,6 +241,14 @@ bool M2MSQLite_setAutoVacuum (sqlite3 *database, const bool flag);
  * @return					true: success, false: failure
  */
 bool M2MSQLite_setSynchronous (sqlite3 *database, const bool synchronous);
+
+
+/**
+ *
+ * @param[in] database		SQLite3 database object to be set temporary store
+ * @return					true: success, false: failure
+ */
+bool M2MSQLite_setTempStore (sqlite3 *database);
 
 
 /**
