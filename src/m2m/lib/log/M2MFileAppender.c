@@ -42,6 +42,15 @@
 static M2MLogger *this_getSuper (const M2MFileAppender *self);
 
 
+/**
+ * This method translates max file size string to number.<br>
+ *
+ * @param[in] maxFileSizeString	max file size string
+ * @return						number of max file size[Byte]
+ */
+static uint32_t this_translateMaxFileSize (const M2MString *maxFileSizeString);
+
+
 
 /*******************************************************************************
  * Private method
@@ -203,7 +212,7 @@ static bool this_needToEncoding (const M2MFileAppender *self)
  * @param[in,out] self
  * @param[in] json
  * @return
- *
+ */
 static M2MFileAppender *this_parseJSON (M2MFileAppender *self, M2MJSON *json)
 	{
 	//========== Variable ==========
@@ -227,23 +236,23 @@ static M2MFileAppender *this_parseJSON (M2MFileAppender *self, M2MJSON *json)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"JSON\" includes error configuration");
+			M2MLogger_error(NULL, (M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"JSON\" includes error configuration");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else if (self==NULL)
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
+		M2MLogger_error(NULL, (M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"M2MFileAppender\" is NULL");
 		return NULL;
 		}
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
+		M2MLogger_error(NULL, (M2MString *)"M2MFileAppender.this_parseJSON()", __LINE__, (M2MString *)"Argument \"JSON\" is NULL");
 		return NULL;
 		}
 	}
-*/
+
 
 /**
  * @param[in] parentDirectoryPath
@@ -970,7 +979,7 @@ void M2MLogger_fatalImpl (M2MFileAppender *self, const M2MString *functionName, 
 		if (M2MLogger_createNewLogMessage(M2MLogLevel_FATAL, functionName, lineNumber, message, &log)!=NULL)
 			{
 			//===== Write log =====
-			M2MSystem_println(log);
+			M2MSystem_errPrintln(log);
 			M2MHeap_free(log);
 			}
 		//===== Error handling =====
@@ -1023,7 +1032,7 @@ void M2MLogger_errorImpl (M2MFileAppender *self, const M2MString *functionName, 
 		if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &log)!=NULL)
 			{
 			//===== Write log =====
-			M2MSystem_println(log);
+			M2MSystem_errPrintln(log);
 			M2MHeap_free(log);
 			}
 		//===== Error handling =====
@@ -1428,7 +1437,7 @@ M2MFileAppender *M2MFileAppender_new ()
 /**
  * @param[in] jsonFilePath	configuration file path
  * @return					logging object or NULL(error happened)
- *
+ */
 M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 	{
 	//========== Variable ==========
@@ -1442,7 +1451,7 @@ M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 		if ((json=M2MJSONParser_parseFile(jsonFilePath))!=NULL)
 			{
 			//===== Create new logging object =====
-			if ((self=M2MFileAppender_createNewFileAppender())!=NULL)
+			if ((self=M2MFileAppender_new())!=NULL)
 				{
 				//===== Parse JSON object for configuration =====
 				if (this_parseJSON(self, json)!=NULL)
@@ -1453,7 +1462,7 @@ M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to parse \"JSON\" object for configure \"M2MFileAppender\" object");
+					M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to parse \"JSON\" object for configure \"M2MFileAppender\" object");
 					M2MJSON_delete(&json);
 					M2MFileAppender_delete(&self);
 					return NULL;
@@ -1462,7 +1471,7 @@ M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" object");
+				M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" object");
 				M2MJSON_delete(&json);
 				return NULL;
 				}
@@ -1470,25 +1479,25 @@ M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to parse argument \"jsonFilePath\" configuration file");
+			M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Failed to parse argument \"jsonFilePath\" configuration file");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Argument \"jsonFilePath\" string is NULL");
+		M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONFile()", __LINE__, (M2MString *)"Argument \"jsonFilePath\" string is NULL");
 		return NULL;
 		}
 	}
-*/
+
 
 /**
  * This method parses JSON format string for constructing FileAppendar object.<br>
  *
  * @param[in] jsonString	JSON format configuration string
  * @return					new created logging object or NULL(means error)
- *
+ */
 M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 	{
 	//========== Variable ==========
@@ -1502,7 +1511,7 @@ M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 		if ((json=M2MJSONParser_parseString(jsonString))!=NULL)
 			{
 			//===== Create new logging object =====
-			if ((self=M2MFileAppender_createNewFileAppender())!=NULL)
+			if ((self=M2MFileAppender_new())!=NULL)
 				{
 				//===== Parse JSON object for configuration =====
 				if (this_parseJSON(self, json)!=NULL)
@@ -1513,7 +1522,7 @@ M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 				//===== Error handling =====
 				else
 					{
-					M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to parse JSON object for configure \"M2MFileAppender\" object");
+					M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to parse JSON object for configure \"M2MFileAppender\" object");
 					M2MJSON_delete(&json);
 					M2MFileAppender_delete(&self);
 					return NULL;
@@ -1522,7 +1531,7 @@ M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 			//===== Error handling =====
 			else
 				{
-				M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" object");
+				M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to allocate new memory for creating \"M2MFileAppender\" object");
 				M2MJSON_delete(&json);
 				return NULL;
 				}
@@ -1530,18 +1539,18 @@ M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString)
 		//===== Error handling =====
 		else
 			{
-			M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to parse argument \"jsonString\"");
+			M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Failed to parse argument \"jsonString\"");
 			return NULL;
 			}
 		}
 	//===== Argument error =====
 	else
 		{
-		M2MLogger_printErrorMessage((M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Argument \"jsonString\" is NULL");
+		M2MLogger_error(NULL, (M2MString *)"M2MFileAppender_parseJSONString()", __LINE__, (M2MString *)"Argument \"jsonString\" is NULL");
 		return NULL;
 		}
 	}
-*/
+
 
 /**
  * @param[in,out] self			File logging structure object

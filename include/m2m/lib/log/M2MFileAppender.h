@@ -42,6 +42,9 @@ extern "C"
 
 
 #include "m2m/M2MSystem.h"
+#include "m2m/lib/json/M2MJSON.h"
+#include "m2m/lib/json/M2MJSONParser.h"
+#include "m2m/lib/json/M2MJSONPointer.h"
 #include "m2m/lib/io/M2MDirectory.h"
 #include "m2m/lib/io/M2MFile.h"
 #include "m2m/lib/io/M2MHeap.h"
@@ -49,6 +52,7 @@ extern "C"
 #include "m2m/lib/log/M2MLogger.h"
 #include "m2m/lib/log/M2MLogLevel.h"
 #include "m2m/lib/util/list/M2MList.h"
+
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -262,18 +266,18 @@ M2MFileAppender *M2MFileAppender_new ();
  *
  * @param[in] jsonFilePath	configuration file path
  * @return					logger object or NULL(error happened)
- *
+ */
 M2MFileAppender *M2MFileAppender_parseJSONFile (const M2MString *jsonFilePath);
-*/
+
 
 /**
  * This method parses JSON format string for constructing FileAppendar object.<br>
  *
  * @param[in] jsonString	JSON format configuration string
  * @return					new created logging object or NULL(means error)
- *
+ */
 M2MFileAppender *M2MFileAppender_parseJSONString (const M2MString *jsonString);
-*/
+
 
 /**
  * @param[in] self

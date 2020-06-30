@@ -87,11 +87,19 @@ unsigned char *M2MSystem_getThreadIDString (unsigned char *buffer, const size_t 
 
 
 /**
+ * Print out a line to the "standard" error output stream.<br>
+ *
+ * @param[in] data	Output data
+ */
+void M2MSystem_errPrintln (const unsigned char *data);
+
+
+/**
  * Print out a line to the "standard" output stream.<br>
  *
  * @param[in] data	Output data
  */
-void M2MSystem_println (const unsigned char *data);
+void M2MSystem_outPrintln (const unsigned char *data);
 
 
 

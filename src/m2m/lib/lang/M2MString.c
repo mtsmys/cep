@@ -367,7 +367,7 @@ static void this_printErrorMessage (const M2MString *functionName, const uint32_
 	if (this_createNewLogMessage(functionName, lineNumber, message, &logMessage)!=NULL)
 		{
 		//===== Print out log =====
-		M2MSystem_println(logMessage);
+		M2MSystem_errPrintln(logMessage);
 		//===== Release allocated memory =====
 		M2MHeap_free(logMessage);
 		}
@@ -1147,6 +1147,40 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 		{
 		this_printErrorMessage(__func__, __LINE__, (M2MString *)"Argument error! Indicated \"string\" pointer is NULL");
 		return NULL;
+		}
+	}
+
+
+/**
+ * @param[in] string
+ * @return
+ */
+bool M2MString_convertFromStringToBoolean (const M2MString *string)
+	{
+	//========== Variable ==========
+	M2MString upperCaseValue[8];
+
+	//===== Check argument =====
+	if (string!=NULL)
+		{
+		//===== Convert into upper case =====
+		memset(upperCaseValue, 0, sizeof(upperCaseValue));
+		M2MString_toUpperCase(string, upperCaseValue, sizeof(upperCaseValue));
+		//=====  =====
+		if (M2MString_compareTo((M2MString *)"TRUE", upperCaseValue)==0)
+			{
+			return true;
+			}
+		//===== In case of no-append =====
+		else
+			{
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return false;
 		}
 	}
 

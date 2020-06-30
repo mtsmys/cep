@@ -282,7 +282,7 @@ static void this_printErrorMessage (const M2MString *functionName, const uint32_
 	if (this_createNewLogMessage(functionName, lineNumber, message, &logMessage)!=NULL)
 		{
 		//===== Print out log =====
-		M2MSystem_println(logMessage);
+		M2MSystem_errPrintln(logMessage);
 		//===== Release allocated memory =====
 		M2MHeap_free(logMessage);
 		}

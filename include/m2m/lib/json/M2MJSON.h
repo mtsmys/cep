@@ -41,12 +41,14 @@ extern "C"
 
 
 
+#include "m2m/M2MSystem.h"
+#include "m2m/lib/time/M2MDate.h"
 #include "m2m/lib/io/M2MHeap.h"
+#include "m2m/lib/log/M2MLogLevel.h"
 #include "m2m/lib/json/M2MJSONType.h"
-#include "m2m/lib/security/M2MCRC32.h"
 #include "m2m/lib/lang/M2MString.h"
-#include "m2m/lib/log/M2MLogger.h"
-#include "m2m/lib/log/M2MFileAppender.h"
+#include "m2m/lib/security/M2MCRC32.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>

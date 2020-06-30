@@ -398,6 +398,13 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 
 
 /**
+ * @param[in] string
+ * @return
+ */
+bool M2MString_convertFromStringToBoolean (const M2MString *string);
+
+
+/**
  * Convert the argument string to double number.<br>
  *
  * @param[in] string		String indicating double integer
