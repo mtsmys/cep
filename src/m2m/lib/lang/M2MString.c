@@ -1152,6 +1152,40 @@ M2MString *M2MString_convertFromSignedLongToString (const signed long number, M2
 
 
 /**
+ * @param[in] string
+ * @return
+ */
+bool M2MString_convertFromStringToBoolean (const M2MString *string)
+	{
+	//========== Variable ==========
+	M2MString upperCaseValue[8];
+
+	//===== Check argument =====
+	if (string!=NULL)
+		{
+		//===== Convert into upper case =====
+		memset(upperCaseValue, 0, sizeof(upperCaseValue));
+		M2MString_toUpperCase(string, upperCaseValue, sizeof(upperCaseValue));
+		//=====  =====
+		if (M2MString_compareTo((M2MString *)"TRUE", upperCaseValue)==0)
+			{
+			return true;
+			}
+		//===== In case of no-append =====
+		else
+			{
+			return false;
+			}
+		}
+	//===== Argument error =====
+	else
+		{
+		return false;
+		}
+	}
+
+
+/**
  * Convert the argument string to double number.<br>
  *
  * @param[in] string		String indicating double integer

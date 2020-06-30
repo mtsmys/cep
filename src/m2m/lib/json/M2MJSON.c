@@ -103,6 +103,12 @@ static M2MJSONObject *this_getSameIndexPrevious (const M2MJSONObject *object);
 
 
 /**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ();
+
+
+/**
  * Display the debug level log message in standard out.
  *
  * @param[in] functionName		String indicating function name
@@ -228,6 +234,183 @@ static M2MJSONObjectTable *this_createNewJSONObjectTable ()
 	else
 		{
 		this_printErrorMessage(METHOD_NAME, __LINE__, (M2MString *)"Failed to allocate new memory for creating \"JSONObjectTable\" object");
+		return NULL;
+		}
+	}
+/**
+ * Copy the log message to the argument "buffer" pointer.<br>
+ * Buffering of array for copying is executed inside the function.<br>
+ * Therefore, it is necessary for caller to call the "M2MHeap_free()" function <br>
+ * in order to prevent memory leak after using the variable.<br>
+ *
+ * @param[in] logLevel			Log level
+ * @param[in] functionName		String indicating function name
+ * @param[in] lineNumber		Line number in source file (can be embedded with "__LINE__")
+ * @param[in] message			Message string
+ * @param[out] buffer			Buffer to copy the created log message
+ * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
+ */
+static M2MString *this_createNewLogMessage (const M2MLogLevel logLevel, const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
+	{
+	//========== Variable ==========
+	M2MString *logLevelString = NULL;
+	M2MString time[64];
+	M2MString lineNumberString[16];
+	M2MString errnoMessage[256];
+	M2MString threadID[128];
+	size_t functionNameLength = 0;
+	size_t messageLength = 0;
+
+	//===== Check argument =====
+	if ((logLevelString=M2MLogLevel_toString (logLevel))!=NULL
+			&& functionName!=NULL && (functionNameLength=M2MString_length(functionName))>0
+			&& message!=NULL && (messageLength=M2MString_length(message))>0
+			&& buffer!=NULL)
+		{
+		//===== Get line number string =====
+		memset(lineNumberString, 0, sizeof(lineNumberString));
+		snprintf(lineNumberString, sizeof(lineNumberString)-1, (M2MString *)"%d", lineNumber);
+		//===== Initialize array =====
+		memset(time, 0, sizeof(time));
+		//===== Get current time string from local calendar ======
+		if (M2MDate_getLocalTimeString(time, sizeof(time))>0
+				&& M2MSystem_getThreadIDString(threadID, sizeof(threadID))!=NULL)
+			{
+			//===== In the case of existing error number =====
+			if (errno!=0 && strerror_r(errno, errnoMessage, sizeof(errnoMessage))==0)
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+//						&& M2MString_append(buffer, errnoMessage)!=NULL
+//						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+//						&& M2MString_append(buffer, M2MString_SPACE)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
+			//===== In the case of not existing error number =====
+			else
+				{
+				//===== Create new log message string =====
+				if (M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, time)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, logLevelString)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"tid=")!=NULL
+						&& M2MString_append(buffer, threadID)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, functionName)!=NULL
+						&& M2MString_append(buffer, M2MString_COLON)!=NULL
+						&& M2MString_append(buffer, lineNumberString)!=NULL
+						&& M2MString_append(buffer, (M2MString *)"l")!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+
+						&& M2MString_append(buffer, M2MString_LEFT_SQUARE_BRACKET)!=NULL
+						&& M2MString_append(buffer, message)!=NULL
+						&& M2MString_append(buffer, M2MString_RIGHT_SQUARE_BRACKET)!=NULL
+						)
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					//===== Return created log message string =====
+					return (*buffer);
+					}
+				//===== Error handling =====
+				else if ((*buffer)!=NULL)
+					{
+					//===== Release allocated memory =====
+					M2MHeap_free((*buffer));
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				else
+					{
+					//===== Initialize error number =====
+					this_initErrorNumber();
+					return NULL;
+					}
+				}
+			}
+		//===== Error handling =====
+		else
+			{
+			//===== Initialize error number =====
+			this_initErrorNumber();
+			return NULL;
+			}
+		}
+	//===== Argument error =====
+	else if (logLevelString==NULL)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (functionName==NULL || functionNameLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else if (message==NULL || messageLength<=0)
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
+		return NULL;
+		}
+	else
+		{
+		//===== Initialize error number =====
+		this_initErrorNumber();
 		return NULL;
 		}
 	}
@@ -662,6 +845,16 @@ static void this_increaseObjectTableCounter (M2MJSONObjectTable *table)
 
 
 /**
+ * Initialize "errorno" variable.<br>
+ */
+static void this_initErrorNumber ()
+	{
+	errno = 0;
+	return;
+	}
+
+
+/**
  * This method checks indicated object(connection) is empty or not.<br>
  *
  * @param[in] object	JSON Object object
@@ -718,7 +911,7 @@ static void this_printDebugMessage (const M2MString *functionName, const uint32_
 	M2MString *logMessage = NULL;
 
 	//===== Create new log message =====
-	if (M2MLogger_createNewLogMessage(M2MLogLevel_DEBUG, functionName, lineNumber, message, &logMessage)!=NULL)
+	if (this_createNewLogMessage(M2MLogLevel_DEBUG, functionName, lineNumber, message, &logMessage)!=NULL)
 		{
 		//===== Print out log =====
 		M2MSystem_outPrintln(logMessage);
@@ -746,7 +939,7 @@ static void this_printErrorMessage (const M2MString *functionName, const uint32_
 	M2MString *logMessage = NULL;
 
 	//===== Create new log message =====
-	if (M2MLogger_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &logMessage)!=NULL)
+	if (this_createNewLogMessage(M2MLogLevel_ERROR, functionName, lineNumber, message, &logMessage)!=NULL)
 		{
 		//===== Print out log =====
 		M2MSystem_errPrintln(logMessage);
