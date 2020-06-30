@@ -229,7 +229,8 @@ static M2MFileAppender *this_parseJSON (M2MFileAppender *self, M2MJSON *json)
 				&& M2MFileAppender_setLogLevel(self, M2MLogLevel_translateString(M2MJSON_getString(M2MJSONPointer_evaluate(json, (unsigned char *)"\"/Logger/Level\""))))!=NULL
 				&& (maxBackupIndex = M2MJSON_getString(M2MJSONPointer_evaluate(json, (unsigned char *)"\"/FileAppender/MaxBackupIndex\"")))!=NULL
 				&& M2MFileAppender_setMaxBackupIndex(self, M2MString_convertFromStringToUnsignedInteger(maxBackupIndex, M2MString_length(maxBackupIndex)))!=NULL
-				&& M2MFileAppender_setMaxFileSize(self, this_translateMaxFileSize(M2MJSON_getString(M2MJSONPointer_evaluate(json, (unsigned char *)"\"/FileAppender/MaxFileSize\""))))!=NULL)
+				&& M2MFileAppender_setMaxFileSize(self, M2MJSON_getString(M2MJSONPointer_evaluate(json, (unsigned char *)"\"/FileAppender/MaxFileSize\"")))!=NULL
+				)
 			{
 			return self;
 			}
