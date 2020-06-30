@@ -626,6 +626,7 @@ M2MJSON *M2MJSONPatch_add (M2MJSON *json, const M2MString *path, const M2MJSON *
 					&& (parentPathLength=M2MString_length(decodedPath)-M2MString_length(lastIndex))>0
 					&& memcpy(&parentPath[0], &decodedPath[0], parentPathLength)!=NULL)
 				{
+				return
 				}
 			//===== Error handling =====
 			else
@@ -686,6 +687,7 @@ M2MJSON *M2MJSONPatch_copy (M2MJSON *json, const M2MString *from, const M2MStrin
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, decodedPath, sizeof(decodedPath))!=NULL)
 			{
+			return
 			}
 		//===== Error handling =====
 		else
@@ -937,6 +939,7 @@ M2MJSON *M2MJSONPatch_replace (M2MJSON *json, const M2MString *path, const M2MJS
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
+			return
 			}
 		//===== Error handling =====
 		else
@@ -989,6 +992,7 @@ bool M2MJSONPatch_test (M2MJSON *json, const M2MString *path, const M2MJSON *val
 		//===== Decode JSON Pointer path =====
 		if (M2MJSONPointer_decodePath(path, DECODED_PATH, sizeof(DECODED_PATH))!=NULL)
 			{
+			return
 			}
 		//===== Error handling =====
 		else
