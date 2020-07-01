@@ -133,7 +133,13 @@ static void this_printErrorMessage (const M2MString *functionName, const uint32_
  * @param[out] buffer			Buffer to copy the created log message
  * @return						The pointer of "buffer" copied the created log message string or NULL (in case of error)
  */
-M2MString *M2MLogger_createNewLogMessage (const M2MLogLevel logLevel, const M2MString *functionName, const uint32_t lineNumber, const M2MString *message, M2MString **buffer)
+M2MString *M2MLogger_createNewLogMessage (
+		const M2MLogLevel logLevel,
+		const M2MString *functionName,
+		const uint32_t lineNumber,
+		const M2MString *message,
+		M2MString **buffer
+		)
 	{
 	//========== Variable ==========
 	M2MString *logLevelString = NULL;
