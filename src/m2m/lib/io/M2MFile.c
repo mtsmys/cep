@@ -1025,6 +1025,15 @@ unsigned long M2MFile_read (const M2MFile *self, unsigned char **data)
 	//===== Check argument =====
 	if (self!=NULL && data!=NULL)
 		{
+		//===== In case of closing descriptor =====
+		if (M2MFile_isClosed(self)==true)
+			{
+			//===== Open the file =====
+			M2MFile_open((M2MFile *)self);
+			}
+		else
+			{
+			}
 		//===== Allocate new memory for copying read data =====
 		if ((fileDescriptor=M2MFile_getFileDescriptor(self))>0
 				&& (fileSize=M2MFile_length(self))>0
