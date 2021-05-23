@@ -5,7 +5,7 @@
  * All rights reserved.
  ******************************************************************************/
 
-#include "m2m/app/cep/M2MCEP.h"
+#include "m2m/cep/M2MCEP.h"
 #include <inttypes.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/Console.h>
@@ -120,7 +120,7 @@ static void this_testSetVacuumRecord ()
  * @param argc
  * @param argv
  * @return
- */
+ *
 int main (int argc, char **argv)
 	{
 	//========== Variable ==========
@@ -150,6 +150,8 @@ int main (int argc, char **argv)
 
 	return 0;
 	}
+*/
+
 
 
 /* End Of File */

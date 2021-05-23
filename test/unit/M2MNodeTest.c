@@ -6,7 +6,7 @@
  ******************************************************************************/
 
 #include "m2m/lib/db/M2MSQLite.h"
-#include "m2m/app/graph/M2MNode.h"
+#include "m2m/graph/M2MNode.h"
 #include <inttypes.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/Console.h>

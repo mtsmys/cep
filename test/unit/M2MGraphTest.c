@@ -5,7 +5,7 @@
  * All rights reserved.
  ******************************************************************************/
 
-#include "m2m/app/graph/M2MGraph.h"
+#include "m2m/graph/M2MGraph.h"
 #include <inttypes.h>
 #include <CUnit/CUnit.h>
 #include <CUnit/Console.h>

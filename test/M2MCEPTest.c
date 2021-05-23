@@ -5,7 +5,7 @@
  * All rights reserved.
  ******************************************************************************/
 
-#include "m2m/app/cep/M2MCEP.h"
+#include "m2m/cep/M2MCEP.h"
 #include "m2m/lib/db/M2MTableManager.h"
 #include "m2m/lib/db/M2MColumnList.h"
 #include "m2m/lib/lang/M2MString.h"
