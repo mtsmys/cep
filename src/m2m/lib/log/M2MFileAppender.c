@@ -516,7 +516,7 @@ static void this_updateExistingLogFiles (M2MFileAppender *self)
 					{
 					numberOfArray = 0;
 					//===== Loop while existing files =====
-					while (M2MList_next(fileNameList)!=NULL)
+					while (fileNameList->next!=NULL)
 						{
 						//===== In the case of detected target file name =====
 						if ((fileName=(M2MString *)M2MList_getValue(fileNameList))!=NULL

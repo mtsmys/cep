@@ -1367,7 +1367,7 @@ static int this_insertRecordList (sqlite3 *database, const M2MDataFrame *record,
 			//===== Reset parameters of SQL statement =====
 			sqlite3_reset(statement);
 			//===== Repeat with uninserted record information object =====
-			while (M2MList_next(recordList)!=NULL)
+			while (recordList->next!=NULL)
 				{
 				//===== Create an INSERT statement =====
 				if ((value=(M2MString *)M2MList_getValue(recordList))!=NULL)

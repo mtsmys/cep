@@ -495,35 +495,26 @@ void M2MList_delete (M2MList *self)
 	M2MList *next = NULL;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_delete()";
 
-	//===== Check argument =====
-	if (self!=NULL)
+	//===== Get first node =====
+	if ((self=M2MList_begin(self))!=NULL)
 		{
-		//===== Get first node =====
-		if ((self=M2MList_begin(self))!=NULL)
+		//===== Repeat until reaching the end node =====
+		while ((next=M2MList_next(self))!=self)
 			{
-			//===== Repeat until reaching the end node =====
-			while ((next=M2MList_next(self))!=NULL)
-				{
-				//===== Delete a node of list structure object =====
-				this_deleteValue(self);
-				M2MHeap_free(self);
-				//===== Move to the next node =====
-				self = next;
-				}
-			//===== Delete the end node =====
+			//===== Delete a node of list structure object =====
 			this_deleteValue(self);
 			M2MHeap_free(self);
+			//===== Move to the next node =====
+			self = next;
 			}
-		//===== Error handling =====
-		else
-			{
-			this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
-			}
+		//===== Delete the end node =====
+		this_deleteValue(self);
+		M2MHeap_free(self);
 		}
-	//===== Argument error =====
+	//===== Error handling =====
 	else
 		{
-		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Failed to get the begin node of M2MList object");
 		}
 	return;
 	}
@@ -539,7 +530,8 @@ void M2MList_delete (M2MList *self)
 M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 	{
 	//========== Variable ==========
-	unsigned int position = 0;
+	unsigned int i = 0;
+	unsigned int listLength = 0;
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_detect()";
 
 	//===== Check argument =====
@@ -548,11 +540,13 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 		//===== Get the first node of the list structure object =====
 		if ((self=M2MList_begin(self))!=NULL)
 			{
+			//=====  =====
+			listLength = M2MList_length(self);
 			//===== Repeat until reaching the end node =====
-			while (self!=NULL)
+			for (i=0; i<listLength; i++)
 				{
 				//===== Check index number matching =====
-				if (index==position)
+				if (index==i)
 					{
 					return self;
 					}
@@ -561,8 +555,6 @@ M2MList *M2MList_detect (M2MList *self, const unsigned int index)
 					{
 					//===== Move to next node of list structure =====
 					self = M2MList_next(self);
-					//===== Increment index number =====
-					position++;
 					}
 				}
 			return self;
@@ -603,7 +595,7 @@ M2MList *M2MList_end (M2MList *self)
 	if (self!=NULL)
 		{
 		//===== Repeat until reaching the end node =====
-		while (M2MList_next(self)!=NULL)
+		while (self->next!=NULL)
 			{
 			self = M2MList_next(self);
 			}
@@ -687,7 +679,7 @@ bool M2MList_isEmpty (M2MList *self)
 		if ((self=M2MList_begin(self))!=NULL)
 			{
 			//===== Repeat until moving to the end node =====
-			while (M2MList_next(self)!=NULL)
+			while (self->next!=NULL)
 				{
 				//===== Confirm existence of value =====
 				if (M2MList_getValue(self)!=NULL)
@@ -758,7 +750,7 @@ unsigned int M2MList_length (M2MList *self)
 				// do nothing
 				}
 			//===== Confirm existence of value =====
-			while (M2MList_next(self)!=NULL)
+			while (self->next!=NULL)
 				{
 				//===== Confirm existence of value =====
 				if (M2MList_getValue(self)!=NULL)
@@ -797,7 +789,7 @@ unsigned int M2MList_length (M2MList *self)
  * Return a list structure object located after the argument one.<br>
  *
  * @param[in] self	List structure object
- * @return next 	List structure object located behind or NULL (if the position of argument node is end)
+ * @return next 	List structure object located behind or "self" (if the position of argument node is end)
  */
 M2MList *M2MList_next (const M2MList *self)
 	{
@@ -805,15 +797,20 @@ M2MList *M2MList_next (const M2MList *self)
 	const M2MString *FUNCTION_NAME = (M2MString *)"M2MList_next()";
 
 	//===== Check argument =====
-	if (self!=NULL)
+	if (self!=NULL && self->next!=NULL)
 		{
 		return self->next;
 		}
 	//===== Argument error =====
-	else
+	else if (self==NULL)
 		{
 		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Argument error! Indicated \"self\" object is NULL");
 		return NULL;
+		}
+	else
+		{
+		this_printErrorMessage(FUNCTION_NAME, __LINE__, (M2MString *)"Indicated \"self\" object is in terminal position");
+		return self;
 		}
 	}
 
@@ -940,7 +937,7 @@ M2MList *M2MList_remove (M2MList *self)
 			if (M2MList_previous(self)==self)
 				{
 				//===== Get next node =====
-				if ((next=M2MList_next(self))!=NULL)
+				if ((next=M2MList_next(self))!=self)
 					{
 					//===== Remove the first node from the link =====
 					this_setPrevious(next, next);
@@ -956,7 +953,7 @@ M2MList *M2MList_remove (M2MList *self)
 					}
 				}
 			//===== When it is an end node =====
-			else if (M2MList_next(self)==NULL)
+			else if (self->next==NULL)
 				{
 				//===== Get the previous node =====
 				if ((previous=M2MList_previous(self))!=NULL)
@@ -978,8 +975,8 @@ M2MList *M2MList_remove (M2MList *self)
 			else
 				{
 				//===== Get previous and next node =====
-				if ((previous = M2MList_previous(self))!=NULL
-						&& (next = M2MList_next(self))!=NULL)
+				if ((previous=M2MList_previous(self))!=NULL
+						&& (next=M2MList_next(self))!=self)
 					{
 					//===== Connect previous node and next node each other =====
 					this_setNext(previous, next);
