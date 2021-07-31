@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_APP_GRAPH_M2MGRAPH_H_
-#define M2M_APP_GRAPH_M2MGRAPH_H_
+#ifndef M2M_GRAPH_M2MGRAPH_H_
+#define M2M_GRAPH_M2MGRAPH_H_
 
 
 
@@ -152,4 +152,4 @@ M2MGraph *M2MGraph_new (const M2MString *sqliteFilePath);
 
 
 
-#endif /* M2M_DB_GRAPH_M2MGRAPH_H_ */
+#endif /* M2M_GRAPH_M2MGRAPH_H_ */

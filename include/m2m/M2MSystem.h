@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_LIB_M2MSYSTEM_H_
-#define M2M_LIB_M2MSYSTEM_H_
+#ifndef M2M_M2MSYSTEM_H_
+#define M2M_M2MSYSTEM_H_
 
 
 #include <inttypes.h>

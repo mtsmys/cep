@@ -29,8 +29,8 @@
 
 #pragma once
 
-#ifndef M2M_APP_CEP_M2MDATAFRAME_H_
-#define M2M_APP_CEP_M2MDATAFRAME_H_
+#ifndef M2M_CEP_M2MDATAFRAME_H_
+#define M2M_CEP_M2MDATAFRAME_H_
 
 
 #include "m2m/lib/lang/M2MString.h"
